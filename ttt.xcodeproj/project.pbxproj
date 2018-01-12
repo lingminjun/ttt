@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A466CFF86FB13BD221AC4E61 /* Pods_ttt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */; };
+		D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7842008694200E3F0C5 /* MMFetchRealm.swift */; };
+		D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7852008694200E3F0C5 /* MMFetchList.swift */; };
+		D958F78B2008694200E3F0C5 /* MMFetchRLMResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7862008694200E3F0C5 /* MMFetchRLMResults.swift */; };
+		D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7872008694200E3F0C5 /* MMUIController.swift */; };
+		D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7882008694200E3F0C5 /* MMFetchsController.swift */; };
+		D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F78E2008694900E3F0C5 /* DemoListController.swift */; };
+		D9917D2A20089F56003682AD /* Dog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9917D2920089F56003682AD /* Dog.swift */; };
+		D9917D2C2008AF73003682AD /* DogCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9917D2B2008AF73003682AD /* DogCell.swift */; };
 		D9FDDBB42008672200A88631 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FDDBB32008672200A88631 /* AppDelegate.swift */; };
 		D9FDDBB62008672200A88631 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FDDBB52008672200A88631 /* ViewController.swift */; };
 		D9FDDBB92008672200A88631 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9FDDBB72008672200A88631 /* Main.storyboard */; };
@@ -15,6 +24,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.release.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.release.xcconfig"; sourceTree = "<group>"; };
+		35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ttt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		91BE48983675DDBC97B96407 /* Pods-ttt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.debug.xcconfig"; sourceTree = "<group>"; };
+		D958F7842008694200E3F0C5 /* MMFetchRealm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchRealm.swift; sourceTree = "<group>"; };
+		D958F7852008694200E3F0C5 /* MMFetchList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchList.swift; sourceTree = "<group>"; };
+		D958F7862008694200E3F0C5 /* MMFetchRLMResults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchRLMResults.swift; sourceTree = "<group>"; };
+		D958F7872008694200E3F0C5 /* MMUIController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMUIController.swift; sourceTree = "<group>"; };
+		D958F7882008694200E3F0C5 /* MMFetchsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchsController.swift; sourceTree = "<group>"; };
+		D958F78E2008694900E3F0C5 /* DemoListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoListController.swift; sourceTree = "<group>"; };
+		D9917D2920089F56003682AD /* Dog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dog.swift; sourceTree = "<group>"; };
+		D9917D2B2008AF73003682AD /* DogCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogCell.swift; sourceTree = "<group>"; };
 		D9FDDBB02008672200A88631 /* ttt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ttt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FDDBB32008672200A88631 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D9FDDBB52008672200A88631 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -29,17 +49,67 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A466CFF86FB13BD221AC4E61 /* Pods_ttt.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9CD8BB8DCB33173D4806A84C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C8CA86FA06B9EA82C8B78A6C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				91BE48983675DDBC97B96407 /* Pods-ttt.debug.xcconfig */,
+				358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		D958F781200868FC00E3F0C5 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				D958F7832008690800E3F0C5 /* demo */,
+				D958F7822008690300E3F0C5 /* ui */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+		D958F7822008690300E3F0C5 /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				D958F7852008694200E3F0C5 /* MMFetchList.swift */,
+				D958F7842008694200E3F0C5 /* MMFetchRealm.swift */,
+				D958F7862008694200E3F0C5 /* MMFetchRLMResults.swift */,
+				D958F7882008694200E3F0C5 /* MMFetchsController.swift */,
+				D958F7872008694200E3F0C5 /* MMUIController.swift */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
+		D958F7832008690800E3F0C5 /* demo */ = {
+			isa = PBXGroup;
+			children = (
+				D958F78E2008694900E3F0C5 /* DemoListController.swift */,
+				D9917D2920089F56003682AD /* Dog.swift */,
+			);
+			path = demo;
+			sourceTree = "<group>";
+		};
 		D9FDDBA72008672200A88631 = {
 			isa = PBXGroup;
 			children = (
 				D9FDDBB22008672200A88631 /* ttt */,
 				D9FDDBB12008672200A88631 /* Products */,
+				C8CA86FA06B9EA82C8B78A6C /* Pods */,
+				9CD8BB8DCB33173D4806A84C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -54,12 +124,14 @@
 		D9FDDBB22008672200A88631 /* ttt */ = {
 			isa = PBXGroup;
 			children = (
+				D958F781200868FC00E3F0C5 /* core */,
 				D9FDDBB32008672200A88631 /* AppDelegate.swift */,
 				D9FDDBB52008672200A88631 /* ViewController.swift */,
 				D9FDDBB72008672200A88631 /* Main.storyboard */,
 				D9FDDBBA2008672200A88631 /* Assets.xcassets */,
 				D9FDDBBC2008672200A88631 /* LaunchScreen.storyboard */,
 				D9FDDBBF2008672200A88631 /* Info.plist */,
+				D9917D2B2008AF73003682AD /* DogCell.swift */,
 			);
 			path = ttt;
 			sourceTree = "<group>";
@@ -71,9 +143,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = D9FDDBC22008672200A88631 /* Build configuration list for PBXNativeTarget "ttt" */;
 			buildPhases = (
+				69C520892AC97F60B60557F2 /* [CP] Check Pods Manifest.lock */,
 				D9FDDBAC2008672200A88631 /* Sources */,
 				D9FDDBAD2008672200A88631 /* Frameworks */,
 				D9FDDBAE2008672200A88631 /* Resources */,
+				D9DA05C448DD850D753D2FE1 /* [CP] Embed Pods Frameworks */,
+				CAA5543ADA1DF210C4A94982 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -131,12 +206,76 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		69C520892AC97F60B60557F2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ttt-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CAA5543ADA1DF210C4A94982 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ttt/Pods-ttt-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D9DA05C448DD850D753D2FE1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-ttt/Pods-ttt-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
+				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-ttt/Pods-ttt-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		D9FDDBAC2008672200A88631 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */,
+				D958F78B2008694200E3F0C5 /* MMFetchRLMResults.swift in Sources */,
+				D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */,
+				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
+				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
+				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
+				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,
+				D9917D2C2008AF73003682AD /* DogCell.swift in Sources */,
 				D9FDDBB42008672200A88631 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -272,6 +411,7 @@
 		};
 		D9FDDBC32008672200A88631 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 91BE48983675DDBC97B96407 /* Pods-ttt.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -282,11 +422,13 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "$(PODS_ROOT)/**";
 			};
 			name = Debug;
 		};
 		D9FDDBC42008672200A88631 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -297,6 +439,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "$(PODS_ROOT)/**";
 			};
 			name = Release;
 		};
