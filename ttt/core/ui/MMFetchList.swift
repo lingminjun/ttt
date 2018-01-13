@@ -32,7 +32,7 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
     override public func update(_ idx: Int, _ b: (() throws -> Void)?) {
         guard let obj = self[idx] else {return}
         _listener?.ssn_fetch_begin_change(self)
-        _listener?.ssn_fetch(self,didChange: obj, at:idx, for: MMFetchChangeType.insert, newIndex:idx)
+        _listener?.ssn_fetch(self,didChange: obj, at:idx, for: MMFetchChangeType.update, newIndex:idx)
         if b != nil {
             do {
                 try b!()
@@ -52,7 +52,7 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
         
         _listener?.ssn_fetch_begin_change(self)
         
-        for ii in 0...newObjects.count {
+        for ii in 0..<newObjects.count {
             _list.insert(newObjects[ii], at: ii + idx)
             
             _listener?.ssn_fetch(self,didChange: newObjects[ii], at: ii + idx, for: MMFetchChangeType.insert, newIndex: ii + idx)
@@ -63,7 +63,7 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
     }
     
     /// Remove and return the element at index `i`. Derived class implements.
-    public override func removeAtIndex(_ index: Int) -> T? {
+    public override func delete(_ index: Int) -> T? {
         if index < 0 || index >= _list.count {
             return nil
         }
@@ -72,14 +72,14 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
         _listener?.ssn_fetch(self,didChange: obj, at: index, for: MMFetchChangeType.delete, newIndex: index)
         return obj
     }
-    public override func removeAtIndex(_ index: Int, length: Int) {
+    public override func delete(_ index: Int, length: Int) {
         if index < 0 || index >= _list.count {
             return
         }
         
         _listener?.ssn_fetch_begin_change(self)
         
-        for ii in (0...length).reversed() {
+        for ii in (0..<length).reversed() {
             
             if index < 0 || index >= _list.count {
                 continue
@@ -96,14 +96,14 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
     
     
     /// Remove all elements. Derived class implements.
-    public override func removeAll() {
+    public override func clear() {
         if _list.isEmpty {
             return
         }
         
         _listener?.ssn_fetch_begin_change(self)
         
-        for ii in (0..._list.count).reversed() {
+        for ii in (0..<_list.count).reversed() {
             
             let obj = _list.remove(at: ii)
             
@@ -125,7 +125,7 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
     
     /// Returns the index of an object in the results collection. Derived class implements.
     public override func indexOf(_ object: T) -> Int? {
-        for idx in 0..._list.count {
+        for idx in 0..<_list.count {
             if _list[idx] === object {// FIX ME
                 return idx;
             }

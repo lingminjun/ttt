@@ -31,6 +31,8 @@ class ViewController: MMUIController {
     override func onViewDidLoad() {
         super.viewDidLoad()
         
+        self.title = "首页"
+        
         //初始化数据是否准备
         let realm = try! Realm()
         let vs = realm.objects(Dog.self)
@@ -102,7 +104,7 @@ extension ViewController: MMFetchsControllerDelegate, UITableViewDelegate {
         print("点击了\(indexPath.row)")
         tableView.deselectRow(at: indexPath, animated: false)
         if indexPath.row == 0 {
-            _fetch?[0]?.removeAtIndex(0);
+            _fetch?[0]?.delete(0);
         } else if (indexPath.row == 1) {
             insertOrUpdate(fetch: (_fetch?[0]!)!, idx: indexPath.row)
         } else if (indexPath.row == 2) {
@@ -116,6 +118,10 @@ extension ViewController: MMFetchsControllerDelegate, UITableViewDelegate {
             d.loyalty = 90
             d.name = "法国比利牛斯指示犬"
             _fetch?.insert(obj: d, at: indexPath)
+        } else if (indexPath.row == 7) {
+            let vc = DemoListController()
+//            self.present(vc, animated: true, completion: nil)
+            self.navigationController?.pushViewController(vc, animated: true)
         }
         else {
             let dog = _fetch?.object(at: indexPath)
@@ -338,8 +344,8 @@ extension ViewController {
     }
     func orderThreadInsert() {
         let queue = DispatchQueue(label: "com.geselle.demoQueue")
-        queue.async {
-            try! self.xxxx()
+        queue.async { [weak self] () -> () in
+            try! self?.xxxx()
         }
     }
 }

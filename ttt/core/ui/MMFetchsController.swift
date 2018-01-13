@@ -88,7 +88,7 @@ public class MMFetch<T: MMCellModel> {
     /// Remove an element from the end of the Array in O(1). Derived class implements.
     public final func removeLast() -> T? {
         if self.count() > 0 {
-            return self.removeAtIndex(self.count() - 1)
+            return self.delete(self.count() - 1)
         }
         return nil
     }
@@ -133,7 +133,7 @@ public class MMFetch<T: MMCellModel> {
         self.insert(newObject, atIndex: self.count())
     }
     public final func append(_ newObjects: [T]) {
-        for index in 0...newObjects.count {
+        for index in 0..<newObjects.count {
             self.append(newObjects[index])
         }
     }
@@ -152,12 +152,12 @@ public class MMFetch<T: MMCellModel> {
     }
     
     /// Remove and return the element at index `i`. Derived class implements.
-    public func removeAtIndex(_ index: Int) -> T? {return nil}
-    public func removeAtIndex(_ index: Int, length: Int) {}
+    public func delete(_ index: Int) -> T? {return nil}
+    public func delete(_ index: Int, length: Int) {}
     
     
     /// Remove all elements. Derived class implements.
-    public func removeAll() {}
+    public func clear() {}
     
     /// Get element at index. Derived class implements.
     public func get(_ index: Int) -> T? {return nil}
@@ -315,7 +315,7 @@ public class MMFetch<T: MMCellModel> {
 /**
  *
  */
-public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource {
+public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource /*,UITableViewDelegate*/ {
     
     var _fetchs = [] as [MMFetch<T>]
     
@@ -395,7 +395,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     /* delete indexPath.
      */
     public func delete(at indexPath: IndexPath) {
-        self[indexPath.section]?.removeAtIndex(indexPath.row)
+        self[indexPath.section]?.delete(indexPath.row)
     }
     
     /* insert indexPath.
@@ -408,7 +408,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     /* Returns the indexPath of a given object.
      */
     public func indexPath(forObject object: T) -> IndexPath? {
-        for section in 0..._fetchs.count {
+        for section in 0..<_fetchs.count {
             let fetch = self[section]
             if let row = fetch?.indexOf(object) {
 //                return IndexPath(indexes: [section,row], length: 2)
@@ -455,7 +455,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     }
     
     public func fetchIndex(forFetchTag fetchTag: String) -> Int? {
-        for index in 0..._fetchs.count {
+        for index in 0..<_fetchs.count {
             if _fetchs[index].tag == fetchTag {
                 return index
             }
@@ -464,7 +464,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     }
     
     func indexOf(_ fetch: MMFetch<T>) -> Int? {
-        for index in 0..._fetchs.count {
+        for index in 0..<_fetchs.count {
             if _fetchs[index] === fetch {
                 return index
             }
@@ -554,6 +554,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
     }
     
+    // section个数
     public func numberOfSections(in tableView: UITableView) -> Int {
         return _fetchs.count
     }
@@ -613,7 +614,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         if let rt = self[indexPath.section]?[indexPath.row]?.ssn_canEdit() {
-            return true
+            return rt
         }
         return false
     }
@@ -623,7 +624,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     // Allows the reorder accessory view to optionally be shown for a particular row. By default, the reorder control will be shown only if the datasource implements -tableView:moveRowAtIndexPath:toIndexPath:
     public func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         if let rt = self[indexPath.section]?[indexPath.row]?.ssn_canMove() {
-            return true
+            return rt
         }
         return false
     }
@@ -650,7 +651,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             //default delete cell
             if (editingStyle == UITableViewCellEditingStyle.delete) {
                 //add code here for when you hit delete
-                self[indexPath.section]?.removeAtIndex(indexPath.row)
+                self[indexPath.section]?.delete(indexPath.row)
                 /// the action delete cell will do at notice call back
 //                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Fade)//
             }

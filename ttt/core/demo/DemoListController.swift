@@ -17,15 +17,47 @@ class DemoListController: MMUIController {
     // MARK:- 属性
     let cellID = "cell"
     var _table : UITableView!
+    var _fetch : MMFetchsController<SettingNode>?
+    
+    func initDataList() -> [SettingNode] {
+        var list = [] as [SettingNode]
+        if true {
+            var node = SettingNode()
+            node.title = "随意设计1"
+            node.subTitle = "new"
+            list.insert(node, at: 0)
+        }
+        if true {
+            var node = SettingNode()
+            node.title = "随意设计2"
+            node.subTitle = "new"
+            list.append(node)
+        }
+        if true {
+            var node = SettingNode()
+            node.title = "随意设计3"
+            node.subTitle = "new"
+            list.append(node)
+        }
+        if true {
+            var node = SettingNode()
+            node.title = "随意设计4"
+            node.subTitle = "new"
+            list.append(node)
+        }
+        return list
+    }
     
     override func onViewDidLoad() {
         super.viewDidLoad()
+        
+        self.title = "List列表"
         
         // 1.创建tableView,并添加的控制器的view
         let tableView = UITableView(frame: view.bounds)
         
         // 2.设置数据源代理
-        tableView.dataSource = self
+//        tableView.dataSource = self
         tableView.delegate = self
         
         // 3.添加到控制器的view
@@ -36,9 +68,10 @@ class DemoListController: MMUIController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
         
         //使用默认的数据库
-        let realm = try! Realm()
-        let predicate = NSPredicate(format: "type.name = '购物' AND cost > 10")
-//        consumeItems = realm.objects(ConsumeItem.self).filter(predicate)
+        var f = MMFetchList(list:initDataList())
+        _fetch = MMFetchsController(fetchs:[f])
+        _fetch?.delegate = self
+        tableView.dataSource = _fetch
     }
     
     
@@ -46,50 +79,70 @@ class DemoListController: MMUIController {
 
 // ------------------------------------------------------------------------
 // Swift中类的扩展: Swift中的扩展相当于OC中的分类
-extension DemoListController: UITableViewDataSource, UITableViewDelegate {
+extension DemoListController: MMFetchsControllerDelegate,UITableViewDelegate {
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1;
+    func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?) {
+        switch type {
+        case .delete:
+            _table.deleteRows(at: [indexPath!], with: .automatic)
+        case .insert:
+            _table.insertRows(at: [indexPath!], with: .automatic)
+        case .update:
+            _table.reloadRows(at: [indexPath!], with: .automatic)
+        default:
+            _table.deleteRows(at: [indexPath!], with: .automatic)
+            _table.insertRows(at: [newIndexPath!], with: .automatic)
+        }
     }
     
-    // MARK:- UITableViewDataSource数据源
-    // 必须实现UITableViewDataSource的option修饰的必须实现的方法,否则会报错
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 20
+    func ssn_controllerWillChangeContent(_ controller: AnyObject) {
+        _table.beginUpdates()
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        /*
-         // ----------------------------------------------------------------
-         // 使用普通方式创建cell
-         let cellID = "cell"
-         
-         // 1.创建cell,此时cell是可选类型
-         var cell = tableView.dequeueReusableCellWithIdentifier(cellID)
-         
-         // 2.判断cell是否为nil
-         if cell == nil {
-         cell = UITableViewCell(style: .Default, reuseIdentifier: cellID)
-         }
-         
-         // 3.设置cell数据
-         cell?.textLabel?.text = "测试数据\(indexPath.row)"
-         
-         return cell!
-         */
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellID)
-        
-        cell?.textLabel?.text = "测试数据\(indexPath.row)"
-        
-        return cell!
-        
+    func ssn_controllerDidChangeContent(_ controller: AnyObject) {
+        _table.endUpdates()
     }
+
     
     // MARK:- UITableViewDelegate代理
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("点击了\(indexPath.row)")
+        if indexPath.row == 0 {
+//            self.dismiss(animated: true, completion: nil)
+            self.navigationController?.popViewController(animated: true)
+        } else if indexPath.row == 1 {
+            var node = SettingNode()
+            node.title = "插入数据1"
+            node.subTitle = "new"
+            _fetch?.insert(obj: node, at: indexPath)
+        } else if indexPath.row == 2 {
+            var list = [SettingNode]()
+            if true {
+                var node = SettingNode()
+                node.title = "插入连续1"
+                node.subTitle = "new"
+                list.append(node)
+            }
+            if true {
+                var node = SettingNode()
+                node.title = "插入连续2"
+                node.subTitle = "new"
+                list.append(node)
+            }
+            if true {
+                var node = SettingNode()
+                node.title = "插入连续3"
+                node.subTitle = "new"
+                list.append(node)
+            }
+            _fetch?[indexPath.section]?.insert(list, atIndex: indexPath.row)
+        } else if indexPath.row == 3 {
+            let node = _fetch?.object(at: indexPath)
+            node?.subTitle = "修改"
+            _fetch?.update(at: indexPath, nil)
+        } else {
+            _fetch?.delete(at: indexPath)
+        }
     }
 }
 

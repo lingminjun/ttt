@@ -77,11 +77,6 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
                 break
             }
         }
-
-        
-//        _list?._observe({ (<#RealmCollectionChange<AnyRealmCollection<T>>#>) in
-//            <#code#>
-//        })
     }
     
     /// 
@@ -119,7 +114,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     }
     
     /// Remove and return the element at index `i`. Derived class implements.
-    override public func removeAtIndex(_ index: Int) -> T? {
+    override public func delete(_ index: Int) -> T? {
         if index < 0 || index >= _list!.count {
             return nil
         }
@@ -133,7 +128,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
         }
         return obj
     }
-    override public func removeAtIndex(_ index: Int, length: Int) {
+    override public func delete(_ index: Int, length: Int) {
         var objs = [T]()
         for i in (0..<length).reversed() {
             if i + index < _list!.count {
@@ -150,7 +145,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     }
     
     /// Remove all elements. Derived class implements.
-    override public func removeAll() {
+    override public func clear() {
         do {
             try _realm.write {
                 _realm.delete(_list!)
