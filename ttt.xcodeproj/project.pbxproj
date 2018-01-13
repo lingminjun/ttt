@@ -62,6 +62,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		538F9E91200A47AF006B3A28 /* fetch */ = {
+			isa = PBXGroup;
+			children = (
+				D958F7852008694200E3F0C5 /* MMFetchList.swift */,
+				D958F7842008694200E3F0C5 /* MMFetchRealm.swift */,
+				D958F7862008694200E3F0C5 /* MMFetchRLMResults.swift */,
+				D958F7882008694200E3F0C5 /* MMFetchsController.swift */,
+				D958F7872008694200E3F0C5 /* MMUIController.swift */,
+			);
+			path = fetch;
+			sourceTree = "<group>";
+		};
 		9CD8BB8DCB33173D4806A84C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -91,11 +103,7 @@
 		D958F7822008690300E3F0C5 /* ui */ = {
 			isa = PBXGroup;
 			children = (
-				D958F7852008694200E3F0C5 /* MMFetchList.swift */,
-				D958F7842008694200E3F0C5 /* MMFetchRealm.swift */,
-				D958F7862008694200E3F0C5 /* MMFetchRLMResults.swift */,
-				D958F7882008694200E3F0C5 /* MMFetchsController.swift */,
-				D958F7872008694200E3F0C5 /* MMUIController.swift */,
+				538F9E91200A47AF006B3A28 /* fetch */,
 			);
 			path = ui;
 			sourceTree = "<group>";

@@ -122,6 +122,8 @@ extension ViewController: MMFetchsControllerDelegate, UITableViewDelegate {
             let vc = DemoListController()
 //            self.present(vc, animated: true, completion: nil)
             self.navigationController?.pushViewController(vc, animated: true)
+        } else if (indexPath.row == 9) {
+            _fetch?.delete(at: indexPath)
         }
         else {
             let dog = _fetch?.object(at: indexPath)
