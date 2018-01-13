@@ -13,7 +13,6 @@
 		A466CFF86FB13BD221AC4E61 /* Pods_ttt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */; };
 		D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7842008694200E3F0C5 /* MMFetchRealm.swift */; };
 		D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7852008694200E3F0C5 /* MMFetchList.swift */; };
-		D958F78B2008694200E3F0C5 /* MMFetchRLMResults.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7862008694200E3F0C5 /* MMFetchRLMResults.swift */; };
 		D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7872008694200E3F0C5 /* MMUIController.swift */; };
 		D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7882008694200E3F0C5 /* MMFetchsController.swift */; };
 		D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F78E2008694900E3F0C5 /* DemoListController.swift */; };
@@ -35,7 +34,6 @@
 		91BE48983675DDBC97B96407 /* Pods-ttt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.debug.xcconfig"; sourceTree = "<group>"; };
 		D958F7842008694200E3F0C5 /* MMFetchRealm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchRealm.swift; sourceTree = "<group>"; };
 		D958F7852008694200E3F0C5 /* MMFetchList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchList.swift; sourceTree = "<group>"; };
-		D958F7862008694200E3F0C5 /* MMFetchRLMResults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchRLMResults.swift; sourceTree = "<group>"; };
 		D958F7872008694200E3F0C5 /* MMUIController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMUIController.swift; sourceTree = "<group>"; };
 		D958F7882008694200E3F0C5 /* MMFetchsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchsController.swift; sourceTree = "<group>"; };
 		D958F78E2008694900E3F0C5 /* DemoListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoListController.swift; sourceTree = "<group>"; };
@@ -67,7 +65,6 @@
 			children = (
 				D958F7852008694200E3F0C5 /* MMFetchList.swift */,
 				D958F7842008694200E3F0C5 /* MMFetchRealm.swift */,
-				D958F7862008694200E3F0C5 /* MMFetchRLMResults.swift */,
 				D958F7882008694200E3F0C5 /* MMFetchsController.swift */,
 				D958F7872008694200E3F0C5 /* MMUIController.swift */,
 			);
@@ -285,7 +282,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */,
-				D958F78B2008694200E3F0C5 /* MMFetchRLMResults.swift in Sources */,
 				538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */,
 				D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */,
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
