@@ -17,5 +17,6 @@ class DogCell: UITableViewCell {
     @objc override func ssn_onDisplay(_ tableView: UITableView, model: AnyObject,atIndexPath indexPath: IndexPath) {
         let dog: Dog = model as! Dog
         self.textLabel?.text = dog.breed
+        self.detailTextLabel?.text = "智力：\(dog.brains)"
     }
 }

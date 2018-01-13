@@ -74,7 +74,7 @@ public class MMFetch<T: MMCellModel> {
     
     /// Access the `index`th element. Reading is O(1).  Writing is
     /// O(1) unless `self`'s storage is shared with another live array; O(`count`) if `self` does not wrap a bridged `NSArray`; otherwise the efficiency is unspecified..
-    public final subscript (index: Int) -> T? { get{ return self.get(index)} set(obj) { if obj != nil {self.insert(obj!, atIndex: index)}} }
+    public final subscript (index: Int) -> T? { get{ return self.get(index)} set(newValue) { if newValue != nil {self.insert(newValue!, atIndex: index)}} }
     
     /// Gets the first element in the array.
     public final func first() -> T? { if self.count() > 0 { return get(0) } else { return nil }}
@@ -144,6 +144,8 @@ public class MMFetch<T: MMCellModel> {
     public func count() -> Int {return 0}
     public func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return nil}
     
+    /// Update
+    public func update(_ idx: Int, _ b: (() throws -> Void)?) {}
     /// Insert `newObject` at index `i`. Derived class implements.
     public func insert(_ newObjects: [T], atIndex i: Int) {
         /*_listener?.ssn_fetch(fetch: self,didChange: newObject, at: self.count(), for: MMFetchChangeType.insert, newIndex: self.count())*/
@@ -268,7 +270,7 @@ public class MMFetch<T: MMCellModel> {
     	Update is reported when an object's state changes, and the changes do not affect the object's position in the results.
      */
     
-    @objc optional func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?)
+    @objc optional func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?)
     
     
     /* Notifies the delegate of added or removed sections.  Enables NSFetchedResultsController change tracking.
@@ -324,7 +326,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         set {
 //            if delegate != nil {
 //            }
-            _delegate = delegate
+            _delegate = newValue
         }
         get {
             return _delegate
@@ -382,6 +384,24 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
      */
     public func object(at indexPath: IndexPath) -> T? {
         return (self[indexPath.section]?[indexPath.row]);
+    }
+    
+    /* update indexPath.
+     */
+    public func update(at indexPath: IndexPath,_ b: (() throws -> Void)?) {
+        self[indexPath.section]?.update(indexPath.row, b)
+    }
+    
+    /* delete indexPath.
+     */
+    public func delete(at indexPath: IndexPath) {
+        self[indexPath.section]?.removeAtIndex(indexPath.row)
+    }
+    
+    /* insert indexPath.
+     */
+    public func insert(obj:T, at indexPath: IndexPath) {
+        self[indexPath.section]?.insert(obj, atIndex: indexPath.row)
     }
     
     
@@ -454,7 +474,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     var _changing: Bool = false
     var _flags: Set<String> = Set<String>(minimumCapacity:2)
-    func ssn_begin_change(_ flag: String) {
+    private func ssn_begin_change(_ flag: String) {
         if !_flags.contains(flag) {
             _flags.insert(flag)
             
@@ -467,7 +487,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             }
         }
     }
-    func ssn_end_change(_ flag: String) {
+    private func ssn_end_change(_ flag: String) {
         if _flags.contains(flag) {
             _flags.remove(flag)
             
@@ -490,7 +510,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     }
     
     /// no data modify. just notice controller changes
-    public func ssn_fetch(_ fetch: MMFetch<T>, didChange anObject: T, at index: Int, for type: MMFetchChangeType, newIndex: Int) {
+    public func ssn_fetch(_ fetch: MMFetch<T>, didChange anObject: T?, at index: Int, for type: MMFetchChangeType, newIndex: Int) {
         if _delegate == nil {
             return
         }

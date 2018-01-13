@@ -2,3 +2,7 @@
 *.lock
 
 *.xcodeproj/xcuserdata
+
+*.xcworkspace/xcuserdata
+
+**/*.xcodeproj/xcuserdata

@@ -99,6 +99,7 @@
 			children = (
 				D958F78E2008694900E3F0C5 /* DemoListController.swift */,
 				D9917D2920089F56003682AD /* Dog.swift */,
+				D9917D2B2008AF73003682AD /* DogCell.swift */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -131,7 +132,6 @@
 				D9FDDBBA2008672200A88631 /* Assets.xcassets */,
 				D9FDDBBC2008672200A88631 /* LaunchScreen.storyboard */,
 				D9FDDBBF2008672200A88631 /* Info.plist */,
-				D9917D2B2008AF73003682AD /* DogCell.swift */,
 			);
 			path = ttt;
 			sourceTree = "<group>";

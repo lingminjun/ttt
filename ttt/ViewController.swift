@@ -13,7 +13,7 @@ import RealmSwift
 extension Dog {
     @objc public override func ssn_cellID() -> String {return "dog"}
     @objc public override func ssn_cell(_ cellID : String) -> UITableViewCell {
-        return DogCell(style: .default, reuseIdentifier: cellID)
+        return DogCell(style: .subtitle, reuseIdentifier: cellID)
     }
     @objc public override func ssn_canEdit() -> Bool {return false}
     @objc public override func ssn_canMove() -> Bool {return false}
@@ -35,38 +35,7 @@ class ViewController: MMUIController {
         let realm = try! Realm()
         let vs = realm.objects(Dog.self)
         if vs.count == 0 {
-            if true {
-                let d = Dog()
-                d.breed = "藏獒"
-                d.brains = 60
-                d.loyalty = 90
-                d.name = "藏獒"
-                try! realm.write {
-                realm.add(d)
-                }
-            }
-            
-            if true {
-                let d = Dog()
-                d.breed = "中华田园犬"
-                d.brains = 80
-                d.loyalty = 80
-                d.name = "土狗"
-                try! realm.write {
-                realm.add(d)
-                }
-            }
-            
-            if true {
-                let d = Dog()
-                d.breed = "拉布拉多"
-                d.brains = 110
-                d.loyalty = 90
-                d.name = "拉布拉多"
-                try! realm.write {
-                realm.add(d)
-                }
-            }
+            initializationData(realm: realm)
         }
  
         
@@ -85,9 +54,10 @@ class ViewController: MMUIController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
         
         //使用默认的数据库
-        var f = MMFetchRealm(result:vs,realm:realm)
+        let ff = vs.sorted(byKeyPath: "breed", ascending: true)
+        var f = MMFetchRealm(result:ff,realm:realm)
         _fetch = MMFetchsController(fetchs:[f])
-//        _fetch?.delegate = self
+        _fetch?.delegate = self
         tableView.dataSource = _fetch
 //        let predicate = NSPredicate(format: "type.name = '购物' AND cost > 10")
         //        consumeItems = realm.objects(ConsumeItem.self).filter(predicate)
@@ -104,23 +74,153 @@ class ViewController: MMUIController {
 // ------------------------------------------------------------------------
 // Swift中类的扩展: Swift中的扩展相当于OC中的分类
 extension ViewController: MMFetchsControllerDelegate, UITableViewDelegate {
-    func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?) {
-        //
+    func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?) {
+        switch type {
+        case .delete:
+            _table.deleteRows(at: [indexPath!], with: .automatic)
+        case .insert:
+            _table.insertRows(at: [indexPath!], with: .automatic)
+        case .update:
+            _table.reloadRows(at: [indexPath!], with: .automatic)
+        default:
+            _table.deleteRows(at: [indexPath!], with: .automatic)
+            _table.insertRows(at: [newIndexPath!], with: .automatic)
+        }
     }
     
     func ssn_controllerWillChangeContent(_ controller: AnyObject) {
-        //
+        _table.beginUpdates()
     }
     
     func ssn_controllerDidChangeContent(_ controller: AnyObject) {
-        //
-    }
+        _table.endUpdates()    }
 
     
     
     // MARK:- UITableViewDelegate代理
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("点击了\(indexPath.row)")
+        tableView.deselectRow(at: indexPath, animated: false)
+        if indexPath.row == 0 {
+            _fetch?[0]?.removeAtIndex(0);
+        } else if (indexPath.row == 1) {
+            insertOrUpdate(fetch: (_fetch?[0]!)!, idx: indexPath.row)
+        } else if (indexPath.row == 2) {
+            orderThreadInsert()
+        } else {
+            let dog = _fetch?.object(at: indexPath)
+            _fetch?.update(at: indexPath, {
+                dog?.brains += 1;
+            })
+        }
+    }
+}
+
+/// test dataing
+extension ViewController {
+    func initializationData(realm: Realm) {
+        if true {
+            let d = Dog()
+            d.breed = "藏獒"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "藏獒"
+            try! realm.write {
+                realm.add(d)
+            }
+        }
+        
+        if true {
+            let d = Dog()
+            d.breed = "中华田园犬"
+            d.brains = 80
+            d.loyalty = 80
+            d.name = "土狗"
+            try! realm.write {
+                realm.add(d)
+            }
+        }
+        
+        if true {
+            let d = Dog()
+            d.breed = "拉布拉多"
+            d.brains = 110
+            d.loyalty = 90
+            d.name = "拉布拉多"
+            try! realm.write {
+                realm.add(d)
+            }
+        }
+    }
+    
+    
+    func insertOrUpdate(fetch: MMFetch<Dog>, idx:Int) {
+        if true {
+            let d = Dog()
+            d.breed = "泰迪犬"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "泰迪犬"
+            fetch.insert(d, atIndex: idx)
+        }
+        if true {
+            let d = Dog()
+            d.breed = "博美犬"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "博美犬"
+            fetch.insert(d, atIndex: idx)
+        }
+    }
+    func xxxx() throws {
+        let realm = try! Realm()
+        
+        if true {
+            let d = Dog()
+            d.breed = "金毛"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "金毛"
+            try! realm.write {
+                realm.add(d)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "萨摩耶"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "萨摩耶"
+            try! realm.write {
+                realm.add(d)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "比熊"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "比熊"
+            try! realm.write {
+                realm.add(d)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "哈士奇"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "哈士奇"
+            try! realm.write {
+                realm.add(d)
+            }
+        }
+    }
+    func orderThreadInsert() {
+        let queue = DispatchQueue(label: "com.geselle.demoQueue")
+        queue.async {
+            try! self.xxxx()
+        }
     }
 }
 

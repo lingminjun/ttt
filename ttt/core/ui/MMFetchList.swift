@@ -28,6 +28,20 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
     public override func count() -> Int {return _list.count}
     public override func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return Array(_list)}
     
+    /// Update
+    override public func update(_ idx: Int, _ b: (() throws -> Void)?) {
+        guard let obj = self[idx] else {return}
+        _listener?.ssn_fetch_begin_change(self)
+        _listener?.ssn_fetch(self,didChange: obj, at:idx, for: MMFetchChangeType.insert, newIndex:idx)
+        if b != nil {
+            do {
+                try b!()
+            } catch {
+                print("error:\(error)")
+            }
+        }
+        _listener?.ssn_fetch_end_change(self)
+    }
     /// Insert `newObject` at index `i`. Derived class implements.
     public override func insert(_ newObjects: [T], atIndex i: Int) {
         var idx = i
