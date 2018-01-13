@@ -107,7 +107,17 @@ extension ViewController: MMFetchsControllerDelegate, UITableViewDelegate {
             insertOrUpdate(fetch: (_fetch?[0]!)!, idx: indexPath.row)
         } else if (indexPath.row == 2) {
             orderThreadInsert()
-        } else {
+        } else if (indexPath.row == 5) {
+            _fetch?.delete(at: indexPath)
+        } else if (indexPath.row == 6) {
+            let d = Dog()
+            d.breed = "法国比利牛斯指示犬"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "法国比利牛斯指示犬"
+            _fetch?.insert(obj: d, at: indexPath)
+        }
+        else {
             let dog = _fetch?.object(at: indexPath)
             _fetch?.update(at: indexPath, {
                 dog?.brains += 1;
@@ -182,7 +192,7 @@ extension ViewController {
             d.loyalty = 90
             d.name = "金毛"
             try! realm.write {
-                realm.add(d)
+                realm.add(d,update:true)
             }
         }
         if true {
@@ -192,7 +202,7 @@ extension ViewController {
             d.loyalty = 90
             d.name = "萨摩耶"
             try! realm.write {
-                realm.add(d)
+                realm.add(d,update:true)
             }
         }
         if true {
@@ -202,7 +212,7 @@ extension ViewController {
             d.loyalty = 90
             d.name = "比熊"
             try! realm.write {
-                realm.add(d)
+                realm.add(d,update:true)
             }
         }
         if true {
@@ -212,7 +222,117 @@ extension ViewController {
             d.loyalty = 90
             d.name = "哈士奇"
             try! realm.write {
-                realm.add(d)
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "阿拉斯加雪橇犬"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "阿拉斯加雪橇犬"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "拉布拉多"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "拉布拉多"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "德国牧羊犬"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "德国牧羊犬"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "松狮"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "松狮"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "吉娃娃"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "吉娃娃"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "标准贵宾"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "标准贵宾"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "约克夏"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "约克夏"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "高加索牧羊犬"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "高加索牧羊犬"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "雪纳瑞"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "雪纳瑞"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "古牧"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "古牧"
+            try! realm.write {
+                realm.add(d,update:true)
+            }
+        }
+        if true {
+            let d = Dog()
+            d.breed = "巴哥"
+            d.brains = 60
+            d.loyalty = 90
+            d.name = "巴哥"
+            try! realm.write {
+                realm.add(d,update:true)
             }
         }
     }
