@@ -11,6 +11,7 @@ import UIKit
 public class MMUIController : UIViewController {
     
     //The following is a safe life-cycle methods.
+    public func onInit(params: Dictionary<String,NSObject>?) {}
     public func onLoadView() -> Bool { return false }
     public func onViewDidLoad() -> Void { }
     public func onViewWillAppear(_ animated: Bool) { }

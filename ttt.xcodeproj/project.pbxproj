@@ -18,6 +18,11 @@
 		D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F78E2008694900E3F0C5 /* DemoListController.swift */; };
 		D9917D2A20089F56003682AD /* Dog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9917D2920089F56003682AD /* Dog.swift */; };
 		D9917D2C2008AF73003682AD /* DogCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9917D2B2008AF73003682AD /* DogCell.swift */; };
+		D9CCAD11200C57B300C03276 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD10200C57B300C03276 /* Navigator.swift */; };
+		D9CCAD13200C5C4B00C03276 /* page_router.xml in Resources */ = {isa = PBXBuildFile; fileRef = D9CCAD12200C5C4B00C03276 /* page_router.xml */; };
+		D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD14200C809E00C03276 /* VCNode.swift */; };
+		D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD16200C8F2700C03276 /* Urls.swift */; };
+		D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD19200CBB7900C03276 /* Injects.swift */; };
 		D9FDDBB42008672200A88631 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FDDBB32008672200A88631 /* AppDelegate.swift */; };
 		D9FDDBB62008672200A88631 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FDDBB52008672200A88631 /* ViewController.swift */; };
 		D9FDDBB92008672200A88631 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9FDDBB72008672200A88631 /* Main.storyboard */; };
@@ -39,6 +44,11 @@
 		D958F78E2008694900E3F0C5 /* DemoListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoListController.swift; sourceTree = "<group>"; };
 		D9917D2920089F56003682AD /* Dog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dog.swift; sourceTree = "<group>"; };
 		D9917D2B2008AF73003682AD /* DogCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogCell.swift; sourceTree = "<group>"; };
+		D9CCAD10200C57B300C03276 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
+		D9CCAD12200C5C4B00C03276 /* page_router.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = page_router.xml; sourceTree = "<group>"; };
+		D9CCAD14200C809E00C03276 /* VCNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCNode.swift; sourceTree = "<group>"; };
+		D9CCAD16200C8F2700C03276 /* Urls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Urls.swift; sourceTree = "<group>"; };
+		D9CCAD19200CBB7900C03276 /* Injects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Injects.swift; sourceTree = "<group>"; };
 		D9FDDBB02008672200A88631 /* ttt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ttt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FDDBB32008672200A88631 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D9FDDBB52008672200A88631 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -66,7 +76,6 @@
 				D958F7852008694200E3F0C5 /* MMFetchList.swift */,
 				D958F7842008694200E3F0C5 /* MMFetchRealm.swift */,
 				D958F7882008694200E3F0C5 /* MMFetchsController.swift */,
-				D958F7872008694200E3F0C5 /* MMUIController.swift */,
 			);
 			path = fetch;
 			sourceTree = "<group>";
@@ -91,6 +100,7 @@
 		D958F781200868FC00E3F0C5 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				D9CCAD18200CBB1100C03276 /* foundation */,
 				D958F7832008690800E3F0C5 /* demo */,
 				D958F7822008690300E3F0C5 /* ui */,
 			);
@@ -100,6 +110,7 @@
 		D958F7822008690300E3F0C5 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				D9CCAD0F200C536300C03276 /* router */,
 				538F9E91200A47AF006B3A28 /* fetch */,
 			);
 			path = ui;
@@ -116,6 +127,25 @@
 				538F9E8F200A2DDE006B3A28 /* SettingNode.swift */,
 			);
 			path = demo;
+			sourceTree = "<group>";
+		};
+		D9CCAD0F200C536300C03276 /* router */ = {
+			isa = PBXGroup;
+			children = (
+				D958F7872008694200E3F0C5 /* MMUIController.swift */,
+				D9CCAD10200C57B300C03276 /* Navigator.swift */,
+				D9CCAD14200C809E00C03276 /* VCNode.swift */,
+			);
+			path = router;
+			sourceTree = "<group>";
+		};
+		D9CCAD18200CBB1100C03276 /* foundation */ = {
+			isa = PBXGroup;
+			children = (
+				D9CCAD19200CBB7900C03276 /* Injects.swift */,
+				D9CCAD16200C8F2700C03276 /* Urls.swift */,
+			);
+			path = foundation;
 			sourceTree = "<group>";
 		};
 		D9FDDBA72008672200A88631 = {
@@ -139,6 +169,7 @@
 		D9FDDBB22008672200A88631 /* ttt */ = {
 			isa = PBXGroup;
 			children = (
+				D9CCAD12200C5C4B00C03276 /* page_router.xml */,
 				D958F781200868FC00E3F0C5 /* core */,
 				D9FDDBB32008672200A88631 /* AppDelegate.swift */,
 				D9FDDBB52008672200A88631 /* ViewController.swift */,
@@ -215,6 +246,7 @@
 				D9FDDBBE2008672200A88631 /* LaunchScreen.storyboard in Resources */,
 				D9FDDBBB2008672200A88631 /* Assets.xcassets in Resources */,
 				D9FDDBB92008672200A88631 /* Main.storyboard in Resources */,
+				D9CCAD13200C5C4B00C03276 /* page_router.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,10 +316,14 @@
 				D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */,
 				538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */,
 				D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */,
+				D9CCAD11200C57B300C03276 /* Navigator.swift in Sources */,
+				D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */,
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
+				D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */,
 				538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */,
+				D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */,
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,
