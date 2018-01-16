@@ -95,7 +95,8 @@ extension ViewController: MMFetchsControllerDelegate, UITableViewDelegate {
     }
     
     func ssn_controllerDidChangeContent(_ controller: AnyObject) {
-        _table.endUpdates()    }
+        _table.endUpdates()
+    }
 
     
     
