@@ -132,9 +132,9 @@ public class MMFetch<T: MMCellModel> {
     public final func append(_ newObject: T) {
         self.insert(newObject, atIndex: self.count())
     }
-    public final func append(_ newObjects: [T]) {
-        for index in 0..<newObjects.count {
-            self.append(newObjects[index])
+    public final func append<C: Sequence>(_ newObjects: C) where C.Iterator.Element == T {
+        for obj in newObjects {
+            self.append(obj)
         }
     }
     
@@ -147,7 +147,7 @@ public class MMFetch<T: MMCellModel> {
     /// Update
     public func update(_ idx: Int, _ b: (() throws -> Void)?) {}
     /// Insert `newObject` at index `i`. Derived class implements.
-    public func insert(_ newObjects: [T], atIndex i: Int) {
+    public func insert<C: Sequence>(_ newObjects: C, atIndex i: Int) where C.Iterator.Element == T {
         /*_listener?.ssn_fetch(fetch: self,didChange: newObject, at: self.count(), for: MMFetchChangeType.insert, newIndex: self.count())*/
     }
     

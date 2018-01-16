@@ -103,7 +103,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
         }
     }
     /// Insert `newObject` at index `i`. Derived class implements.
-    override public func insert(_ newObjects: [T], atIndex i: Int) {
+    override public func insert<C: Sequence>(_ newObjects: C, atIndex i: Int) where C.Iterator.Element == T {
         do {
             try _realm.write {
                 _realm.add(newObjects, update: true);//(newObjects)

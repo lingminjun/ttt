@@ -43,7 +43,7 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
         _listener?.ssn_fetch_end_change(self)
     }
     /// Insert `newObject` at index `i`. Derived class implements.
-    public override func insert(_ newObjects: [T], atIndex i: Int) {
+    public override func insert<C: Sequence>(_ newObjects: C, atIndex i: Int) where C.Iterator.Element == T {
         var idx = i
         //compatibility out boundary
         if i < 0 || i > _list.count {
@@ -52,11 +52,16 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
         
         _listener?.ssn_fetch_begin_change(self)
         
-        for ii in 0..<newObjects.count {
-            _list.insert(newObjects[ii], at: ii + idx)
-            
-            _listener?.ssn_fetch(self,didChange: newObjects[ii], at: ii + idx, for: MMFetchChangeType.insert, newIndex: ii + idx)
+        for obj in newObjects {
+            let at = idx
+            idx += 1
+            _list.insert(obj, at: at)
+            _listener?.ssn_fetch(self,didChange: obj, at: at, for: MMFetchChangeType.insert, newIndex: at)
         }
+//        for ii in 0..<newObjects.underestimatedCount {
+//            _list.insert(newObjects[ii], at: ii + idx)
+//            _listener?.ssn_fetch(self,didChange: newObjects[ii], at: ii + idx, for: MMFetchChangeType.insert, newIndex: ii + idx)
+//        }
         
         _listener?.ssn_fetch_end_change(self)
         
