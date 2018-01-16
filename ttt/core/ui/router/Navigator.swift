@@ -48,7 +48,7 @@ final class Navigator: NSObject {
     }
     
     /// open url or open path
-    public func open(path:String, params:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+    public func open(path:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
         if path.isEmpty {
             return false
         }
@@ -64,7 +64,8 @@ final class Navigator: NSObject {
         return open(url, params:params, modal:modal)
     }
     
-    public func open(_ url:String, params:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+    /// open url
+    public func open(_ url:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
         if !isValid(url:url) {
             return false
         }
@@ -76,7 +77,7 @@ final class Navigator: NSObject {
     
     /// is valid url
     public func isValid(url:String) -> Bool {
-        let uri = URL(string:url)
+        let uri = URL(string:Urls.encoding(url: url))
         
         if (uri == nil) {return false}
         

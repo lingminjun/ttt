@@ -14,95 +14,113 @@ final class Urls {
     enum QValue {
         case value(String)
         case array([String])
-    }
-    
-    
-    /**
-     * 获取url中除去host之后的path, 如果遇到 http://m.mymm.com/detail/{skuid}.html 类型，则匹配保留 detail/{_}.html
-     * @param url
-     * @return
-     */
-    public static func getURLFinderPath(url: String) -> String  {
-        let surl = compatibilityTidy(url: url)
-        let uri = URL(string:surl)
         
-        if (uri == nil) {return ""}
+        // value支持 String
+        public init<S: StringProtocol>(_ string: S) {self = .value("\(string)")}
         
-        let host = uri!.host
-        if (host == nil || host!.isEmpty) {
-            return "";
+        // array支持
+        public init<C: Sequence>(_ array: C) where C.Iterator.Element: StringProtocol {
+            var ary = [] as [String]
+            for value in array {
+                ary.append("\(value)")
+            }
+            self = .array(ary)
         }
-        
-        let paths = uri!.pathComponents
-        if (paths.isEmpty) {//home page: https://m.mymm.com
-            return "/";
+        public init<C: Sequence>(_ array: C) where C.Iterator.Element == Int {
+            var ary = [] as [String]
+            for value in array {
+                ary.append("\(value)")
+            }
+            self = .array(ary)
         }
+
         
-        var builder = String();
-        var isFirst = true;
-        for p in paths {
-            if (!p.isEmpty && p != "/" && p != "." && p != "..") {
-                var str = p;
-                //contain param key
-                if p.contains("{") && p.contains("}") {
-                    let range = p.range(of: "}")!.upperBound ..< str.endIndex
-                    str = "{_}" + p[range];
+        // support int
+        public init(_ int: Int) {self = .value("\(int)")}
+        public init(_ int8: Int8) {self = .value("\(int8)")}
+        public init(_ int16: Int16) {self = .value("\(int16)")}
+        public init(_ int32: Int32) {self = .value("\(int32)")}
+        public init(_ int64: Int64) {self = .value("\(int64)")}
+        
+        public init(_ uint: UInt) {self = .value("\(uint)")}
+        public init(_ uint8: UInt8) {self = .value("\(uint8)")}
+        public init(_ uint16: UInt16) {self = .value("\(uint16)")}
+        public init(_ uint32: UInt32) {self = .value("\(uint32)")}
+        public init(_ uint64: UInt64) {self = .value("\(uint64)")}
+        
+        //Float
+        public init(_ float: Float) {self = .value("\(float)")}
+        
+        // Double
+        public init(_ double: Double) {self = .value("\(double)")}
+        
+        // Bool
+        public init(_ bool: Bool) {self = .value("\(bool)")}
+        
+        // Character
+        public init(_ char: Character) {self = .value("\(char)")}
+        
+        // get string
+        public var string: String? { get{ switch self { case QValue.value(let value): return value; default: break }; return nil } }
+        
+        // get [string]
+        public var array: [String]? { get{ switch self { case QValue.array(let array): return array; default: break }; return nil } }
+        
+        // get bool
+        public var bool: Bool? {
+            get{
+                switch self {
+                case QValue.value(let value):
+                    let v = value.lowercased()
+                    if v == "true" || v == "yes" || v == "on" || v == "1" || v == "t" || v == "y" {
+                        return true
+                    } else if v == "false" || v == "no" || v == "off" || v == "0" || v == "f" || v == "n" {
+                        return false
+                    }
+                    break
+                default: break
                 }
-                
-                if (isFirst) {
-                    isFirst = false;
-                }
-                else {
-                    builder.append("/");
-                }
-                
-                // 不区分大小写，不一定合理，兼容方案; Not case sensitive.
-                builder.append(str.lowercased());
+                return nil
             }
         }
         
-        if builder.isEmpty {
-            return "/"
+        // get char
+        public var char: Character? {
+            get{
+                switch self {
+                case QValue.value(let value):
+                    if value.count == 1 {
+                        return value[value.startIndex]
+                    }
+                    break
+                default: break
+                }
+                return nil
+            }
         }
         
-        return builder;
+        // get double
+        public var double: Double? { get{ switch self { case QValue.value(let value): return Double(value); default: break }; return nil } }
+        
+        // get float
+        public var float: Float? { get{ switch self { case QValue.value(let value): return Float(value); default: break }; return nil } }
+        
+        // get int
+        public var int: Int? { get{ switch self { case QValue.value(let value): return Int(value); default: break }; return nil } }
+        public var int8: Int8? { get{ switch self { case QValue.value(let value): return Int8(value); default: break }; return nil } }
+        public var int16: Int16? { get{ switch self { case QValue.value(let value): return Int16(value); default: break }; return nil } }
+        public var int32: Int32? { get{ switch self { case QValue.value(let value): return Int32(value); default: break }; return nil } }
+        public var int64: Int64? { get{ switch self { case QValue.value(let value): return Int64(value); default: break }; return nil } }
+        public var uint: UInt? { get{ switch self { case QValue.value(let value): return UInt(value); default: break }; return nil } }
+        public var uint8: UInt8? { get{ switch self { case QValue.value(let value): return UInt8(value); default: break }; return nil } }
+        public var uint16: UInt16? { get{ switch self { case QValue.value(let value): return UInt16(value); default: break }; return nil } }
+        public var uint32: UInt32? { get{ switch self { case QValue.value(let value): return UInt32(value); default: break }; return nil } }
+        public var uint64: UInt64? { get{ switch self { case QValue.value(let value): return UInt64(value); default: break }; return nil } }
     }
     
-    // just support last component param key
-    public static func getURLPathParamKey(url: String) -> String  {
-        let surl = compatibilityTidy(url: url)
-        let uri = URL(string:surl)
-        
-        if (uri == nil) {return ""}
-        
-        let host = uri!.host
-        if (host == nil || host!.isEmpty) {
-            return ""
-        }
-        
-        let paths = uri!.pathComponents
-        if (paths.isEmpty) {//home page: https://m.mymm.com
-            return ""
-        }
-        
-        for path in paths {
-            if (path.isEmpty || path == "/" || path == "." || path == "..") {
-                continue
-            }
-            
-            if path.contains("{") && path.contains("}") {
-                return "";
-            }
-            
-            let range = path.range(of: "{")!.upperBound ..< path.range(of: "}")!.lowerBound
-            return String(path[range])
-        }
-        
-        return ""
-    }
     
     /// query url encode
-    public static func encode(str:String) -> String {
+    public static func encoded(str:String) -> String {
         let value = str.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         if value == nil {
             return str
@@ -111,7 +129,7 @@ final class Urls {
     }
     
     /// query url decode
-    public static func decode(str:String) -> String {
+    public static func decoded(str:String) -> String {
         let value = str.removingPercentEncoding
         if value == nil {
             return str
@@ -121,14 +139,14 @@ final class Urls {
     
     /// get url query dictionary
     public static func query(url: String, decord: Bool = true) ->Dictionary<String,QValue> {
-        let surl = compatibilityTidy(url: url)
+        let surl = encoding(url: url)
         guard let q = URL(string:surl) else {return Dictionary<String,QValue>()}
         return query(query:q.query!, decord:decord)
     }
     
     /// get url fragment dictionary
     public static func fragment(url: String, decord: Bool = true) ->Dictionary<String,QValue> {
-        let surl = compatibilityTidy(url: url)
+        let surl = encoding(url: url)
         guard let q = URL(string:surl) else {return Dictionary<String,QValue>()}
         return query(query:q.fragment!, decord:decord)
     }
@@ -154,7 +172,7 @@ final class Urls {
             if !key.isEmpty {
                 
                 if decord && !value.isEmpty {
-                    value = decode(str: value)
+                    value = decoded(str: value)
                 }
                 
                 let v = map[key]
@@ -192,7 +210,7 @@ final class Urls {
                     result += "&"
                 }
                 if encode {
-                    result += key + "=" + self.encode(str: value)
+                    result += key + "=" + self.encoded(str: value)
                 } else {
                     result += key + "=" + value
                 }
@@ -204,7 +222,7 @@ final class Urls {
                         result += "&"
                     }
                     if encode {
-                        result += key + "=" + self.encode(str: str)
+                        result += key + "=" + self.encoded(str: str)
                     } else {
                         result += key + "=" + str
                     }
@@ -222,7 +240,7 @@ final class Urls {
     private static let URL_ALLOWED_CHARS = CharacterSet.init(charactersIn: "$'()*+,[]@ ").inverted //!?#& RFC 3986
     
     
-    private static func compatibilityTidy(url:String) -> String {
+    public static func encoding(url:String) -> String {
         var surl = url.removingPercentEncoding
         if surl != nil {
             surl = surl!.addingPercentEncoding(withAllowedCharacters: URL_ALLOWED_CHARS)
@@ -234,11 +252,11 @@ final class Urls {
     
     /// tidy <scheme>://<host>:<port>/<path>;<params>?<query>#<fragment> , case sensitive path
     /// just uri:<scheme>://<host>:<port>/<path>;<params>
-    /// param: only is just url path
-    /// param: sensitve is path case sensitve
+    /// *param: only is just url path
+    /// *param: sensitve is path case sensitve
     public static func tidy(url:String, path only:Bool = false, case sensitve:Bool = false) -> String {
         //decoding and encoding can compatibility more scene
-        let surl = compatibilityTidy(url: url)
+        let surl = encoding(url: url)
         
         let uri = URL(string:surl)
         if (uri == nil) {return url}
@@ -339,5 +357,89 @@ final class Urls {
         let url1 = self.tidy(url: url, path: true, case: sensitve)
         let url2 = self.tidy(url: turl, path: true, case: sensitve)
         return url1 == url2
+    }
+    
+    /**
+     * 获取url中除去host之后的path, 如果遇到 http://m.mymm.com/detail/{skuid}.html 类型，则匹配保留 detail/{_}.html
+     * @param url
+     * @return
+     */
+    public static func getURLFinderPath(url: String) -> String  {
+        let surl = encoding(url: url)
+        let uri = URL(string:surl)
+        
+        if (uri == nil) {return ""}
+        
+        let host = uri!.host
+        if (host == nil || host!.isEmpty) {
+            return "";
+        }
+        
+        let paths = uri!.pathComponents
+        if (paths.isEmpty) {//home page: https://m.mymm.com
+            return "/";
+        }
+        
+        var builder = String();
+        var isFirst = true;
+        for p in paths {
+            if (!p.isEmpty && p != "/" && p != "." && p != "..") {
+                var str = p;
+                //contain param key
+                if p.contains("{") && p.contains("}") {
+                    let range = p.range(of: "}")!.upperBound ..< str.endIndex
+                    str = "{_}" + p[range];
+                }
+                
+                if (isFirst) {
+                    isFirst = false;
+                }
+                else {
+                    builder.append("/");
+                }
+                
+                // 不区分大小写，不一定合理，兼容方案; Not case sensitive.
+                builder.append(str.lowercased());
+            }
+        }
+        
+        if builder.isEmpty {
+            return "/"
+        }
+        
+        return builder;
+    }
+    
+    // just support last component param key
+    public static func getURLPathParamKey(url: String) -> String  {
+        let surl = encoding(url: url)
+        let uri = URL(string:surl)
+        
+        if (uri == nil) {return ""}
+        
+        let host = uri!.host
+        if (host == nil || host!.isEmpty) {
+            return ""
+        }
+        
+        let paths = uri!.pathComponents
+        if (paths.isEmpty) {//home page: https://m.mymm.com
+            return ""
+        }
+        
+        for path in paths {
+            if (path.isEmpty || path == "/" || path == "." || path == "..") {
+                continue
+            }
+            
+            if path.contains("{") && path.contains("}") {
+                return "";
+            }
+            
+            let range = path.range(of: "{")!.upperBound ..< path.range(of: "}")!.lowerBound
+            return String(path[range])
+        }
+        
+        return ""
     }
 }
