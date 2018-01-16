@@ -1,5 +1,5 @@
 //
-//  MMFetchController.swift
+//  MMFetchsController.swift
 //  merchant-ios
 //
 //  Created by MJ Ling on 2018/1/5.
@@ -24,11 +24,8 @@ extension UITableViewCell {
     
     @objc var ssn_cellModel : MMCellModel? {
         get{
-            var result = objc_getAssociatedObject(self, &CELL_MODEL_PROPERTY) as? MMCellModel
-            if result == nil {
-                return nil
-            }
-            return result!
+            guard let result = objc_getAssociatedObject(self, &CELL_MODEL_PROPERTY) as? MMCellModel else {  return nil }
+            return result
         }
 //        set{
 //            objc_setAssociatedObject(self, &CELL_MODEL_PROPERTY, newValue, objc_AssociationPolicy(OBJC_ASSOCIATION_RETAIN))
