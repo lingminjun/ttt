@@ -116,6 +116,18 @@ final class Urls {
         public var uint16: UInt16? { get{ switch self { case QValue.value(let value): return UInt16(value); default: break }; return nil } }
         public var uint32: UInt32? { get{ switch self { case QValue.value(let value): return UInt32(value); default: break }; return nil } }
         public var uint64: UInt64? { get{ switch self { case QValue.value(let value): return UInt64(value); default: break }; return nil } }
+        
+        
+        // json obj support
+        public init<C: MMJsonable>(_ entity: C) {self = .value("\(entity.ssn_jsonString())")}
+        public func json<C: MMJsonable>(_ type: C.Type) -> C? {
+            switch self {
+            case QValue.value(let value):
+                return type.ssn_from(json: value)
+            default: break
+            }
+            return nil
+        }
     }
     
     

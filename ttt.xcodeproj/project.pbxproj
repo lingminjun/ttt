@@ -11,6 +11,7 @@
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
 		538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8F200A2DDE006B3A28 /* SettingNode.swift */; };
 		A466CFF86FB13BD221AC4E61 /* Pods_ttt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */; };
+		D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9414050200F3E3F0050132B /* MMJsonable.swift */; };
 		D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7842008694200E3F0C5 /* MMFetchRealm.swift */; };
 		D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7852008694200E3F0C5 /* MMFetchList.swift */; };
 		D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7872008694200E3F0C5 /* MMUIController.swift */; };
@@ -37,6 +38,7 @@
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		538F9E8F200A2DDE006B3A28 /* SettingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNode.swift; sourceTree = "<group>"; };
 		91BE48983675DDBC97B96407 /* Pods-ttt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.debug.xcconfig"; sourceTree = "<group>"; };
+		D9414050200F3E3F0050132B /* MMJsonable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMJsonable.swift; sourceTree = "<group>"; };
 		D958F7842008694200E3F0C5 /* MMFetchRealm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchRealm.swift; sourceTree = "<group>"; };
 		D958F7852008694200E3F0C5 /* MMFetchList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchList.swift; sourceTree = "<group>"; };
 		D958F7872008694200E3F0C5 /* MMUIController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMUIController.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 			children = (
 				D9CCAD19200CBB7900C03276 /* Injects.swift */,
 				D9CCAD16200C8F2700C03276 /* Urls.swift */,
+				D9414050200F3E3F0050132B /* MMJsonable.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 				D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */,
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
+				D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */,
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,
 				D9917D2C2008AF73003682AD /* DogCell.swift in Sources */,
 				D9FDDBB42008672200A88631 /* AppDelegate.swift in Sources */,

@@ -11,42 +11,118 @@ import Foundation
 /// reflect //http://www.hangge.com/blog/cache/detail_976.html
 final public class Injects {
     
-    /// fill填充数据
-    public func fill<T: NSObject>(dic:Dictionary<String,NSObject>, model:T) {
+    /// Get the property type. if it is NSNull, may be option type.
+    open static func type(property: String,of obj: NSObject) -> Any.Type {
         
-        /// 这里将字典中所有KEY  和 值  都转换为  STRING类型，目的只有一个运用 OBJ的 setValue方法，给 这个对象赋值
-        
-        /// 这就完成了，字典和对象的转换
-        
-        let mirrotwo:Mirror = Mirror(reflecting: dic)
-        
-        for p in mirrotwo.children {
-            
-            var (key,value) = (p.value as! (String,String))
-            
-            //循环出字典中的每一对key - value 都是String类型，然后将这个类型赋值给model
-            
-            //这一次遍历当前需要赋值对象的属性，是因为需要判断当前对象是否有这个属性，如果有才会给他赋值，如果没有就略过
-            
-            //mirrorModel是当前需要赋值的对象的反射对象，他的LABEL就是对象的属性，value就是数值，但是只读的，
-            
-            //所以只能通过model.setValue来赋值
-            
-            let mirrorModel = Mirror(reflecting: model)
-            
-            for eachItem in mirrorModel.children {
-                
-                if(eachItem.label! == key){
-                    
-                    //这一步简直爆炸的方法
-                    
-                    model.setValue(value, forKey: key)
-                    
-                }
-                
+        var mr: Mirror = Mirror(reflecting: obj)
+        for child in mr.children {
+            if child.label! == property {
+                return Swift.type(of: child.value)
             }
-            
+        }
+        while let parent = mr.superclassMirror {
+            for child in parent.children {
+                if child.label! == property {
+                    return Swift.type(of: child.value)
+                }
+            }
+            mr = parent
+        }
+        return NSNull.Type.self
+    }
+    
+    /// Is a Type, similar to Swift.Type (of:)
+    open static func isType(_ obj: Any, type: Any.Type) -> Bool {
+//        return (obj as? type) != nil
+        
+        let t = Swift.type(of: obj)
+        if t == type {
+            return true
         }
         
+        // recursive
+        var mr: Mirror = Mirror(reflecting: obj)
+        while let parent = mr.superclassMirror {
+            if parent.subjectType == type {
+                return true
+            }
+            mr = parent
+        }
+        return false
+    }
+    
+    /// contained Int,Float,Double,Bool,Character,String
+    open static func isBaseType(_ type: Any.Type) -> Bool {
+        if type == Int.Type.self
+            || type == Int8.Type.self
+            || type == Int16.Type.self
+            || type == Int32.Type.self
+            || type == Int64.Type.self
+            || type == UInt.Type.self
+            || type == UInt8.Type.self
+            || type == UInt16.Type.self
+            || type == UInt32.Type.self
+            || type == UInt64.Type.self
+        {
+            return true
+        }
+        
+        if type == Float.Type.self
+            || type == Double.Type.self
+            || type == Bool.Type.self
+            || type == Character.Type.self
+        {
+            return true
+        }
+        
+        if type == String.Type.self {
+            return true
+        }
+        
+        return false
+    }
+    
+    /// Set property
+    open static func set(_ value:Any,to property:String, of obj: NSObject) {
+        let tb = self.type(property:property,of:obj)
+        if tb == NSNull.Type.self {
+            print("[\(obj)] without [\(property)]")
+        } else if self.isType(obj, type: tb)  {//子类，可以赋值
+            obj.setValue(value, forKey: property)
+        } else if value is String {
+            
+        }
+    }
+
+    
+    
+    /// fill填充数据
+    public static func fill<T: NSObject>(dic:Dictionary<String,NSObject>, model:T) {
+        
+        let mirror = Mirror(reflecting: model)
+        for (key,value) in dic {
+            for item in mirror.children {
+                
+                if(item.label != nil && item.label! == key){
+                    let v = item.value
+                    
+                    //若无法判断类型
+                    let o = type(of: v)
+                    let t = type(of: value)
+                    if o == t {//类型相同，直接复制
+                        model.setValue(v, forKey: key)
+                    } else if v is Optional {
+                        //针对基础类型
+                        do {
+                            try model.setValue(value, forKey: key)
+                        } catch {
+                            print("error:\(error)")
+                            model.setValue(v, forKey: key) // restore value
+                        }
+                    }
+                    
+                }
+            }
+        }
     }
 }
