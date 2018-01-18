@@ -7,28 +7,31 @@
 //
 
 import Foundation
-
+    
 /// reflect //http://www.hangge.com/blog/cache/detail_976.html
 final public class Injects {
     
     /// Get the property type. if it is NSNull, may be option type.
-    open static func type(property: String,of obj: NSObject) -> Any.Type {
+    open static func get(property: String,of obj: NSObject) -> Any? {
         
         var mr: Mirror = Mirror(reflecting: obj)
         for child in mr.children {
             if child.label! == property {
-                return Swift.type(of: child.value)
+                return child.value
             }
         }
+        
+        //recursive
         while let parent = mr.superclassMirror {
             for child in parent.children {
                 if child.label! == property {
-                    return Swift.type(of: child.value)
+                    return child.value
                 }
             }
             mr = parent
         }
-        return NSNull.Type.self
+        
+        return nil
     }
     
     /// Is a Type, similar to Swift.Type (of:)
@@ -52,30 +55,38 @@ final public class Injects {
     }
     
     /// contained Int,Float,Double,Bool,Character,String
-    open static func isBaseType(_ type: Any.Type) -> Bool {
-        if type == Int.Type.self
-            || type == Int8.Type.self
-            || type == Int16.Type.self
-            || type == Int32.Type.self
-            || type == Int64.Type.self
-            || type == UInt.Type.self
-            || type == UInt8.Type.self
-            || type == UInt16.Type.self
-            || type == UInt32.Type.self
-            || type == UInt64.Type.self
+    open static func isBaseType(_ obj: Any) -> Bool {
+//        let type = Swift.type(of: obj)
+        
+        if obj is Int
+            || obj is Int8
+            || obj is Int16
+            || obj is Int32
+            || obj is Int64
+            || obj is UInt
+            || obj is UInt8
+            || obj is UInt16
+            || obj is UInt32
+            || obj is UInt64
         {
             return true
         }
         
-        if type == Float.Type.self
-            || type == Double.Type.self
-            || type == Bool.Type.self
-            || type == Character.Type.self
+        if obj is Float
+            || obj is Double
+            || obj is Bool
+            || obj is Character
         {
             return true
         }
         
-        if type == String.Type.self {
+        // support other StringProtocol(Associated Types)
+        if obj is String || obj is Substring {
+            return true
+        }
+        
+        // objective-c class support
+        if obj is NSValue {
             return true
         }
         
@@ -83,46 +94,81 @@ final public class Injects {
     }
     
     /// Set property
-    open static func set(_ value:Any,to property:String, of obj: NSObject) {
-        let tb = self.type(property:property,of:obj)
-        if tb == NSNull.Type.self {
-            print("[\(obj)] without [\(property)]")
-        } else if self.isType(obj, type: tb)  {//子类，可以赋值
-            obj.setValue(value, forKey: property)
-        } else if value is String {
+    open static func set<T: NSObject>(_ value:Any,to property:String, of obj: T) {
+        let va = self.get(property:property,of:obj)
+        if va == nil {
+            print("\(type(of: obj)) without \(property) property")
+            return
+        }
+        
+        let oldv = va!
+        
+        if self.isType(obj, type: type(of: oldv))  {//子类，可以赋值
+            MMTry.try({ do { obj.setValue(value, forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        } else if isBaseType(value) && isBaseType(oldv) {
+            let v = "\(value)"
+            if oldv is Int{ MMTry.try({ do {  obj.setValue(Int(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is Int8 { MMTry.try({ do { obj.setValue(Int8(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is Int16 { MMTry.try({ do { obj.setValue(Int16(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is Int32 { MMTry.try({ do { obj.setValue(Int32(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is Int64 { MMTry.try({ do { obj.setValue(Int64(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is UInt { MMTry.try({ do { obj.setValue(UInt(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is UInt8 { MMTry.try({ do { obj.setValue(UInt8(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is UInt16 { MMTry.try({ do { obj.setValue(UInt16(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is UInt32 { MMTry.try({ do { obj.setValue(UInt32(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is UInt64 { MMTry.try({ do { obj.setValue(UInt64(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is Float { MMTry.try({ do { obj.setValue(Float(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            else if oldv is Double { MMTry.try({ do { obj.setValue(Double(v), forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
             
+            else if oldv is String || oldv is Substring {
+                MMTry.try({
+                    do { obj.setValue(v, forKey: property) } catch { print("error:\(error)") }
+                }, catch: { (exception) in
+                    print("error:\(exception)")
+                }, finally: nil)
+            }
+            
+            else if oldv is Bool {
+                let bs = v.lowercased()
+                if bs == "true" || bs == "yes" || bs == "on" || bs == "1" || bs == "t" || bs == "y" {
+                    MMTry.try({ do { obj.setValue(true, forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                } else if bs == "false" || bs == "no" || bs == "off" || bs == "0" || bs == "f" || bs == "n" {
+                    MMTry.try({ do { obj.setValue(false, forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                } else {
+                    print("\(type(of: obj))  the \(property) unable to set value [\(v)]")
+                }
+            }
+            else if oldv is Character {
+                if v.count == 1 {
+                    MMTry.try({ do { obj.setValue(v[v.startIndex], forKey: property) } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                } else {
+                    print("\(type(of: obj)) the \(property) unable to set value [\(v)]")
+                }
+            }
+            else {
+                print("\(type(of: obj)) the \(property) unable to set value [\(v)]")
+            }
+        } else {
+            MMTry.try({
+                do {
+                    try obj.setValue(value, forKey: property)
+                } catch {
+                    print("\(type(of: obj)) the \(property) unable to set value [\(value)]")
+                    print("error:\(error)")
+                    obj.setValue(oldv, forKey: property) //Reduced value
+                }
+            }, catch: { (exception) in
+                print("error:\(exception)")
+                print("\(type(of: obj)) the \(property) unable to set value [\(value)]")
+                obj.setValue(oldv, forKey: property) //Reduced value
+            }, finally: nil)
         }
     }
 
-    
-    
-    /// fill填充数据
-    public static func fill<T: NSObject>(dic:Dictionary<String,NSObject>, model:T) {
-        
-        let mirror = Mirror(reflecting: model)
+    /// fill model
+    open static func fill<T: NSObject>(dic:Dictionary<String,Any>, model:T) {
         for (key,value) in dic {
-            for item in mirror.children {
-                
-                if(item.label != nil && item.label! == key){
-                    let v = item.value
-                    
-                    //若无法判断类型
-                    let o = type(of: v)
-                    let t = type(of: value)
-                    if o == t {//类型相同，直接复制
-                        model.setValue(v, forKey: key)
-                    } else if v is Optional {
-                        //针对基础类型
-                        do {
-                            try model.setValue(value, forKey: key)
-                        } catch {
-                            print("error:\(error)")
-                            model.setValue(v, forKey: key) // restore value
-                        }
-                    }
-                    
-                }
-            }
+            self.set(value, to: key, of: model)
         }
     }
 }

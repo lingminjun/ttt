@@ -12,6 +12,7 @@
 		538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8F200A2DDE006B3A28 /* SettingNode.swift */; };
 		A466CFF86FB13BD221AC4E61 /* Pods_ttt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */; };
 		D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9414050200F3E3F0050132B /* MMJsonable.swift */; };
+		D941405C20107C610050132B /* MMTry.m in Sources */ = {isa = PBXBuildFile; fileRef = D941405B20107C610050132B /* MMTry.m */; };
 		D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7842008694200E3F0C5 /* MMFetchRealm.swift */; };
 		D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7852008694200E3F0C5 /* MMFetchList.swift */; };
 		D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7872008694200E3F0C5 /* MMUIController.swift */; };
@@ -39,6 +40,9 @@
 		538F9E8F200A2DDE006B3A28 /* SettingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNode.swift; sourceTree = "<group>"; };
 		91BE48983675DDBC97B96407 /* Pods-ttt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.debug.xcconfig"; sourceTree = "<group>"; };
 		D9414050200F3E3F0050132B /* MMJsonable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMJsonable.swift; sourceTree = "<group>"; };
+		D941405A20107C610050132B /* MMTry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMTry.h; sourceTree = "<group>"; };
+		D941405B20107C610050132B /* MMTry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMTry.m; sourceTree = "<group>"; };
+		D941405F20107D700050132B /* ttt-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ttt-Bridging-Header.h"; sourceTree = "<group>"; };
 		D958F7842008694200E3F0C5 /* MMFetchRealm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchRealm.swift; sourceTree = "<group>"; };
 		D958F7852008694200E3F0C5 /* MMFetchList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchList.swift; sourceTree = "<group>"; };
 		D958F7872008694200E3F0C5 /* MMUIController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMUIController.swift; sourceTree = "<group>"; };
@@ -147,6 +151,9 @@
 				D9CCAD19200CBB7900C03276 /* Injects.swift */,
 				D9CCAD16200C8F2700C03276 /* Urls.swift */,
 				D9414050200F3E3F0050132B /* MMJsonable.swift */,
+				D941405A20107C610050132B /* MMTry.h */,
+				D941405B20107C610050132B /* MMTry.m */,
+				D941405F20107D700050132B /* ttt-Bridging-Header.h */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -219,6 +226,7 @@
 				TargetAttributes = {
 					D9FDDBAF2008672200A88631 = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -319,6 +327,7 @@
 				D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */,
 				538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */,
 				D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */,
+				D941405C20107C610050132B /* MMTry.m in Sources */,
 				D9CCAD11200C57B300C03276 /* Navigator.swift in Sources */,
 				D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */,
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
@@ -470,12 +479,15 @@
 			baseConfigurationReference = 91BE48983675DDBC97B96407 /* Pods-ttt.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MGL332UAE8;
 				INFOPLIST_FILE = ttt/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ssn.ttt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ttt/core/foundation/ttt-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(PODS_ROOT)/**";
@@ -487,12 +499,14 @@
 			baseConfigurationReference = 358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MGL332UAE8;
 				INFOPLIST_FILE = ttt/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ssn.ttt;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ttt/core/foundation/ttt-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(PODS_ROOT)/**";

@@ -24,11 +24,9 @@ public class MMUIController : UIViewController {
     override final public func loadView() {
         if _stack_flag { return } else { _stack_flag = true }
         var rt = false
-        do {
-            rt = try onLoadView()
-        } catch {
-            print("error:\(error)")
-        }
+        MMTry.try({ do {
+            rt = try self.onLoadView()
+        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         _stack_flag = false
         if !rt {
             super.loadView()
@@ -37,65 +35,53 @@ public class MMUIController : UIViewController {
     
     override final public func viewDidLoad() {
         if _stack_flag { return } else { _stack_flag = true }
-        do {
-            try onViewDidLoad()
-        } catch {
-            print("error:\(error)")
-        }
+        MMTry.try({ do {
+            try self.onViewDidLoad()
+        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         _stack_flag = false
         super.viewDidLoad();
     }
     
     override final public func viewWillAppear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
-        do {
-            try onViewWillAppear(animated)
-        } catch {
-            print("error:\(error)")
-        }
+        MMTry.try({ do {
+            try self.onViewWillAppear(animated)
+        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         _stack_flag = false
         super.viewWillAppear(animated)
     }
     
     override final public func viewDidAppear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
-        do {
-            try onViewDidAppear(animated)
-        } catch {
-            print("error:\(error)")
-        }
+        MMTry.try({ do {
+            try self.onViewDidAppear(animated)
+        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         _stack_flag = false
         super.viewDidAppear(animated)
     }
     
     override final public func viewWillDisappear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
-        do {
-            try onViewWillDisappear(animated)
-        } catch {
-            print("error:\(error)")
-        }
+        MMTry.try({ do {
+            try self.onViewWillDisappear(animated)
+        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         _stack_flag = false
         super.viewWillDisappear(animated)
     }
     
     override final public func viewDidDisappear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
-        do {
-            try onViewDidDisappear(animated)
-        } catch {
-            print("error:\(error)")
-        }
+        MMTry.try({ do {
+            try self.onViewDidDisappear(animated)
+        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         _stack_flag = false
         super.viewDidDisappear(animated)
     }
     
     override final public func didReceiveMemoryWarning() {
-        do {
-            try onReceiveMemoryWarning()
-        } catch {
-            print("error:\(error)")
-        }
+        MMTry.try({ do {
+            try self.onReceiveMemoryWarning()
+        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         super.didReceiveMemoryWarning()
     }
     
