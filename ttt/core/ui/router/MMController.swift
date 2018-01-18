@@ -9,8 +9,8 @@
 import Foundation
 import UIKit
 
-public protocol MMController {
-    func onInit(params: Dictionary<String,Urls.QValue>?, ext:Dictionary<String,Any>?)
+@objc public protocol MMController {
+//    func onInit(params: Dictionary<String,Urls.QValue>?, ext:Dictionary<String,Any>?)
     func onLoadView() -> Bool
     func onViewDidLoad() -> Void
     func onViewWillAppear(_ animated: Bool)
@@ -20,16 +20,16 @@ public protocol MMController {
     func onReceiveMemoryWarning()
 }
 
-public protocol MMContainer {
+@objc public protocol MMContainer {
     func topController() -> MMController?
     func childrenControllers() -> [MMController]
-    func add(controller:MMController, at:Int?)
-    func open(controller at:Int?)
+    func add(controller:MMController, at:Int)
+    func open(controller at:Int)
 }
 
 extension UIViewController: MMController {
     //The following is a safe life-cycle methods.
-    public func onInit(params: Dictionary<String,Urls.QValue>?, ext:Dictionary<String,Any>? = nil) {}
+//    public func onInit(params: Dictionary<String,Urls.QValue>?, ext:Dictionary<String,Any>? = nil) {}
     public func onLoadView() -> Bool { return false }
     public func onViewDidLoad() -> Void { }
     public func onViewWillAppear(_ animated: Bool) { }
@@ -48,16 +48,106 @@ extension UINavigationController: MMContainer {
         return self.viewControllers
     }
     
-    public func add(controller: MMController, at: Int?) {
-        let vs = self.viewControllers
-        if at == nil || at! > self.viewControllers.count {
-            //
+    public func add(controller: MMController, at: Int = -1) {
+        if controller is UIViewController {
+            var vs = self.viewControllers
+            if at >= 0 && at < vs.count {
+                vs.append((controller as! UIViewController))
+                self.setViewControllers(vs, animated: false)
+            } else {// push
+                self.pushViewController((controller as! UIViewController), animated: true)
+            }
         }
     }
     
-    public func open(controller at: Int?) {
+    public func open(controller at: Int) {
+        let vs = self.viewControllers
+        if at >= 0 && at < vs.count {
+            let vc =  vs[at]
+            self.popToViewController(vc, animated: true)
+        }
+    }
+}
+
+extension UITabBarController: MMContainer {
+    public func topController() -> MMController? {
+        return self.selectedViewController
+    }
+    
+    public func childrenControllers() -> [MMController] {
+        guard let vs = self.viewControllers else { return [] }
+        return vs
+    }
+    
+    public func add(controller: MMController, at: Int = -1) {
+        if controller is UIViewController {
+            var vs = self.viewControllers
+            if vs == nil {
+                vs = []
+            }
+            if at >= 0 && at < vs!.count {
+                vs!.insert((controller as! UIViewController), at: at)
+            } else {
+                vs!.append((controller as! UIViewController))
+            }
+        }
+    }
+    
+    public func open(controller at: Int) {
+        guard let vs = self.viewControllers else { return }
+        if at >= 0 && at < vs.count {
+            if at == self.selectedIndex {
+                return
+            }
+            
+            self.selectedIndex = at
+        }
+    }
+    
+}
+
+extension UIWindow: MMContainer {
+    public func topController() -> MMController? {
+        return self.rootViewController
+    }
+    
+    public func childrenControllers() -> [MMController] {
+        let root = self.rootViewController
+        if root == nil {
+            return []
+        }
+        return [root!]
+    }
+    
+    public func add(controller: MMController, at: Int) {
+        if controller is UIViewController && self.rootViewController == nil {
+            self.rootViewController = (controller as! UIViewController)
+        }
+    }
+    
+    public func open(controller at: Int) {
         //
     }
     
     
+}
+
+extension UIViewController {
+    @objc public func theContainer() -> MMContainer? {
+        let vc = self.navigationController
+        if vc != nil {
+            return vc!
+        }
+        
+        let tv = self.tabBarController
+        if tv != nil {
+            return tv!
+        }
+        
+        if (self.view.window?.rootViewController == self) {
+            return self.view.window
+        }
+        
+        return nil
+    }
 }

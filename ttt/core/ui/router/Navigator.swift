@@ -12,7 +12,7 @@ import UIKit
 /// Routing app all scene pages.
 public final class Navigator: NSObject {
     
-    // 私有化
+    // private
     private override init() {
         super.init()
         loadConfig()
@@ -109,7 +109,7 @@ public final class Navigator: NSObject {
         }
         
         let type = NSClassFromString(vc) as! UIViewController.Type
-        let viewController = type.init()
+        var viewController = type.init()
         if let v = viewController as? MMUIController {
             v._node = router!.node
             v._uri = router!.id
@@ -125,13 +125,35 @@ public final class Navigator: NSObject {
         
         if !cc.isEmpty {
             let ctype = NSClassFromString(cc) as! UIViewController.Type
-            let viewContainer = type.init()
-//            if viewController
+            
+            //默认情况，请取当前top
+            let viewContainer = ctype.init()
+            if viewController is MMContainer {
+                let container = viewContainer as! MMContainer
+                container.add(controller: viewController, at: -1)
+                viewController = viewContainer
+            }
         }
         
-        
-        
-        return nil
+        return viewController
+    }
+    
+    var _window : UIWindow = UIWindow()
+    open func launching(root window:UIWindow) {
+        _window = window
+    }
+    
+    /// get top container
+    open func topContainer() -> MMContainer? {
+        var container = _window as MMContainer
+        while let vc = container.topController() {
+            if vc is MMContainer {
+                container = vc as! MMContainer
+            } else {
+                return container
+            }
+        }
+        return container
     }
     
     /// get router
