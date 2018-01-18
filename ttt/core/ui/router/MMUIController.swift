@@ -10,8 +10,8 @@ import UIKit
 
 public class MMUIController : UIViewController {
     
-    //The following is a safe life-cycle methods.
-    public func onInit(params: Dictionary<String,NSObject>?) {}
+    /*
+    public func onInit(params: Dictionary<String,Urls.QValue>?, ext:Dictionary<String,Any>? = nil) {}
     public func onLoadView() -> Bool { return false }
     public func onViewDidLoad() -> Void { }
     public func onViewWillAppear(_ animated: Bool) { }
@@ -19,6 +19,7 @@ public class MMUIController : UIViewController {
     public func onViewWillDisappear(_ animated: Bool) { }
     public func onViewDidDisappear(_ animated: Bool) { }
     public func onReceiveMemoryWarning() {}
+    */
     
     //System life-cycle methods
     override final public func loadView() {
@@ -86,4 +87,8 @@ public class MMUIController : UIViewController {
     }
     
     var _stack_flag = false
+    var _node = VCNode()
+    var _uri = ""
+    
+    
 }

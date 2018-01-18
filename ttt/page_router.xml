@@ -2,8 +2,8 @@
 <items version="1.0">
     <item url="https://m.mymm.com/splash.html"
         key=""
-        controller=""
-        container="com.mm.main.app.StartActivity"
+        controller="MMUIController"
+        container=""
         description="启动页"/>
 
     <item url="https://m.mymm.com/intro.html"

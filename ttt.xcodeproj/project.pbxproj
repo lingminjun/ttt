@@ -13,6 +13,7 @@
 		A466CFF86FB13BD221AC4E61 /* Pods_ttt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */; };
 		D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9414050200F3E3F0050132B /* MMJsonable.swift */; };
 		D941405C20107C610050132B /* MMTry.m in Sources */ = {isa = PBXBuildFile; fileRef = D941405B20107C610050132B /* MMTry.m */; };
+		D9414061201096CC0050132B /* MMController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9414060201096CC0050132B /* MMController.swift */; };
 		D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7842008694200E3F0C5 /* MMFetchRealm.swift */; };
 		D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7852008694200E3F0C5 /* MMFetchList.swift */; };
 		D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7872008694200E3F0C5 /* MMUIController.swift */; };
@@ -43,6 +44,7 @@
 		D941405A20107C610050132B /* MMTry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMTry.h; sourceTree = "<group>"; };
 		D941405B20107C610050132B /* MMTry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMTry.m; sourceTree = "<group>"; };
 		D941405F20107D700050132B /* ttt-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ttt-Bridging-Header.h"; sourceTree = "<group>"; };
+		D9414060201096CC0050132B /* MMController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMController.swift; sourceTree = "<group>"; };
 		D958F7842008694200E3F0C5 /* MMFetchRealm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchRealm.swift; sourceTree = "<group>"; };
 		D958F7852008694200E3F0C5 /* MMFetchList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchList.swift; sourceTree = "<group>"; };
 		D958F7872008694200E3F0C5 /* MMUIController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMUIController.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				D958F7872008694200E3F0C5 /* MMUIController.swift */,
 				D9CCAD10200C57B300C03276 /* Navigator.swift */,
 				D9CCAD14200C809E00C03276 /* VCNode.swift */,
+				D9414060201096CC0050132B /* MMController.swift */,
 			);
 			path = router;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */,
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
+				D9414061201096CC0050132B /* MMController.swift in Sources */,
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
 				D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */,
 				538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */,

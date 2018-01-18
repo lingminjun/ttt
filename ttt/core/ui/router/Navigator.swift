@@ -7,9 +7,11 @@
 //
 
 import Foundation
+import UIKit
 
 /// Routing app all scene pages.
-final class Navigator: NSObject {
+public final class Navigator: NSObject {
+    
     // 私有化
     private override init() {
         super.init()
@@ -47,10 +49,10 @@ final class Navigator: NSObject {
         }
     }
     
-    /// open url or open path
-    public func open(path:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+    /// Comple url from path
+    open func comple(path: String) -> String {
         if path.isEmpty {
-            return false
+            return path
         }
         var url = ""
         if path.contains("://") {
@@ -60,12 +62,20 @@ final class Navigator: NSObject {
         } else {
             url = _scheme + "://" + _host + "/" + path
         }
-        
+        return url
+    }
+    
+    /// open url or open path
+    open func open(path:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+        if path.isEmpty {
+            return false
+        }
+        let url = comple(path: path)
         return open(url, params:params, modal:modal)
     }
     
     /// open url
-    public func open(_ url:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+    open func open(_ url:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
         if !isValid(url:url) {
             return false
         }
@@ -75,8 +85,102 @@ final class Navigator: NSObject {
         return true
     }
     
+    /// generate VC
+    open func getViewController(path:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
+        if path.isEmpty {
+            return nil
+        }
+        let url = comple(path: path)
+        return getViewController(url, params: params, ext: ext)
+    }
+    open func getViewController(_ url:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
+        if !isValid(url:url) {
+            return nil
+        }
+        
+        let router = routerNode(url: url)
+        if router == nil {
+            return nil
+        }
+        
+        var vc = router!.node.controller
+        if vc.isEmpty {
+            vc = "UIViewController"
+        }
+        
+        let type = NSClassFromString(vc) as! UIViewController.Type
+        let viewController = type.init()
+        if let v = viewController as? MMUIController {
+            v._node = router!.node
+            v._uri = router!.id
+            MMTry.try({ do {
+                v.onInit(params: params, ext: ext)
+            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        }
+        
+        var cc = router!.node.container
+        if cc.isEmpty && !(viewController is UINavigationController) {
+            cc = "UINavigationController"
+        }
+        
+        if !cc.isEmpty {
+            let ctype = NSClassFromString(cc) as! UIViewController.Type
+            let viewContainer = type.init()
+//            if viewController
+        }
+        
+        
+        
+        return nil
+    }
+    
+    /// get router
+    open func getRouter(url:String) -> VCNode? {
+        return routerNode(url: url)?.node
+    }
+    fileprivate func routerNode(url:String) -> RouterNode? {
+        let uri = Urls.getURLFinderPath(url:url)
+        if uri.isEmpty {
+            return nil
+        }
+        
+        let node = _routers[uri]
+        if (node != nil) {return node}
+        
+        //开始兼容其他形式，如 detail/{_}.html 或者 detail/{_}/{_}.html
+        let strs = uri.split(separator: "/")
+        var builder = ""
+        for  i in (0..<strs.count).reversed() {
+            //最后一个，需要特殊处理下
+            let str = strs[i]
+            if i == strs.count - 1 {
+                let range = str.range(of: ".", options: .backwards)
+                if range != nil {
+                    builder.append("{_}");
+                    builder.append(String(str[range!.lowerBound..<str.endIndex]))
+                } else {
+                    builder.append("{_}");
+                }
+            } else {
+                builder.insert(contentsOf: "{_}/", at: builder.startIndex) // insert(0,"{_}/");//往前插入
+            }
+            
+            var key = ""
+            for j in 0..<i {
+                key.append(String(strs[j]));
+                key.append("/");
+            }
+            
+            key.append(builder);
+            let nn = _routers[key]
+            if (nn != nil) { return nn }
+        }
+        
+        return nil;
+    }
+    
     /// is valid url
-    public func isValid(url:String) -> Bool {
+    open func isValid(url:String) -> Bool {
         let uri = URL(string:Urls.encoding(url: url))
         
         if (uri == nil) {return false}

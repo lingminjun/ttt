@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct VCNode {
+public struct VCNode {
     public var controller: String = ""
     public var container: String = "" //限定特定的activity打开，默认UIViewContainer
     

@@ -8,10 +8,10 @@
 
 import Foundation
 
-final class Urls {
+public final class Urls {
     
     /// query value defined
-    enum QValue {
+    public enum QValue {
         case value(String)
         case array([String])
         
