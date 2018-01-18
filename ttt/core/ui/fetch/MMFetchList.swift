@@ -34,11 +34,9 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
         _listener?.ssn_fetch_begin_change(self)
         _listener?.ssn_fetch(self,didChange: obj, at:idx, for: MMFetchChangeType.update, newIndex:idx)
         if b != nil {
-            do {
+            MMTry.try({ do {
                 try b!()
-            } catch {
-                print("error:\(error)")
-            }
+            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         }
         _listener?.ssn_fetch_end_change(self)
     }

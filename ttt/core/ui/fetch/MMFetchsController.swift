@@ -576,11 +576,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         // 2.判断cell是否为nil
         if cell == nil {
-            do {
+            MMTry.try({ do {
                 cell = try model?.ssn_cell(cellID)
-            } catch {
-                print("error:\(error)")
-            }
+            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         }
         
         if cell == nil {
@@ -589,12 +587,10 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         // 3.设置cell数据
         if model != nil {
-            do {
+            MMTry.try({ do {
                 cell?.ssn_set_cellModel(model)//提前设置model的值
                 try cell!.ssn_onDisplay(tableView, model: model!, atIndexPath: indexPath)
-            } catch {
-                print("error:\(error)")
-            }
+            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         }
         
         return cell!
@@ -638,11 +634,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     public func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         var rt: Bool = false
         if _delegate != nil {
-            do {
-                rt = try _delegate!.ssn_controller!(self, tableView: tableView, commitEditingStyle: editingStyle, forRowAtIndexPath: indexPath)
-            } catch {
-                print("error:\(error)")
-            }
+            MMTry.try({ do {
+                rt = try self._delegate!.ssn_controller!(self, tableView: tableView, commitEditingStyle: editingStyle, forRowAtIndexPath: indexPath)
+            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         }
         if !rt {
             //default delete cell
@@ -657,10 +651,8 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     // Data manipulation - reorder / moving support
     public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        do {
+        MMTry.try({ do {
             try self.delegate?.ssn_controller!(self, tableView: tableView, moveRowAtIndexPath: sourceIndexPath, toIndexPath: destinationIndexPath)
-        } catch {
-            print("error:\(error)")
-        }
+        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
     }
 }
