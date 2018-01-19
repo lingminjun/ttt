@@ -21,7 +21,14 @@ public class MMUIController : UIViewController {
     public func onViewDidDisappear(_ animated: Bool) { }
     public func onReceiveMemoryWarning() {}
      */
-    
+    public func isVisible() -> Bool {
+        switch _visible {
+        case .didDisappear:
+            return false
+        default:
+            return true
+        }
+    }
     
     //System life-cycle methods
     override final public func loadView() {
@@ -47,6 +54,7 @@ public class MMUIController : UIViewController {
     
     override final public func viewWillAppear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
+        _visible = VisibleStatus.willAppear
         MMTry.try({ do {
             try self.onViewWillAppear(animated)
         } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
@@ -56,6 +64,7 @@ public class MMUIController : UIViewController {
     
     override final public func viewDidAppear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
+        _visible = VisibleStatus.didAppear
         MMTry.try({ do {
             try self.onViewDidAppear(animated)
         } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
@@ -70,6 +79,7 @@ public class MMUIController : UIViewController {
         } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         _stack_flag = false
         super.viewWillDisappear(animated)
+        _visible = VisibleStatus.willDisappear
     }
     
     override final public func viewDidDisappear(_ animated: Bool) {
@@ -79,6 +89,7 @@ public class MMUIController : UIViewController {
         } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         _stack_flag = false
         super.viewDidDisappear(animated)
+        _visible = VisibleStatus.didDisappear
     }
     
     override final public func didReceiveMemoryWarning() {
@@ -88,9 +99,18 @@ public class MMUIController : UIViewController {
         super.didReceiveMemoryWarning()
     }
     
-    var _stack_flag = false
+    private var _stack_flag = false
     var _node = VCNode()
     var _uri = ""
     
+    private var _visible = VisibleStatus.didDisappear
+    final func visible() -> VisibleStatus { return _visible }
     
+    
+    enum VisibleStatus {
+        case didDisappear
+        case willAppear
+        case didAppear
+        case willDisappear
+    }
 }

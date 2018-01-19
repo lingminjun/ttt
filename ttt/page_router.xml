@@ -15,4 +15,9 @@
         controller="DemoRealmController"
         container=""
         description="狗狗列表"/>
+    <item url="https://m.mymm.com/web.html"
+        key=""
+        controller="MMUIWebController"
+        container=""
+        description="浏览器"/>
 </items>

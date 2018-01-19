@@ -152,15 +152,17 @@ public final class Urls {
     /// get url query dictionary
     public static func query(url: String, decord: Bool = true) ->Dictionary<String,QValue> {
         let surl = encoding(url: url)
-        guard let q = URL(string:surl) else {return Dictionary<String,QValue>()}
-        return query(query:q.query!, decord:decord)
+        guard let u = URL(string:surl) else {return Dictionary<String,QValue>()}
+        guard let q = u.query else {return Dictionary<String,QValue>()}
+        return query(query:q, decord:decord)
     }
     
     /// get url fragment dictionary
     public static func fragment(url: String, decord: Bool = true) ->Dictionary<String,QValue> {
         let surl = encoding(url: url)
-        guard let q = URL(string:surl) else {return Dictionary<String,QValue>()}
-        return query(query:q.fragment!, decord:decord)
+        guard let u = URL(string:surl) else {return Dictionary<String,QValue>()}
+        guard let f = u.fragment else {return Dictionary<String,QValue>()}
+        return query(query:f, decord:decord)
     }
     
     /// get query dictionary
@@ -266,7 +268,7 @@ public final class Urls {
     /// just uri:<scheme>://<host>:<port>/<path>;<params>
     /// *param: only is just url path
     /// *param: sensitve is path case sensitve
-    public static func tidy(url:String, path only:Bool = false, case sensitve:Bool = false) -> String {
+    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = false) -> String {
         //decoding and encoding can compatibility more scene
         let surl = encoding(url: url)
         
@@ -340,6 +342,10 @@ public final class Urls {
             }
         }
         
+        if nofragment {
+            return result
+        }
+        
         //fragment
         let fragment = uri?.fragment
         if fragment != nil {
@@ -361,6 +367,13 @@ public final class Urls {
     public static func isEqualURL(_ url:String, _ turl:String, case sensitve:Bool = false) -> Bool {
         let url1 = self.tidy(url: url, path: false, case: sensitve)
         let url2 = self.tidy(url: turl, path: false, case: sensitve)
+        return url1 == url2
+    }
+    
+    /// compared <scheme>://<host>:<port>/<path>;<params>?<query>
+    public static func isEqualURI(_ url:String, _ turl:String, case sensitve:Bool = false) -> Bool {
+        let url1 = self.tidy(url: url, path: true, nofragment: true,  case: sensitve)
+        let url2 = self.tidy(url: turl, path: true, nofragment: true, case: sensitve)
         return url1 == url2
     }
     

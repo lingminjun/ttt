@@ -9,6 +9,8 @@
 import Foundation
 import UIKit
 
+public let ON_BROWSER_KEY = "_on_browser"
+
 /// Routing app all scene pages.
 public final class Navigator: NSObject {
     
@@ -136,9 +138,29 @@ public final class Navigator: NSObject {
             return nil
         }
         
-        let router = routerNode(url: url)
+        // merge params
+        var query = Urls.query(url: url)
+        if params != nil {
+            for (key,value) in params! {
+                query[key] = value
+            }
+        }
+        
+        var router = routerNode(url: url)
         if router == nil {
-            return nil
+            if query[ON_BROWSER_KEY] != nil {
+                router = RouterNode()
+                router!.id = "/app/browser.html"
+                router!.node = VCNode()
+                router!.node.controller = "MMUIWebController"
+                router!.node.url = comple(path: "/app/browser.html")
+                router!.node.path = router!.id
+                
+                query[LOAD_URL_KEY] = Urls.QValue(url)
+                query.removeValue(forKey: ON_BROWSER_KEY)
+            } else {
+                return nil
+            }
         }
         
         var vc = router!.node.controller
@@ -159,7 +181,7 @@ public final class Navigator: NSObject {
             v._node = router!.node
             v._uri = router!.id
             MMTry.try({
-                v.onInit(params: params, ext: ext)
+                v.onInit(params: query, ext: ext)
             }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         }
         

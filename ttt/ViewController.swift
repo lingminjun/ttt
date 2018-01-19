@@ -19,118 +19,58 @@ extension Dog {
     @objc public override func ssn_canMove() -> Bool {return false}
 }
 
-class ViewController: MMUIController {
+class ViewController: MMUITableController<Dog> {
     
-    // 注意: Swift中mark注释的格式: MARK:-
-    // MARK:- 属性
-    let cellID = "cell"
-    var _table : UITableView!
-    
-    var _fetch : MMFetchsController<Dog>?
-    
-    override func onViewDidLoad() {
-        super.viewDidLoad()
-        
-        Injects.fill(dic: ["cellID":"xxxx"], model: self)
-        
-        self.title = "首页"
-        
-        //初始化数据是否准备
+    public override func loadFetchs() -> [MMFetch<Dog>] {
         let realm = try! Realm()
         let vs = realm.objects(Dog.self)
         if vs.count == 0 {
             initializationData(realm: realm)
         }
- 
-        
-        // 1.创建tableView,并添加的控制器的view
-        let tableView = UITableView(frame: view.bounds)
-        
-        // 2.设置数据源代理
-//        tableView.dataSource = self
-        tableView.delegate = self
-        
-        // 3.添加到控制器的view
-        view.addSubview(tableView)
-        _table = tableView
-        
-        // 4.注册cell
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
-        
-        //使用默认的数据库
         let ff = vs.sorted(byKeyPath: "breed", ascending: true)
-        var f = MMFetchRealm(result:ff,realm:realm)
-        _fetch = MMFetchsController(fetchs:[f])
-        _fetch?.delegate = self
-        tableView.dataSource = _fetch
-//        let predicate = NSPredicate(format: "type.name = '购物' AND cost > 10")
-        //        consumeItems = realm.objects(ConsumeItem.self).filter(predicate)
+        let f = MMFetchRealm(result:ff,realm:realm)
+        return [f]
     }
-
+    
+    
     override func onReceiveMemoryWarning() {
         super.onReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
 
 
-}
-
-// ------------------------------------------------------------------------
-// Swift中类的扩展: Swift中的扩展相当于OC中的分类
-extension ViewController: MMFetchsControllerDelegate, UITableViewDelegate {
-    func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .delete:
-            _table.deleteRows(at: [indexPath!], with: .automatic)
-        case .insert:
-            _table.insertRows(at: [indexPath!], with: .automatic)
-        case .update:
-            _table.reloadRows(at: [indexPath!], with: .automatic)
-        default:
-            _table.deleteRows(at: [indexPath!], with: .automatic)
-            _table.insertRows(at: [newIndexPath!], with: .automatic)
-        }
-    }
-    
-    func ssn_controllerWillChangeContent(_ controller: AnyObject) {
-        _table.beginUpdates()
-    }
-    
-    func ssn_controllerDidChangeContent(_ controller: AnyObject) {
-        _table.endUpdates()
-    }
-
-    
-    
     // MARK:- UITableViewDelegate代理
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    public override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("点击了\(indexPath.row)")
         tableView.deselectRow(at: indexPath, animated: false)
         if indexPath.row == 0 {
-            _fetch?[0]?.delete(0);
+            self.fetchs[0]?.delete(0);
         } else if (indexPath.row == 1) {
-            insertOrUpdate(fetch: (_fetch?[0]!)!, idx: indexPath.row)
+            insertOrUpdate(fetch: (self.fetchs[0]!), idx: indexPath.row)
         } else if (indexPath.row == 2) {
             orderThreadInsert()
         } else if (indexPath.row == 5) {
-            _fetch?.delete(at: indexPath)
+            self.fetchs.delete(at: indexPath)
         } else if (indexPath.row == 6) {
             let d = Dog()
             d.breed = "法国比利牛斯指示犬"
             d.brains = 60
             d.loyalty = 90
             d.name = "法国比利牛斯指示犬"
-            _fetch?.insert(obj: d, at: indexPath)
+            self.fetchs.insert(obj: d, at: indexPath)
         } else if (indexPath.row == 7) {
             Navigator.shared.open("https://m.mymm.com/setting.html")
 //            let vc = DemoListController()
 //            self.navigationController?.pushViewController(vc, animated: true)
+        } else if (indexPath.row == 8) {
+            let params = ["_load_url":Urls.QValue("https://m.baidu.com")]
+            Navigator.shared.open("https://m.mymm.com/web.html",params:params)
         } else if (indexPath.row == 9) {
-            _fetch?.delete(at: indexPath)
+            self.fetchs.delete(at: indexPath)
         }
         else {
-            let dog = _fetch?.object(at: indexPath)
-            _fetch?.update(at: indexPath, {
+            let dog = self.fetchs.object(at: indexPath)
+            self.fetchs.update(at: indexPath, {
                 dog?.brains += 1;
             })
         }
