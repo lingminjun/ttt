@@ -150,4 +150,23 @@ extension UIViewController {
         
         return nil
     }
+    
+    public func ssn_back() {
+        let nav = self.navigationController
+        var presenting = self.presentingViewController
+        
+        if nav != nil {
+            let idx = nav!.viewControllers.index(of: self)
+            if idx != nil && idx! > 0 {
+                nav!.popToViewController(nav!.viewControllers[idx!-1], animated: true)
+                return
+            }
+            
+            presenting = nav!.presentingViewController
+        }
+        
+        if presenting != nil {
+            presenting!.dismiss(animated: true, completion: nil)
+        }
+    }
 }

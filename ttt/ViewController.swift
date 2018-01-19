@@ -31,6 +31,8 @@ class ViewController: MMUIController {
     override func onViewDidLoad() {
         super.viewDidLoad()
         
+        Injects.fill(dic: ["cellID":"xxxx"], model: self)
+        
         self.title = "首页"
         
         //初始化数据是否准备

@@ -12,6 +12,6 @@
 /**
  Provides try catch functionality for swift by wrapping around Objective-C
  */
-+ (void)try:(void (^)())try catch:(void (^)(NSException *))catch finally:(void (^)())finally;
++ (void)try:(void (^)(void))try catch:(void (^)(NSException *))catch finally:(void (^)(void))finally;
 
 @end

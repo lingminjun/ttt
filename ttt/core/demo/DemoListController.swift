@@ -109,7 +109,8 @@ extension DemoListController: MMFetchsControllerDelegate,UITableViewDelegate {
         print("点击了\(indexPath.row)")
         if indexPath.row == 0 {
 //            self.dismiss(animated: true, completion: nil)
-            self.navigationController?.popViewController(animated: true)
+//            self.navigationController?.popViewController(animated: true)
+            self.ssn_back()
         } else if indexPath.row == 1 {
             var node = SettingNode()
             node.title = "插入数据1"
@@ -140,6 +141,8 @@ extension DemoListController: MMFetchsControllerDelegate,UITableViewDelegate {
             let node = _fetch?.object(at: indexPath)
             node?.subTitle = "修改"
             _fetch?.update(at: indexPath, nil)
+        } else if indexPath.row == 4 {
+            Navigator.shared.open("https://m.mymm.com/dog/list.html")
         } else {
             _fetch?.delete(at: indexPath)
         }
