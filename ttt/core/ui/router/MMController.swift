@@ -20,7 +20,7 @@ import UIKit
     func onReceiveMemoryWarning()
 }
 
-@objc public protocol MMContainer {
+@objc public protocol MMContainer : NSObjectProtocol{
     func topController() -> MMController?
     func childrenControllers() -> [MMController]
     func add(controller:MMController, at:Int)

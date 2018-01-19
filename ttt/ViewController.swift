@@ -120,9 +120,9 @@ extension ViewController: MMFetchsControllerDelegate, UITableViewDelegate {
             d.name = "法国比利牛斯指示犬"
             _fetch?.insert(obj: d, at: indexPath)
         } else if (indexPath.row == 7) {
-            let vc = DemoListController()
-//            self.present(vc, animated: true, completion: nil)
-            self.navigationController?.pushViewController(vc, animated: true)
+            Navigator.shared.open("https://m.mymm.com/setting.html")
+//            let vc = DemoListController()
+//            self.navigationController?.pushViewController(vc, animated: true)
         } else if (indexPath.row == 9) {
             _fetch?.delete(at: indexPath)
         }

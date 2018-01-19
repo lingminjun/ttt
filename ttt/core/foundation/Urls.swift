@@ -444,7 +444,7 @@ public final class Urls {
                 continue
             }
             
-            if path.contains("{") && path.contains("}") {
+            if !path.contains("{") && !path.contains("}") {
                 return "";
             }
             

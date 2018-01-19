@@ -74,13 +74,51 @@ public final class Navigator: NSObject {
         return open(url, params:params, modal:modal)
     }
     
+    private static func isSameKind(aClass: AnyClass, bClass: AnyClass) -> Bool {
+        return aClass.isSubclass(of: bClass) || bClass.isSubclass(of: aClass)
+    }
+    
     /// open url
     open func open(_ url:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
         if !isValid(url:url) {
             return false
         }
         
-        // TODO
+        guard let router = routerNode(url: url) else {return false}
+        guard let vc = getViewController(url, params: params, ext: ext) else {return false}
+        var tc = topContainer()
+        
+        var cc = router.node.container
+        if cc.isEmpty && !(vc is UINavigationController) {
+            cc = "UINavigationController"
+        }
+        
+        //open 主要是看top container和xml配置中是否同一个类型，若是，则不再new container
+        if !cc.isEmpty {
+            var xclazz = Navigator.reflectOCClass(name:cc)
+            if xclazz != nil {
+                let tclazz = type(of: tc) as Swift.AnyClass
+                
+                /// 不是同一个类型的或者是modal
+                if !Navigator.isSameKind(aClass:xclazz!,bClass:tclazz) || modal  {
+                    MMTry.try({
+                        tc = (Navigator.reflectViewController(name:cc) as? MMContainer)! //若不满足协议则构建失败
+                    }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                }
+            }
+        }
+        
+        tc.add(controller: vc, at: -1)
+        
+        //看看tc是否已经放入布局之中
+        let ftc = topContainer()
+        if tc !== ftc && tc is UIViewController {
+            if modal || ftc is UIViewController {
+                (ftc as! UIViewController).present((tc as! UIViewController), animated: true, completion: nil)
+            } else {
+                ftc.add(controller: tc as! MMController, at: -1)
+            }
+        }
         
         return true
     }
@@ -108,43 +146,61 @@ public final class Navigator: NSObject {
             vc = "UIViewController"
         }
         
-        let type = NSClassFromString(vc) as! UIViewController.Type
-        var viewController = type.init()
+        var viewController :UIViewController? = nil
+        MMTry.try({
+            viewController = Navigator.reflectViewController(name:vc)
+            viewController?.title = router!.node.des
+        }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        if viewController == nil {
+            return nil
+        }
+        
         if let v = viewController as? MMUIController {
             v._node = router!.node
             v._uri = router!.id
-            MMTry.try({ do {
+            MMTry.try({
                 v.onInit(params: params, ext: ext)
-            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
-        }
-        
-        var cc = router!.node.container
-        if cc.isEmpty && !(viewController is UINavigationController) {
-            cc = "UINavigationController"
-        }
-        
-        if !cc.isEmpty {
-            let ctype = NSClassFromString(cc) as! UIViewController.Type
-            
-            //默认情况，请取当前top
-            let viewContainer = ctype.init()
-            if viewController is MMContainer {
-                let container = viewContainer as! MMContainer
-                container.add(controller: viewController, at: -1)
-                viewController = viewContainer
-            }
+            }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         }
         
         return viewController
     }
     
+    private static func reflectOCClass(name:String) -> Swift.AnyClass? {
+        guard let NameSpace = Bundle.main.infoDictionary!["CFBundleExecutable"] as? String else { return nil }
+        
+        var vcname = name
+        if !name.contains(".") {
+            vcname = NameSpace + "." + name
+        }
+        
+        var clazz: Swift.AnyClass? = nil
+        MMTry.try({
+            clazz = NSClassFromString(vcname)
+        }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        
+        if clazz == nil {
+            MMTry.try({
+                clazz = NSClassFromString(name) //如果是系统看，则不需要取报名
+            }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        }
+        return clazz
+    }
+    private static func reflectViewController(name:String) -> UIViewController? {
+        guard let clazz = reflectOCClass(name:name) else {return nil}
+        let type = clazz as? UIViewController.Type
+        return type?.init()
+    }
+    
     var _window : UIWindow = UIWindow()
+    
+    // launching
     open func launching(root window:UIWindow) {
         _window = window
     }
     
     /// get top container
-    open func topContainer() -> MMContainer? {
+    open func topContainer() -> MMContainer {
         var container = _window as MMContainer
         while let vc = container.topController() {
             if vc is MMContainer {
@@ -261,6 +317,25 @@ extension Navigator : XMLParserDelegate {
         if elementName == "item" {
             print("start parser:\(elementName)")
             _node = VCNode()
+            
+            for (attributeName,attributeValue) in attributeDict {
+                if attributeValue.isEmpty {
+                    continue
+                }
+                if attributeName == "url" {
+                    _node.url = attributeValue
+                    _node.path = Urls.getURLFinderPath(url: attributeValue)
+                    _node.param = Urls.getURLPathParamKey(url: attributeValue)
+                } else if attributeName == "key" {
+                    _node.key = attributeValue
+                } else if attributeName == "controller" {
+                    _node.controller = attributeValue
+                } else if attributeName == "container" {
+                    _node.container = attributeValue
+                } else if attributeName == "description" {
+                    _node.des = attributeValue
+                }
+            }
         }
     }
     
@@ -282,24 +357,24 @@ extension Navigator : XMLParserDelegate {
         }
     }
     
-    public func parser(_ parser: XMLParser, foundAttributeDeclarationWithName attributeName: String, forElement elementName: String, type: String?, defaultValue: String?) {
-        
-        if elementName == "item" {
-            if attributeName == "url" && defaultValue != nil {
-                _node.url = defaultValue!
-                _node.path = Urls.getURLFinderPath(url: defaultValue!)
-                _node.param = Urls.getURLPathParamKey(url: defaultValue!)
-            } else if attributeName == "key" && defaultValue != nil {
-                _node.key = defaultValue!
-            } else if attributeName == "controller" && defaultValue != nil {
-                _node.controller = defaultValue!
-            } else if attributeName == "container" && defaultValue != nil {
-                _node.container = defaultValue!
-            } else if attributeName == "description" && defaultValue != nil {
-                _node.des = defaultValue!
-            }
-        }
-    }
+//    public func parser(_ parser: XMLParser, foundAttributeDeclarationWithName attributeName: String, forElement elementName: String, type: String?, defaultValue: String?) {
+//
+//        if elementName == "item" {
+//            if attributeName == "url" && defaultValue != nil {
+//                _node.url = defaultValue!
+//                _node.path = Urls.getURLFinderPath(url: defaultValue!)
+//                _node.param = Urls.getURLPathParamKey(url: defaultValue!)
+//            } else if attributeName == "key" && defaultValue != nil {
+//                _node.key = defaultValue!
+//            } else if attributeName == "controller" && defaultValue != nil {
+//                _node.controller = defaultValue!
+//            } else if attributeName == "container" && defaultValue != nil {
+//                _node.container = defaultValue!
+//            } else if attributeName == "description" && defaultValue != nil {
+//                _node.des = defaultValue!
+//            }
+//        }
+//    }
     
 //    // 3
 //    public func parser(_ parser: XMLParser, foundCharacters string: String) {

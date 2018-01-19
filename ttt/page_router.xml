@@ -1,61 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <items version="1.0">
-    <item url="https://m.mymm.com/splash.html"
-        key=""
-        controller="MMUIController"
-        container=""
-        description="启动页"/>
-
-    <item url="https://m.mymm.com/intro.html"
-        key=""
-        controller=""
-        container="com.mm.main.app.activity.storefront.intro.IntroActivity"
-        description="新手介绍页"/>
-
-    <item url="https://m.mymm.com/u/signup.html"
-        key=""
-        controller=""
-        container="com.mm.main.app.activity.storefront.signup.SignupLoginActivity"
-        description="注册"/>
-
-    <item url="https://m.mymm.com/u/login.html"
-        key=""
-        controller=""
-        container="com.mm.main.app.activity.storefront.login.LoginActivity"
-        description="登录"/>
-
-    <item url="https://m.mymm.com/u/{userKey}.html"
-        key=""
-        controller="com.mm.main.app.fragment.UserProfileFragment"
-        container=""
-        description="个人中心"/>
-
-    <item url="https://m.mymm.com/m-index.html"
-        key=""
-        controller=""
-        container="com.mm.main.app.activity.storefront.StorefrontMainActivity"
-        description="首页"/>
     <item url="https://m.mymm.com"
         key=""
-        controller=""
-        container="com.mm.main.app.activity.storefront.StorefrontMainActivity"
-        description="首页"/>
-
-    <item url="https://m.mymm.com/s/{skuId}"
+        controller="ViewController"
+        container=""
+        description="启动页"/>
+    <item url="https://m.mymm.com/setting.html"
         key=""
-        controller="com.mm.main.app.fragment.ProductDetailsPageFragment"
-        container="com.mm.main.app.activity.storefront.base.BaseContainerActivity"
-        description="商品详情"/>
-
-    <item url="https://m.mymm.com/m/{merchantId}"
+        controller="DemoListController"
+        container=""
+        description="设置"/>
+    <item url="https://m.mymm.com/dog/list.html"
         key=""
-        controller="com.mm.main.app.fragment.MerchantLandingFragment"
-        container="com.mm.main.app.activity.storefront.base.BaseContainerActivity"
-        description="店铺主页"/>
-
-    <item url="https://m.mymm.com/m/profile.html"
-        key=""
-        controller="com.mm.main.app.fragment.MerchantProfileFragment"
-        container="com.mm.main.app.activity.storefront.base.BaseContainerActivity"
-        description="店铺说明"/>
+        controller="DemoRealmController"
+        container=""
+        description="狗狗列表"/>
 </items>
