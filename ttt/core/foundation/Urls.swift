@@ -364,23 +364,56 @@ public final class Urls {
     }
     
     /// compared <scheme>://<host>:<port>/<path>;<params>?<query>#<fragment>
-    public static func isEqualURL(_ url:String, _ turl:String, case sensitve:Bool = false) -> Bool {
+    public static func isEqualURL(_ url:String, _ turl:String, case sensitve:Bool = false, ignore scheme:Bool = false) -> Bool {
         let url1 = self.tidy(url: url, path: false, case: sensitve)
         let url2 = self.tidy(url: turl, path: false, case: sensitve)
+        if scheme {
+            let range1 = url1.range(of: "://")
+            let range2 = url2.range(of: "://")
+            
+            if range1 != nil && range2 != nil {
+                let str1 = url1[range1!.upperBound..<url1.endIndex]
+                let str2 = url2[range2!.upperBound..<url2.endIndex]
+                return str1 == str2
+            }
+            return false
+        }
         return url1 == url2
     }
     
     /// compared <scheme>://<host>:<port>/<path>;<params>?<query>
-    public static func isEqualURI(_ url:String, _ turl:String, case sensitve:Bool = false) -> Bool {
+    public static func isEqualURI(_ url:String, _ turl:String, case sensitve:Bool = false, ignore scheme:Bool = false) -> Bool {
         let url1 = self.tidy(url: url, path: true, nofragment: true,  case: sensitve)
         let url2 = self.tidy(url: turl, path: true, nofragment: true, case: sensitve)
+        if scheme {
+            let range1 = url1.range(of: "://")
+            let range2 = url2.range(of: "://")
+            
+            if range1 != nil && range2 != nil {
+                let str1 = url1[range1!.upperBound..<url1.endIndex]
+                let str2 = url2[range2!.upperBound..<url2.endIndex]
+                return str1 == str2
+            }
+            return false
+        }
         return url1 == url2
     }
     
     /// compared <scheme>://<host>:<port>/<path>;<params>
-    public static func isEqualURLPath(_ url:String, _ turl:String, case sensitve:Bool = false) -> Bool {
+    public static func isEqualURLPath(_ url:String, _ turl:String, case sensitve:Bool = false, ignore scheme:Bool = false) -> Bool {
         let url1 = self.tidy(url: url, path: true, case: sensitve)
         let url2 = self.tidy(url: turl, path: true, case: sensitve)
+        if scheme {
+            let range1 = url1.range(of: "://")
+            let range2 = url2.range(of: "://")
+            
+            if range1 != nil && range2 != nil {
+                let str1 = url1[range1!.upperBound..<url1.endIndex]
+                let str2 = url2[range2!.upperBound..<url2.endIndex]
+                return str1 == str2
+            }
+            return false
+        }
         return url1 == url2
     }
     

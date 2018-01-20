@@ -78,7 +78,7 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
     }
     
     private func checkGotoOtherWebController(url: String) -> Bool {
-        if Urls.isEqualURI(_url, url) {
+        if Urls.isEqualURI(_url, url, ignore:true) {
             return true
         }
         
