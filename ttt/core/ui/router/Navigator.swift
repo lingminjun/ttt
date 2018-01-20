@@ -139,7 +139,7 @@ public final class Navigator: NSObject {
         tc.add(controller: vc, at: -1)
         
         //看看tc是否已经放入布局之中
-        let ftc = topContainer()
+        let ftc = topContainer(volatile: false)
         if tc !== ftc && tc is UIViewController {
             if modal || ftc is UIViewController {
                 (ftc as! UIViewController).present((tc as! UIViewController), animated: true, completion: nil)
@@ -247,17 +247,33 @@ public final class Navigator: NSObject {
         _window = window
     }
     
-    /// get top container
-    open func topContainer() -> MMContainer {
-        var container = _window as MMContainer
-        while let vc = container.topController() {
-            if vc is MMContainer {
-                container = vc as! MMContainer
-            } else {
+    /// get top container, default UINavigationController
+    open func topContainer(volatile: Bool = true) -> MMContainer {
+        let ctns = containers();
+        if !volatile {
+            return ctns.last!
+        }
+        for container in ctns.reversed() {
+            if container.volatileContainer() {
                 return container
             }
         }
-        return container
+        return ctns.first! //返回window
+    }
+    
+    fileprivate func containers() -> [MMContainer] {
+        var ctns = [] as [MMContainer]
+        var container = _window as MMContainer
+        ctns.append(container)
+        while let vc = container.topController() {
+            if vc is MMContainer {
+                container = vc as! MMContainer
+                ctns.append(container)
+            } else {
+                break
+            }
+        }
+        return ctns
     }
     
     /// get router

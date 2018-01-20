@@ -23,6 +23,7 @@ import UIKit
 @objc public protocol MMContainer : NSObjectProtocol{
     func topController() -> MMController?
     func childrenControllers() -> [MMController]
+    func volatileContainer() -> Bool
     func add(controller:MMController, at:Int)
     func open(controller at:Int)
 }
@@ -40,6 +41,10 @@ extension UIViewController: MMController {
 }
 
 extension UINavigationController: MMContainer {
+    public func volatileContainer() -> Bool {
+        return true
+    }
+    
     public func topController() -> MMController? {
         return self.visibleViewController
     }
@@ -70,6 +75,10 @@ extension UINavigationController: MMContainer {
 }
 
 extension UITabBarController: MMContainer {
+    public func volatileContainer() -> Bool {
+        return false
+    }
+    
     public func topController() -> MMController? {
         return self.selectedViewController
     }
@@ -107,6 +116,10 @@ extension UITabBarController: MMContainer {
 }
 
 extension UIWindow: MMContainer {
+    public func volatileContainer() -> Bool {
+        return false
+    }
+    
     public func topController() -> MMController? {
         return self.rootViewController
     }
