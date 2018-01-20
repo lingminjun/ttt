@@ -44,10 +44,36 @@ public final class Navigator: NSObject {
     
     public func addHosts(hosts: [String]) {
         for host in hosts {
-            if _host.isEmpty {
-                _host = host.lowercased()
+            var value = String(host.lowercased())
+            var regex = false
+            if host.contains("**") {
+                // \w  [a-zA-Z_0-9]
+                value = value.replacingOccurrences(of: "**", with: "[\\w|.]+")
+                value = value.replacingOccurrences(of: ".", with: "\\.")
+                regex = true
+            } else if host.contains("*") {
+                // \w  [a-zA-Z_0-9]
+                value = value.replacingOccurrences(of: "*", with: "\\w+")
+                value = value.replacingOccurrences(of: ".", with: "\\.")
+                regex = true
             }
-            _hosts.insert(host.lowercased())
+            
+            //设置默认url
+            if _host.isEmpty {
+                if host.contains("**") {
+                    var h = String(host.lowercased())
+                    h = h.replacingOccurrences(of: "**", with: "m")
+                    _host = h
+                } else if host.contains("*") {
+                    var h = String(host.lowercased())
+                    h = h.replacingOccurrences(of: "*", with: "m")
+                    _host = h
+                } else {
+                    _host = host.lowercased()
+                }
+            }
+            
+            _hosts.insert(HostMask(mask:host,value:value,regex:regex))
         }
     }
     
@@ -295,18 +321,48 @@ public final class Navigator: NSObject {
             return false
         }
         
-        return _schemes.contains(scheme!.lowercased()) && _hosts.contains(host!.lowercased())
+        if !_schemes.contains(scheme!.lowercased()) {
+            return false
+        }
+        
+        let h = host!.lowercased()
+        for hst in _hosts {
+            if hst.regex {
+                let regex = NSPredicate(format: "SELF MATCHES %@", hst.value)
+                if regex.evaluate(with: h) {
+                    return true
+                }
+            } else {
+                if h == hst.value {
+                    return true
+                }
+            }
+        }
+        
+        return false
     }
     
     // member var
     var _scheme: String = "" // default scheme
     var _host: String = ""  // default host
     var _schemes: Set<String> = Set<String>(minimumCapacity:3)
-    var _hosts: Set<String> = Set<String>(minimumCapacity:2)
+    var _hosts: Set<HostMask> = Set<HostMask>(minimumCapacity:2)
     var _routers: Dictionary<String,RouterNode> = Dictionary<String,RouterNode>()
     
     //
     private var _node: VCNode = VCNode()
+}
+
+struct HostMask : Hashable {
+    public var hashValue: Int { get { return self.mask.hashValue } }
+    
+    static func ==(lhs: HostMask, rhs: HostMask) -> Bool {
+        return lhs.mask == rhs.mask
+    }
+    
+    var mask = ""
+    var value = ""
+    var regex = false
 }
 
 class RouterNode: NSObject {
