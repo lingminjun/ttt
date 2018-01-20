@@ -49,6 +49,11 @@ public class MMUITableController<T: MMCellModel>: MMUIController,UITableViewDele
         
     }
     
+    deinit {
+        _table.dataSource = nil
+        _table.delegate = nil
+    }
+    
     // MARK:- UITableViewDelegate代理
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("点击了\(indexPath.row) section:\(indexPath.section)")

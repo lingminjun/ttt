@@ -42,7 +42,7 @@ class ViewController: MMUITableController<Dog> {
     }
     
     @objc func rightAction() -> Void {
-        Navigator.shared.open("https://m.baidu.com?_on_browser=true")
+        Navigator.shared.open("https://m.baidu.com?_on_browser")
     }
     
     override func onReceiveMemoryWarning() {

@@ -49,6 +49,10 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         _web.loadRequest(req)
     }
     
+    deinit {
+        _web.delegate = nil
+    }
+    
     // MARK UIWebViewDelegate
     public func webViewDidStartLoad(_ webView: UIWebView) {
         //
