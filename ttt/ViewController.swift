@@ -32,6 +32,18 @@ class ViewController: MMUITableController<Dog> {
         return [f]
     }
     
+    public override func onViewDidLoad() {
+        super.onViewDidLoad()
+        
+        let sel = #selector(ViewController.rightAction)
+        //title: String?, style: UIBarButtonItemStyle, target: Any?, action: Selector?
+        let item = UIBarButtonItem(title: "百度", style: UIBarButtonItemStyle.plain, target: self, action: sel)
+        self.navigationItem.rightBarButtonItem=item
+    }
+    
+    @objc func rightAction() -> Void {
+        Navigator.shared.open("https://m.baidu.com?_on_browser=true")
+    }
     
     override func onReceiveMemoryWarning() {
         super.onReceiveMemoryWarning()
@@ -63,7 +75,8 @@ class ViewController: MMUITableController<Dog> {
 //            let vc = DemoListController()
 //            self.navigationController?.pushViewController(vc, animated: true)
         } else if (indexPath.row == 8) {
-            let params = ["_load_url":Urls.QValue("https://m.baidu.com")]
+//            let params = ["_load_url":Urls.QValue("https://m.baidu.com")]
+            let params = ["_load_url":Urls.QValue("https://m.fengqu.com")]
             Navigator.shared.open("https://m.mymm.com/web.html",params:params)
         } else if (indexPath.row == 9) {
             self.fetchs.delete(at: indexPath)

@@ -172,21 +172,23 @@ public final class Navigator: NSObject {
             }
         }
         
-        var router = routerNode(url: url)
+        var router: RouterNode? = nil
+        if query[ON_BROWSER_KEY] != nil {
+            router = RouterNode()
+            router!.id = "/app/browser.html"
+            router!.node = VCNode()
+            router!.node.controller = "MMUIWebController"
+            router!.node.url = url//comple(path: "/app/browser.html")
+            router!.node.path = router!.id
+            
+            query[LOAD_URL_KEY] = Urls.QValue(url)
+            query.removeValue(forKey: ON_BROWSER_KEY)
+        } else {
+            router = routerNode(url: url)
+        }
+        
         if router == nil {
-            if query[ON_BROWSER_KEY] != nil {
-                router = RouterNode()
-                router!.id = "/app/browser.html"
-                router!.node = VCNode()
-                router!.node.controller = "MMUIWebController"
-                router!.node.url = comple(path: "/app/browser.html")
-                router!.node.path = router!.id
-                
-                query[LOAD_URL_KEY] = Urls.QValue(url)
-                query.removeValue(forKey: ON_BROWSER_KEY)
-            } else {
-                return nil
-            }
+            return nil
         }
         
         var vc = router!.node.controller

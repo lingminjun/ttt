@@ -34,6 +34,8 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
     public override func onLoadView() -> Bool {
         self.view = UIView(frame:UIScreen.main.bounds)
         _web = UIWebView(frame:self.view.bounds)
+        _web.scalesPageToFit = true;
+//        _web.scrollView.isScrollEnabled = false
         _web.delegate = self
         self.view.addSubview(_web)
         return true
