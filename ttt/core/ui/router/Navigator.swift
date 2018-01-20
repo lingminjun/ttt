@@ -178,7 +178,13 @@ public final class Navigator: NSObject {
             router!.id = "/app/browser.html"
             router!.node = VCNode()
             router!.node.controller = "MMUIWebController"
-            router!.node.url = url//comple(path: "/app/browser.html")
+            let uurl = query[LOAD_URL_KEY]?.string
+            if uurl == nil {
+                router!.node.url = url//comple(path: "/app/browser.html")
+                query[LOAD_URL_KEY] = Urls.QValue(url)
+            } else {
+                router!.node.url = uurl!
+            }
             router!.node.path = router!.id
             
             query[LOAD_URL_KEY] = Urls.QValue(url)
