@@ -77,7 +77,9 @@ class ViewController: MMUITableController<Dog> {
         } else if (indexPath.row == 8) {
 //            let params = ["_load_url":QValue("https://m.baidu.com")]
             let params = ["_load_url":QValue("https://m.fengqu.com")]
-            Navigator.shared.open("https://m.mymm.com/web.html",params:params)
+//            Navigator.shared.open("https://m.mymm.com/web.html",params:params)
+            
+             Navigator.shared.open("https://mymm.com/p/243afdc9-f33c-4726-b9ca-f4b5ff64446f?_on_browser&cs=wechat&cm=message&ca=u:5d530d98-7c96-42d7-9b0f-fcb54be8359e&mw=1&h=https://api.mymm.cn")
         } else if (indexPath.row == 9) {
             self.fetchs.delete(at: indexPath)
         }

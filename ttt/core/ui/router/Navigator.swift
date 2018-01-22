@@ -111,12 +111,11 @@ public final class Navigator: NSObject {
         if !isValid(url:url) {
             return false
         }
+        var cc: String = ""
         
-        guard let router = routerNode(url: url) else {return false}
-        guard let vc = getViewController(url, params: params, ext: ext) else {return false}
+        guard let vc = genViewController(url, params: params, ext: ext, container: &cc) else {return false}
         var tc = topContainer()
         
-        var cc = router.node.container
         if cc.isEmpty && !(vc is UINavigationController) {
             cc = "UINavigationController"
         }
@@ -160,6 +159,10 @@ public final class Navigator: NSObject {
         return getViewController(url, params: params, ext: ext)
     }
     open func getViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
+        var container = ""
+        return genViewController(url, params: params, ext: ext, container: &container)
+    }
+    fileprivate func genViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, container: inout String) -> UIViewController? {
         if !isValid(url:url) {
             return nil
         }
@@ -196,6 +199,9 @@ public final class Navigator: NSObject {
         if router == nil {
             return nil
         }
+        
+        //out param
+        container = router!.node.container
         
         var vc = router!.node.controller
         if vc.isEmpty {
