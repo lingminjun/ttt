@@ -62,6 +62,10 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         if (!_wload) {
             _wload = true
         }
+        let title = _web.stringByEvaluatingJavaScript(from: "document.title")
+        if title != nil && !title!.isEmpty {
+            self.title = title
+        }
     }
     
     public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
