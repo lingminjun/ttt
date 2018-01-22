@@ -75,8 +75,8 @@ class ViewController: MMUITableController<Dog> {
 //            let vc = DemoListController()
 //            self.navigationController?.pushViewController(vc, animated: true)
         } else if (indexPath.row == 8) {
-//            let params = ["_load_url":Urls.QValue("https://m.baidu.com")]
-            let params = ["_load_url":Urls.QValue("https://m.fengqu.com")]
+//            let params = ["_load_url":QValue("https://m.baidu.com")]
+            let params = ["_load_url":QValue("https://m.fengqu.com")]
             Navigator.shared.open("https://m.mymm.com/web.html",params:params)
         } else if (indexPath.row == 9) {
             self.fetchs.delete(at: indexPath)

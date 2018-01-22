@@ -11,7 +11,7 @@ import UIKit
 public class MMUIController : UIViewController {
     
     
-    public func onInit(params: Dictionary<String,Urls.QValue>?, ext:Dictionary<String,Any>? = nil) {}
+    public func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>? = nil) {}
     /*
     public func onLoadView() -> Bool { return false }
     public func onViewDidLoad() -> Void { }

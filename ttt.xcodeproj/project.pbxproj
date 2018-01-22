@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
 		538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */; };
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
 		538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8F200A2DDE006B3A28 /* SettingNode.swift */; };
@@ -36,6 +37,7 @@
 /* Begin PBXFileReference section */
 		358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.release.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.release.xcconfig"; sourceTree = "<group>"; };
 		35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ttt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
 		538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRealmController.swift; sourceTree = "<group>"; };
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		538F9E8F200A2DDE006B3A28 /* SettingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNode.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				D941405A20107C610050132B /* MMTry.h */,
 				D941405B20107C610050132B /* MMTry.m */,
 				D941405F20107D700050132B /* ttt-Bridging-Header.h */,
+				5342EA8C20143B7D00A806B3 /* RPC.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -336,6 +339,7 @@
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
 				D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */,
+				5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */,
 				538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */,
 				D94140632011CCBD0050132B /* MMUITableController.swift in Sources */,
 				D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */,

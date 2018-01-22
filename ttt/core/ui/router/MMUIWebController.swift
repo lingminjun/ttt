@@ -17,7 +17,7 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
     public var launchUrl: String { get { return _url } }
     public var currentUrl: String? { get { return _web.request?.url?.absoluteString } }
     
-    public override func onInit(params: Dictionary<String, Urls.QValue>?, ext: Dictionary<String, Any>?) {
+    public override func onInit(params: Dictionary<String, QValue>?, ext: Dictionary<String, Any>?) {
         var url = params?[LOAD_URL_KEY]?.string
         if url == nil && ext != nil {
             let v = ext![LOAD_URL_KEY]

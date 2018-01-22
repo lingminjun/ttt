@@ -94,7 +94,7 @@ public final class Navigator: NSObject {
     }
     
     /// open url or open path
-    open func open(path:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+    open func open(path:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
         if path.isEmpty {
             return false
         }
@@ -107,7 +107,7 @@ public final class Navigator: NSObject {
     }
     
     /// open url
-    open func open(_ url:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+    open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
         if !isValid(url:url) {
             return false
         }
@@ -152,14 +152,14 @@ public final class Navigator: NSObject {
     }
     
     /// generate VC
-    open func getViewController(path:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
+    open func getViewController(path:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
         if path.isEmpty {
             return nil
         }
         let url = comple(path: path)
         return getViewController(url, params: params, ext: ext)
     }
-    open func getViewController(_ url:String, params:Dictionary<String,Urls.QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
+    open func getViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
         if !isValid(url:url) {
             return nil
         }
@@ -181,13 +181,13 @@ public final class Navigator: NSObject {
             let uurl = query[LOAD_URL_KEY]?.string
             if uurl == nil {
                 router!.node.url = url//comple(path: "/app/browser.html")
-                query[LOAD_URL_KEY] = Urls.QValue(url)
+                query[LOAD_URL_KEY] = QValue(url)
             } else {
                 router!.node.url = uurl!
             }
             router!.node.path = router!.id
             
-            query[LOAD_URL_KEY] = Urls.QValue(url)
+            query[LOAD_URL_KEY] = QValue(url)
             query.removeValue(forKey: ON_BROWSER_KEY)
         } else {
             router = routerNode(url: url)

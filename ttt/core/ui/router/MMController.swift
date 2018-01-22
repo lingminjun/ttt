@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 @objc public protocol MMController {
-//    func onInit(params: Dictionary<String,Urls.QValue>?, ext:Dictionary<String,Any>?)
+//    func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>?)
     func onLoadView() -> Bool
     func onViewDidLoad() -> Void
     func onViewWillAppear(_ animated: Bool)
@@ -30,7 +30,7 @@ import UIKit
 
 extension UIViewController: MMController {
     //The following is a safe life-cycle methods.
-//    public func onInit(params: Dictionary<String,Urls.QValue>?, ext:Dictionary<String,Any>? = nil) {}
+//    public func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>? = nil) {}
     public func onLoadView() -> Bool { return false }
     public func onViewDidLoad() -> Void { }
     public func onViewWillAppear(_ animated: Bool) { }

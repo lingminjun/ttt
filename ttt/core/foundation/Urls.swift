@@ -8,128 +8,127 @@
 
 import Foundation
 
-public final class Urls {
+/// query value defined
+public enum QValue {
+    case value(String)
+    case array([String])
     
-    /// query value defined
-    public enum QValue {
-        case value(String)
-        case array([String])
-        
-        // value支持 String
-        public init<S: StringProtocol>(_ string: S) {self = .value("\(string)")}
-        
-        // array支持
-        public init<C: Sequence>(_ array: C) where C.Iterator.Element: StringProtocol {
-            var ary = [] as [String]
-            for value in array {
-                ary.append("\(value)")
-            }
-            self = .array(ary)
+    // value支持 String
+    public init<S: StringProtocol>(_ string: S) {self = .value("\(string)")}
+    
+    // array支持
+    public init<C: Sequence>(_ array: C) where C.Iterator.Element: StringProtocol {
+        var ary = [] as [String]
+        for value in array {
+            ary.append("\(value)")
         }
-        public init<C: Sequence>(_ array: C) where C.Iterator.Element == Int {
-            var ary = [] as [String]
-            for value in array {
-                ary.append("\(value)")
-            }
-            self = .array(ary)
+        self = .array(ary)
+    }
+    public init<C: Sequence>(_ array: C) where C.Iterator.Element == Int {
+        var ary = [] as [String]
+        for value in array {
+            ary.append("\(value)")
         }
-
-        
-        // support int
-        public init(_ int: Int) {self = .value("\(int)")}
-        public init(_ int8: Int8) {self = .value("\(int8)")}
-        public init(_ int16: Int16) {self = .value("\(int16)")}
-        public init(_ int32: Int32) {self = .value("\(int32)")}
-        public init(_ int64: Int64) {self = .value("\(int64)")}
-        
-        public init(_ uint: UInt) {self = .value("\(uint)")}
-        public init(_ uint8: UInt8) {self = .value("\(uint8)")}
-        public init(_ uint16: UInt16) {self = .value("\(uint16)")}
-        public init(_ uint32: UInt32) {self = .value("\(uint32)")}
-        public init(_ uint64: UInt64) {self = .value("\(uint64)")}
-        
-        //Float
-        public init(_ float: Float) {self = .value("\(float)")}
-        
-        // Double
-        public init(_ double: Double) {self = .value("\(double)")}
-        
-        // Bool
-        public init(_ bool: Bool) {self = .value("\(bool)")}
-        
-        // Character
-        public init(_ char: Character) {self = .value("\(char)")}
-        
-        // get string
-        public var string: String? { get{ switch self { case QValue.value(let value): return value; default: break }; return nil } }
-        
-        // get [string]
-        public var array: [String]? { get{ switch self { case QValue.array(let array): return array; default: break }; return nil } }
-        
-        // get bool
-        public var bool: Bool? {
-            get{
-                switch self {
-                case QValue.value(let value):
-                    let v = value.lowercased()
-                    if v == "true" || v == "yes" || v == "on" || v == "1" || v == "t" || v == "y" {
-                        return true
-                    } else if v == "false" || v == "no" || v == "off" || v == "0" || v == "f" || v == "n" {
-                        return false
-                    }
-                    break
-                default: break
-                }
-                return nil
-            }
-        }
-        
-        // get char
-        public var char: Character? {
-            get{
-                switch self {
-                case QValue.value(let value):
-                    if value.count == 1 {
-                        return value[value.startIndex]
-                    }
-                    break
-                default: break
-                }
-                return nil
-            }
-        }
-        
-        // get double
-        public var double: Double? { get{ switch self { case QValue.value(let value): return Double(value); default: break }; return nil } }
-        
-        // get float
-        public var float: Float? { get{ switch self { case QValue.value(let value): return Float(value); default: break }; return nil } }
-        
-        // get int
-        public var int: Int? { get{ switch self { case QValue.value(let value): return Int(value); default: break }; return nil } }
-        public var int8: Int8? { get{ switch self { case QValue.value(let value): return Int8(value); default: break }; return nil } }
-        public var int16: Int16? { get{ switch self { case QValue.value(let value): return Int16(value); default: break }; return nil } }
-        public var int32: Int32? { get{ switch self { case QValue.value(let value): return Int32(value); default: break }; return nil } }
-        public var int64: Int64? { get{ switch self { case QValue.value(let value): return Int64(value); default: break }; return nil } }
-        public var uint: UInt? { get{ switch self { case QValue.value(let value): return UInt(value); default: break }; return nil } }
-        public var uint8: UInt8? { get{ switch self { case QValue.value(let value): return UInt8(value); default: break }; return nil } }
-        public var uint16: UInt16? { get{ switch self { case QValue.value(let value): return UInt16(value); default: break }; return nil } }
-        public var uint32: UInt32? { get{ switch self { case QValue.value(let value): return UInt32(value); default: break }; return nil } }
-        public var uint64: UInt64? { get{ switch self { case QValue.value(let value): return UInt64(value); default: break }; return nil } }
-        
-        
-        // json obj support
-        public init<C: MMJsonable>(_ entity: C) {self = .value("\(entity.ssn_jsonString())")}
-        public func json<C: MMJsonable>(_ type: C.Type) -> C? {
+        self = .array(ary)
+    }
+    
+    
+    // support int
+    public init(_ int: Int) {self = .value("\(int)")}
+    public init(_ int8: Int8) {self = .value("\(int8)")}
+    public init(_ int16: Int16) {self = .value("\(int16)")}
+    public init(_ int32: Int32) {self = .value("\(int32)")}
+    public init(_ int64: Int64) {self = .value("\(int64)")}
+    
+    public init(_ uint: UInt) {self = .value("\(uint)")}
+    public init(_ uint8: UInt8) {self = .value("\(uint8)")}
+    public init(_ uint16: UInt16) {self = .value("\(uint16)")}
+    public init(_ uint32: UInt32) {self = .value("\(uint32)")}
+    public init(_ uint64: UInt64) {self = .value("\(uint64)")}
+    
+    //Float
+    public init(_ float: Float) {self = .value("\(float)")}
+    
+    // Double
+    public init(_ double: Double) {self = .value("\(double)")}
+    
+    // Bool
+    public init(_ bool: Bool) {self = .value("\(bool)")}
+    
+    // Character
+    public init(_ char: Character) {self = .value("\(char)")}
+    
+    // get string
+    public var string: String? { get{ switch self { case QValue.value(let value): return value; default: break }; return nil } }
+    
+    // get [string]
+    public var array: [String]? { get{ switch self { case QValue.array(let array): return array; default: break }; return nil } }
+    
+    // get bool
+    public var bool: Bool? {
+        get{
             switch self {
             case QValue.value(let value):
-                return type.ssn_from(json: value)
+                let v = value.lowercased()
+                if v == "true" || v == "yes" || v == "on" || v == "1" || v == "t" || v == "y" {
+                    return true
+                } else if v == "false" || v == "no" || v == "off" || v == "0" || v == "f" || v == "n" {
+                    return false
+                }
+                break
             default: break
             }
             return nil
         }
     }
     
+    // get char
+    public var char: Character? {
+        get{
+            switch self {
+            case QValue.value(let value):
+                if value.count == 1 {
+                    return value[value.startIndex]
+                }
+                break
+            default: break
+            }
+            return nil
+        }
+    }
+    
+    // get double
+    public var double: Double? { get{ switch self { case QValue.value(let value): return Double(value); default: break }; return nil } }
+    
+    // get float
+    public var float: Float? { get{ switch self { case QValue.value(let value): return Float(value); default: break }; return nil } }
+    
+    // get int
+    public var int: Int? { get{ switch self { case QValue.value(let value): return Int(value); default: break }; return nil } }
+    public var int8: Int8? { get{ switch self { case QValue.value(let value): return Int8(value); default: break }; return nil } }
+    public var int16: Int16? { get{ switch self { case QValue.value(let value): return Int16(value); default: break }; return nil } }
+    public var int32: Int32? { get{ switch self { case QValue.value(let value): return Int32(value); default: break }; return nil } }
+    public var int64: Int64? { get{ switch self { case QValue.value(let value): return Int64(value); default: break }; return nil } }
+    public var uint: UInt? { get{ switch self { case QValue.value(let value): return UInt(value); default: break }; return nil } }
+    public var uint8: UInt8? { get{ switch self { case QValue.value(let value): return UInt8(value); default: break }; return nil } }
+    public var uint16: UInt16? { get{ switch self { case QValue.value(let value): return UInt16(value); default: break }; return nil } }
+    public var uint32: UInt32? { get{ switch self { case QValue.value(let value): return UInt32(value); default: break }; return nil } }
+    public var uint64: UInt64? { get{ switch self { case QValue.value(let value): return UInt64(value); default: break }; return nil } }
+    
+    
+    // json obj support
+    public init<C: MMJsonable>(_ entity: C) {self = .value("\(entity.ssn_jsonString())")}
+    public func json<C: MMJsonable>(_ type: C.Type) -> C? {
+        switch self {
+        case QValue.value(let value):
+            return type.ssn_from(json: value)
+        default: break
+        }
+        return nil
+    }
+}
+
+public final class Urls {
     
     /// query url encode
     public static func encoded(str:String) -> String {
