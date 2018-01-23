@@ -17,6 +17,9 @@
 		D9414061201096CC0050132B /* MMController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9414060201096CC0050132B /* MMController.swift */; };
 		D94140632011CCBD0050132B /* MMUITableController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94140622011CCBD0050132B /* MMUITableController.swift */; };
 		D94140652011DC8E0050132B /* MMUIWebController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94140642011DC8E0050132B /* MMUIWebController.swift */; };
+		D94140672016D6420050132B /* RigidCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94140662016D6420050132B /* RigidCache.swift */; };
+		D94140692016F1120050132B /* CycleStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94140682016F1120050132B /* CycleStack.swift */; };
+		D941406B201721470050132B /* KeyCycleStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D941406A201721470050132B /* KeyCycleStack.swift */; };
 		D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7842008694200E3F0C5 /* MMFetchRealm.swift */; };
 		D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7852008694200E3F0C5 /* MMFetchList.swift */; };
 		D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7872008694200E3F0C5 /* MMUIController.swift */; };
@@ -49,6 +52,9 @@
 		D9414060201096CC0050132B /* MMController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMController.swift; sourceTree = "<group>"; };
 		D94140622011CCBD0050132B /* MMUITableController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMUITableController.swift; sourceTree = "<group>"; };
 		D94140642011DC8E0050132B /* MMUIWebController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMUIWebController.swift; sourceTree = "<group>"; };
+		D94140662016D6420050132B /* RigidCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RigidCache.swift; sourceTree = "<group>"; };
+		D94140682016F1120050132B /* CycleStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleStack.swift; sourceTree = "<group>"; };
+		D941406A201721470050132B /* KeyCycleStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCycleStack.swift; sourceTree = "<group>"; };
 		D958F7842008694200E3F0C5 /* MMFetchRealm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchRealm.swift; sourceTree = "<group>"; };
 		D958F7852008694200E3F0C5 /* MMFetchList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchList.swift; sourceTree = "<group>"; };
 		D958F7872008694200E3F0C5 /* MMUIController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMUIController.swift; sourceTree = "<group>"; };
@@ -162,6 +168,9 @@
 				D941405B20107C610050132B /* MMTry.m */,
 				D941405F20107D700050132B /* ttt-Bridging-Header.h */,
 				5342EA8C20143B7D00A806B3 /* RPC.swift */,
+				D94140662016D6420050132B /* RigidCache.swift */,
+				D94140682016F1120050132B /* CycleStack.swift */,
+				D941406A201721470050132B /* KeyCycleStack.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -337,8 +346,10 @@
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
+				D94140692016F1120050132B /* CycleStack.swift in Sources */,
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
 				D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */,
+				D94140672016D6420050132B /* RigidCache.swift in Sources */,
 				5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */,
 				538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */,
 				D94140632011CCBD0050132B /* MMUITableController.swift in Sources */,
@@ -346,6 +357,7 @@
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D94140652011DC8E0050132B /* MMUIWebController.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
+				D941406B201721470050132B /* KeyCycleStack.swift in Sources */,
 				D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */,
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,
 				D9917D2C2008AF73003682AD /* DogCell.swift in Sources */,

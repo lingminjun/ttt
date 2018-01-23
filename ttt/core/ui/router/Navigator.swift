@@ -113,7 +113,18 @@ public final class Navigator: NSObject {
         }
         var cc: String = ""
         
-        guard let vc = genViewController(url, params: params, ext: ext, container: &cc) else {return false}
+        guard let vc = genViewController(url, params: params, ext: ext, container: &cc) else {
+            let u = URL(string:url)
+            if u != nil {
+                if UIApplication.shared.canOpenURL(u!) {
+                    UIApplication.shared.open(u!, options: [:], completionHandler: { (result) in
+                        print("open url \(url) result \(result)")
+                    })
+                    return true
+                }
+            }
+            return false
+        }
         var tc = topContainer()
         
         if cc.isEmpty && !(vc is UINavigationController) {
