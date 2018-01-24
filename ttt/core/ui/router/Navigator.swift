@@ -117,7 +117,11 @@ public final class Navigator: NSObject {
             let u = URL(string:url)
             if u != nil {
                 if UIApplication.shared.canOpenURL(u!) {
-                    UIApplication.shared.open(u!, options: [:], completionHandler: { (result) in
+                    var options = Dictionary<String,Any>()
+                    if params != nil {
+                        options = QValue.convert(query: params!)
+                    }
+                    UIApplication.shared.open(u!, options:options, completionHandler: { (result) in
                         print("open url \(url) result \(result)")
                     })
                     return true

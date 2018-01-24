@@ -107,7 +107,7 @@ final public class Injects {
             MMTry.try({ obj.setValue(value, forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         } else if isBaseType(value) && isBaseType(oldv) {
             let v = "\(value)"
-            if oldv is Int{ MMTry.try({  obj.setValue(Int(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            if oldv is Int { MMTry.try({  obj.setValue(Int(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
             else if oldv is Int8 { MMTry.try({ obj.setValue(Int8(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
             else if oldv is Int16 { MMTry.try({ obj.setValue(Int16(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
             else if oldv is Int32 { MMTry.try({ obj.setValue(Int32(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }

@@ -126,6 +126,36 @@ public enum QValue {
         }
         return nil
     }
+    
+    public static func convert(dic:Dictionary<String,AnyObject>) -> Dictionary<String,QValue> {
+        var query = Dictionary<String,QValue>()
+        for (key,value) in dic {
+            if Injects.isBaseType(value) {
+                query[key] = QValue("\(value)")
+            } else if value is MMJsonable {
+                let entity = value as! MMJsonable
+                query[key] = QValue("\(entity.ssn_jsonString())")
+            } else if value is QValue {
+                query[key] = value as! QValue
+            }
+        }
+        return query
+    }
+    
+    public static func convert(query:Dictionary<String,QValue>) -> Dictionary<String,AnyObject> {
+        var dic = Dictionary<String,AnyObject>()
+        for (key,value) in query {
+            switch value {
+            case QValue.value(let v):
+                dic[key] = v as AnyObject
+                break
+            case QValue.array(let l):
+                dic[key] = l as AnyObject
+                break
+            }
+        }
+        return dic
+    }
 }
 
 public final class Urls {
