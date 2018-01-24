@@ -114,13 +114,18 @@ public final class Navigator: NSObject {
     }
     
     /// open url
-    open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+    open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false, inner:Bool = false) -> Bool {
         if !isValid(url:url) {
             return false
         }
         var cc: String = ""
         
         guard let vc = genViewController(url, params: params, ext: ext, container: &cc) else {
+            
+            if inner {
+                return false
+            }
+            
             let u = URL(string:url)
             if u != nil {
                 let scms = Navigator.appURLSchemes()

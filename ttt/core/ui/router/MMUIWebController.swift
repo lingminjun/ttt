@@ -74,12 +74,13 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         if url == nil || url!.isEmpty || url == "about:blank" {
             return true
         }
+        
         print("should load \(url)")
         switch navigationType {
         case .linkClicked:
             return checkGotoOtherWebController(url: url!)
-        case .other:
-            return checkGotoOtherWebController(url: url!)
+//        case .other:
+//            return checkGotoOtherWebController(url: url!)
         default:
             return true
         }
@@ -93,7 +94,7 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         /// 判断
         
         /// 委托导航器打开
-        if Navigator.shared.open(url) {
+        if Navigator.shared.open(url, inner:true) {
             return false
         }
         
