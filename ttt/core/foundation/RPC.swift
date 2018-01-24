@@ -212,11 +212,21 @@ public final class RPC {
         exec(cmds: [cmd], queue:.serial, feedback: feedback)
     }
     
-    /// exec blocks
+    /// exec cmds
+    public static func exec(tasks:[AtomicTask], queue model:QueueModel = .concurrent, errbreak:Bool = false, group:String = "", feedback:Feedback) {
+        var list = [(task:AtomicTask,cmd:String)]()
+        for i in 0..<tasks.count {
+            let task = tasks[i]
+            list.append((task: task, cmd: "cmd\(i)"))
+        }
+        exec(cmds: list, queue:model, errbreak:errbreak, group:group, feedback: feedback)
+    }
+    
+    /// exec cmds
     public static func exec(cmds: [(task:AtomicTask,cmd:String)], queue model:QueueModel = .concurrent, errbreak:Bool = false, group:String = "", feedback:Feedback) {
         switch model {
         case .concurrent:
-            concurrentExec(cmds: cmds, errbreak: errbreak, group: group, feedback: feedback)
+            concurrentExec(cmds: cmds, group: group, feedback: feedback)
             break
         case .serial:
             serialExec(cmds: cmds, errbreak: errbreak, group: group, feedback: feedback)
@@ -224,17 +234,32 @@ public final class RPC {
         }
     }
     
-    private static func concurrentExec(cmds: [(task:AtomicTask,cmd:String)], errbreak:Bool = false, group:String = "", feedback:Feedback) {
+    private static func tidyGrouId(_ group:String) -> String {
         var groupId = group
         if group.isEmpty {
-            groupId = "\(Int(Date().timeIntervalSince1970))"
+            groupId = "\(Int(Date().timeIntervalSince1970 * 1000))"
         }
-        
-        DispatchQueue.global().async {
-            var cs = [String]()
-            for (_,cmd) in cmds {
+        return groupId
+    }
+    
+    private static func tidyCMDs(_ cmds:[(task:AtomicTask,cmd:String)]) -> [String] {
+        var cs = [String]()
+        for i in 0..<cmds.count {
+            let (_,cmd) = cmds[i]
+            if cmd.isEmpty {
+                cs.append("cmd\(i)")
+            } else {
                 cs.append(cmd)
             }
+        }
+        return cs
+    }
+    
+    private static func concurrentExec(cmds: [(task:AtomicTask,cmd:String)], group:String = "", feedback:Feedback) {
+        let groupId = tidyGrouId(group)
+        
+        DispatchQueue.global().async {
+            let cs = tidyCMDs(cmds)
             let resp = Response(cmds:cs)
             let assembly = AssemblyObject(resp:resp)
             
@@ -244,7 +269,8 @@ public final class RPC {
             
             for i in 0..<cmds.count {
                 let idx = Index(i)
-                let (block,cmd) = cmds[i]
+                let (block,_) = cmds[i]
+                let cmd = cs[i]
                 
                 workQueue.async(group:workGroup) {
                     MMTry.try({ do {
@@ -279,16 +305,10 @@ public final class RPC {
     }
     
     private static func serialExec(cmds: [(task:AtomicTask,cmd:String)], errbreak:Bool = false, group:String = "", feedback:Feedback) {
-        var groupId = group
-        if group.isEmpty {
-            groupId = "\(Int(Date().timeIntervalSince1970))"
-        }
+        let groupId = tidyGrouId(group)
         
         workQueue.async {
-            var cs = [String]()
-            for (_,cmd) in cmds {
-                cs.append(cmd)
-            }
+            let cs = tidyCMDs(cmds)
             let resp = Response(cmds:cs)
             let assembly = AssemblyObject(resp:resp)
             
@@ -296,8 +316,10 @@ public final class RPC {
             
             for i in 0..<cmds.count {
                 let idx = Index(i)
-                let (block,cmd) = cmds[i]
+                let (block,_) = cmds[i]
+                let cmd = cs[i]
                 
+                var isError = false
                 MMTry.try({ do {
                     let rs = try block(idx, nil, assembly.resp)
                     assembly.resp.set(result: rs, index: idx) // maybe not safty
@@ -305,11 +327,13 @@ public final class RPC {
                         feedback.staged(index: idx, cmd: cmd, group: groupId, result: rs, assembly: assembly)
                     }
                 } catch {
+                    isError = true
                     let err = NSError(domain: "RPC", code: -101, userInfo: [NSLocalizedDescriptionKey:error.localizedDescription])
                     assembly.resp.set(error:err, index:idx)
                     DispatchQueue.main.async {
                         feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
                     } } }, catch: { (exception) in
+                        isError = true
                         var msg = exception?.reason
                         if msg == nil {
                             msg = "not message"
@@ -320,6 +344,10 @@ public final class RPC {
                             feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
                         }
                 }, finally: nil)
+                
+                if errbreak && isError {
+                    break
+                }
             }
             
             DispatchQueue.main.async { feedback.finish(group: groupId, assembly: assembly) }
