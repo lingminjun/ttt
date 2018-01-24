@@ -34,7 +34,6 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     
     public override func onViewDidLoad() {
         super.onViewDidLoad()
-        
         let sel = #selector(ViewController.rightAction)
         //title: String?, style: UIBarButtonItemStyle, target: Any?, action: Selector?
         let item = UIBarButtonItem(title: "选项", style: UIBarButtonItemStyle.plain, target: self, action: sel)

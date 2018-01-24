@@ -18,6 +18,13 @@ public final class Navigator: NSObject {
     private override init() {
         super.init()
         loadConfig()
+        
+        //add default schemes
+    }
+    
+    private func addDefaultSchemes() {
+        addHost(host: "https")
+        addHosts(hosts: Navigator.appURLSchemes())
     }
     
     // singleton
@@ -116,7 +123,9 @@ public final class Navigator: NSObject {
         guard let vc = genViewController(url, params: params, ext: ext, container: &cc) else {
             let u = URL(string:url)
             if u != nil {
-                if UIApplication.shared.canOpenURL(u!) {
+                let scms = Navigator.appURLSchemes()
+                let thescheme = u!.scheme
+                if thescheme != nil && !scms.contains(thescheme!) && UIApplication.shared.canOpenURL(u!) {
                     var options = Dictionary<String,Any>()
                     if params != nil {
                         options = QValue.convert(query: params!)
@@ -241,6 +250,22 @@ public final class Navigator: NSObject {
         }
         
         return viewController
+    }
+    
+    private static func appURLSchemes() -> [String] {
+        guard let schemes = Bundle.main.infoDictionary!["CFBundleURLTypes"] else { return [] }
+        guard let list = schemes as? Array<Dictionary<String,Any>> else { return [] }
+        var rs = [String]()
+        for item in list {
+            guard let scs = item["CFBundleURLSchemes"] else { continue }
+            guard let ss = scs as? Array<String> else { continue }
+            for str in ss {
+                if !str.isEmpty {
+                    rs.append(str)
+                }
+            }
+        }
+        return rs
     }
     
     private static func reflectOCClass(name:String) -> Swift.AnyClass? {
