@@ -25,6 +25,7 @@
 		D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7872008694200E3F0C5 /* MMUIController.swift */; };
 		D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F7882008694200E3F0C5 /* MMFetchsController.swift */; };
 		D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D958F78E2008694900E3F0C5 /* DemoListController.swift */; };
+		D99152D7201836EE00FD8B92 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99152D6201836EE00FD8B92 /* ProfileViewController.swift */; };
 		D9917D2A20089F56003682AD /* Dog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9917D2920089F56003682AD /* Dog.swift */; };
 		D9917D2C2008AF73003682AD /* DogCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9917D2B2008AF73003682AD /* DogCell.swift */; };
 		D9CCAD11200C57B300C03276 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD10200C57B300C03276 /* Navigator.swift */; };
@@ -60,6 +61,7 @@
 		D958F7872008694200E3F0C5 /* MMUIController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMUIController.swift; sourceTree = "<group>"; };
 		D958F7882008694200E3F0C5 /* MMFetchsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MMFetchsController.swift; sourceTree = "<group>"; };
 		D958F78E2008694900E3F0C5 /* DemoListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DemoListController.swift; sourceTree = "<group>"; };
+		D99152D6201836EE00FD8B92 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		D9917D2920089F56003682AD /* Dog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dog.swift; sourceTree = "<group>"; };
 		D9917D2B2008AF73003682AD /* DogCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogCell.swift; sourceTree = "<group>"; };
 		D9CCAD10200C57B300C03276 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */,
 				538F9E8D200A2D9C006B3A28 /* SettingCell.swift */,
 				538F9E8F200A2DDE006B3A28 /* SettingNode.swift */,
+				D99152D6201836EE00FD8B92 /* ProfileViewController.swift */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -347,6 +350,7 @@
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
 				D94140692016F1120050132B /* CycleStack.swift in Sources */,
+				D99152D7201836EE00FD8B92 /* ProfileViewController.swift in Sources */,
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
 				D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */,
 				D94140672016D6420050132B /* RigidCache.swift in Sources */,

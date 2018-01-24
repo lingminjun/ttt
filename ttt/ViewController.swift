@@ -19,7 +19,7 @@ extension Dog {
     @objc public override func ssn_canMove() -> Bool {return false}
 }
 
-class ViewController: MMUITableController<Dog> {
+class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     
     public override func loadFetchs() -> [MMFetch<Dog>] {
         let realm = try! Realm()
@@ -37,12 +37,14 @@ class ViewController: MMUITableController<Dog> {
         
         let sel = #selector(ViewController.rightAction)
         //title: String?, style: UIBarButtonItemStyle, target: Any?, action: Selector?
-        let item = UIBarButtonItem(title: "百度", style: UIBarButtonItemStyle.plain, target: self, action: sel)
+        let item = UIBarButtonItem(title: "选项", style: UIBarButtonItemStyle.plain, target: self, action: sel)
         self.navigationItem.rightBarButtonItem=item
     }
     
     @objc func rightAction() -> Void {
-        Navigator.shared.open("https://m.baidu.com?_on_browser")
+        let sheet = UIActionSheet(title: "跳转", delegate: self, cancelButtonTitle: "取消", destructiveButtonTitle: "百度")
+        sheet.addButton(withTitle: "测试")
+        sheet.show(in: self.view)
     }
     
     override func onReceiveMemoryWarning() {
@@ -88,6 +90,17 @@ class ViewController: MMUITableController<Dog> {
             self.fetchs.update(at: indexPath, {
                 dog?.brains += 1;
             })
+        }
+    }
+    
+    
+    func actionSheet(_ actionSheet: UIActionSheet, clickedButtonAt buttonIndex: Int) {
+        let title = actionSheet.buttonTitle(at: buttonIndex)
+        if title == "测试" {
+           Navigator.shared.open("https://m.mymm.com/profile.html")
+        } else if title == "百度" {
+             Navigator.shared.open("https://m.baidu.com?_on_browser")
+            
         }
     }
 }

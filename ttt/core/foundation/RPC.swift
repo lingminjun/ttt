@@ -9,10 +9,10 @@
 import Foundation
 
 public protocol Feedback {
-    func start(group:String)
+    func start(group:String, assembly:RPC.AssemblyObject)
     func finish(group:String, assembly:RPC.AssemblyObject)
-    func failed(index:RPC.Index, cmd:String?, group:String, error: NSError)
-    func staged(index:RPC.Index, cmd:String?, group:String, obj: AnyObject?, assembly:RPC.AssemblyObject) //Stage success.
+    func failed(index:RPC.Index, cmd:String, group:String, error: NSError)
+    func staged(index:RPC.Index, cmd:String, group:String, result: Any, assembly:RPC.AssemblyObject) //Stage success.
 }
 
 /// 任务队列管理
@@ -28,40 +28,40 @@ public final class RPC {
         
         var value:Int { get {
             switch self {
-            case .first: return 1
-            case .second: return 2
-            case .third: return 3
-            case .fourth: return 4
-            case .fifth: return 5
-            case .sixth: return 6
-            case .seventh: return 7
-            case .eighth: return 8
-            case .ninth: return 9
-            case .tenth: return 10
+            case .first: return 0
+            case .second: return 1
+            case .third: return 2
+            case .fourth: return 3
+            case .fifth: return 4
+            case .sixth: return 5
+            case .seventh: return 6
+            case .eighth: return 7
+            case .ninth: return 8
+            case .tenth: return 9
             case .at(let value): return value
             } }
         }
         
         public init(_ index: Int) {
-            if index == 1 {
+            if index == 0 {
                 self = .first
-            } else if index == 2 {
+            } else if index == 1 {
                 self = .second
-            } else if index == 3 {
+            } else if index == 2 {
                 self = .third
-            } else if index == 4 {
+            } else if index == 3 {
                 self = .fourth
-            } else if index == 5 {
+            } else if index == 4 {
                 self = .fifth
-            } else if index == 6 {
+            } else if index == 5 {
                 self = .sixth
-            } else if index == 7 {
+            } else if index == 6 {
                 self = .seventh
-            } else if index == 8 {
+            } else if index == 7 {
                 self = .eighth
-            } else if index == 9 {
+            } else if index == 8 {
                 self = .ninth
-            } else if index == 10 {
+            } else if index == 9 {
                 self = .tenth
             } else {
                 self = .at(index)
@@ -71,23 +71,34 @@ public final class RPC {
     
     /// queue model
     public enum QueueModel {
-        case concurrent,serial,discrete
+        case concurrent,serial/*,discrete*/
     }
     
     /// result struct
     public enum Result {
-        case value(AnyObject)
+        case value(Any)
         case error(NSError)
+        case empty
     }
     
-    /// assemble object: Need to be combined to get the data
-    public class AssemblyObject {
-        private var _model:AnyObject? = nil
-        private var _resp:Dictionary<Int,Result> = Dictionary<Int,Result>()
+    /// returned datas
+    public final class Response {
+        private var _resp:Dictionary<Int,Result>!
+        private var _cmds:[String]!
         
-        public func setModel(_ model: AnyObject) { _model = model }
-        public func getModel<T>(_ type:T.Type) -> T? {
-            return _model as? T
+        fileprivate init(cmds:[String]) {
+            _cmds = cmds
+            // important! set minimumCapacity, because multi-thread set/get the dictionary
+            _resp = Dictionary<Int,Result>(minimumCapacity: cmds.count + 3)
+        }
+        
+        fileprivate func index(of cmd:String) -> Int? {
+            for i in 0..<_cmds.count {
+                if _cmds[i] == cmd {
+                    return i
+                }
+            }
+            return nil
         }
         
         /// has done remote call
@@ -106,6 +117,18 @@ public final class RPC {
             return nil
         }
         
+        /// is empty
+        public func isEmpty(_ idx:Index) -> Bool {
+            guard let obj = _resp[idx.value] else {return false}
+            
+            switch obj {
+            case Result.empty: return true
+            default: break }
+            
+            return false
+        }
+        
+        /// get error
         public func getError(_ idx:Index) -> NSError? {
             guard let obj = _resp[idx.value] else {return nil}
             
@@ -116,81 +139,133 @@ public final class RPC {
             return nil
         }
         
-        fileprivate func set(result:AnyObject, index:Index) {
-            _resp[index.value] = Result.value(result)
+        /// has done remote call
+        public func hasDone(cmd:String) -> Bool {
+            guard let idx = index(of: cmd) else { return true }
+            return hasDone(RPC.Index(idx))
+        }
+        
+        /// get result
+        public func getResult<T>(cmd:String, type:T.Type) -> T? {
+            guard let idx = index(of: cmd) else { return nil }
+            return getResult(RPC.Index(idx),type:type)
+        }
+        
+        /// is empty
+        public func isEmpty(cmd:String) -> Bool {
+            guard let idx = index(of: cmd) else { return true }
+            return isEmpty(RPC.Index(idx))
+        }
+        
+        /// get error
+        public func getError(cmd:String) -> NSError? {
+            guard let idx = index(of: cmd) else { return nil }
+            return getError(RPC.Index(idx))
+        }
+        
+        fileprivate func set(result:Any, index:Index) {
+            if result is Result {
+                _resp[index.value] = result as! Result
+            } else {
+                _resp[index.value] = Result.value(result)
+            }
         }
         
         fileprivate func set(error:NSError, index:Index) {
             _resp[index.value] = Result.error(error)
         }
+        
+        fileprivate func setEmpty(index:Index) {
+            _resp[index.value] = Result.empty
+        }
+    }
+    
+    /// assemble object: Need to be combined to get the data. you can modify the model in main thread
+    public final class AssemblyObject {
+        private var _model:Any? = nil
+        private var _resp:Response!
+        
+        fileprivate init(resp:Response) {
+            _resp = resp
+        }
+        
+        /// get and set the complex object
+        public func setModel(_ model: Any) { _model = model }
+        public func getModel<T>(_ type:T.Type) -> T? {
+            return _model as? T
+        }
+        
+        /// get response
+        public var resp: Response { get { return _resp } }
     }
     
     /// function
-    public typealias AtomicBlock = (_ index:Index, _ cmd:String?, _ assembly:AssemblyObject) throws -> AnyObject
-    
-    // task
-//    fileprivate struct Task {
-//        var block: AtomicBlock!
-//        var cmd = "" //命令
-//        var level = 0 //安全级别，可以根据此标识定义特定安全访问价签属性
-//        var errbreak = false //线性时起作用
-//        var depend: [String]? = nil
-//    }
-    
-    public static func exec(block:@escaping AtomicBlock, feedback:Feedback) {
-        exec(blocks: [block], queue:.discrete, feedback: feedback)
+    public typealias AtomicTask = (_ index:Index, _ cmd:String?, _ resp:Response) throws -> Any
+
+    /// exec single block
+    public static func exec(task:@escaping AtomicTask, feedback:Feedback) {
+        exec(cmds: [(task:task,cmd:"")], queue:.serial, feedback: feedback)
     }
     
-    public static func exec(blocks: [AtomicBlock], queue model:QueueModel = .concurrent, errbreak:Bool = false, group:String = "", feedback:Feedback) {
+    /// exec single block
+    public static func exec(_ cmd:(task:AtomicTask,cmd:String), feedback:Feedback) {
+        exec(cmds: [cmd], queue:.serial, feedback: feedback)
+    }
+    
+    /// exec blocks
+    public static func exec(cmds: [(task:AtomicTask,cmd:String)], queue model:QueueModel = .concurrent, errbreak:Bool = false, group:String = "", feedback:Feedback) {
         switch model {
         case .concurrent:
-            concurrentExec(blocks: blocks, errbreak: errbreak, group: group, feedback: feedback)
+            concurrentExec(cmds: cmds, errbreak: errbreak, group: group, feedback: feedback)
             break
         case .serial:
-            serialExec(blocks: blocks, errbreak: errbreak, group: group, feedback: feedback)
-            break
-        default:
+            serialExec(cmds: cmds, errbreak: errbreak, group: group, feedback: feedback)
             break
         }
     }
     
-    private static func concurrentExec(blocks: [AtomicBlock], errbreak:Bool = false, group:String = "", feedback:Feedback) {
+    private static func concurrentExec(cmds: [(task:AtomicTask,cmd:String)], errbreak:Bool = false, group:String = "", feedback:Feedback) {
         var groupId = group
         if group.isEmpty {
             groupId = "\(Int(Date().timeIntervalSince1970))"
         }
         
-        let cmd: String? = nil
-        
         DispatchQueue.global().async {
-            DispatchQueue.main.async { feedback.start(group: groupId) }
+            var cs = [String]()
+            for (_,cmd) in cmds {
+                cs.append(cmd)
+            }
+            let resp = Response(cmds:cs)
+            let assembly = AssemblyObject(resp:resp)
+            
+            DispatchQueue.main.async { feedback.start(group: groupId, assembly: assembly) }
             
             let workGroup = DispatchGroup()
-            let assembly = AssemblyObject()
-
-            for i in 0..<blocks.count {
-                let idx = Index(i+1)
-                let block = blocks[i]
+            
+            for i in 0..<cmds.count {
+                let idx = Index(i)
+                let (block,cmd) = cmds[i]
                 
                 workQueue.async(group:workGroup) {
-                    var rs: AnyObject? = nil
                     MMTry.try({ do {
-                        rs = try block(idx, nil, assembly)
-                        if rs != nil {
-                            assembly.set(result: rs!, index: idx)
-                        } else {
-                            assembly.set(error:NSError(domain: "RPC", code: -100, userInfo: [NSLocalizedDescriptionKey:"not result value"]), index: idx)
-                        }
-                        DispatchQueue.main.async { feedback.staged(index: idx, cmd: cmd, group: groupId, obj: rs, assembly: assembly) }
-                    } catch {
+                        let rs = try block(idx, nil, assembly.resp)
+                        assembly.resp.set(result: rs, index: idx) // maybe not safty
                         DispatchQueue.main.async {
-                            let err = NSError(domain: "RPC", code: -101, userInfo: [NSLocalizedDescriptionKey:error.localizedDescription])
-                            assembly.set(error:err, index:idx)
+                            feedback.staged(index: idx, cmd: cmd, group: groupId, result: rs, assembly: assembly)
+                        }
+                    } catch {
+                        let err = NSError(domain: "RPC", code: -101, userInfo: [NSLocalizedDescriptionKey:error.localizedDescription])
+                        assembly.resp.set(error:err, index:idx)
+                        DispatchQueue.main.async {
                             feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
                         } } }, catch: { (exception) in
+                            var msg = exception?.reason
+                            if msg == nil {
+                                msg = "not message"
+                            }
+                            let err = NSError(domain: "RPC", code: -102, userInfo: [NSLocalizedDescriptionKey:msg!])
+                            assembly.resp.set(error:err, index:idx)
                             DispatchQueue.main.async {
-                                let err = NSError(domain: "RPC", code: -102, userInfo: [NSLocalizedDescriptionKey:exception?.reason])
-                                assembly.set(error:err, index:idx)
                                 feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
                             }
                     }, finally: nil)
@@ -203,42 +278,45 @@ public final class RPC {
         }
     }
     
-    private static func serialExec(blocks: [AtomicBlock], errbreak:Bool = false, group:String = "", feedback:Feedback) {
+    private static func serialExec(cmds: [(task:AtomicTask,cmd:String)], errbreak:Bool = false, group:String = "", feedback:Feedback) {
         var groupId = group
         if group.isEmpty {
             groupId = "\(Int(Date().timeIntervalSince1970))"
         }
         
-        let cmd: String? = nil
-        
         workQueue.async {
+            var cs = [String]()
+            for (_,cmd) in cmds {
+                cs.append(cmd)
+            }
+            let resp = Response(cmds:cs)
+            let assembly = AssemblyObject(resp:resp)
             
-            DispatchQueue.main.async { feedback.start(group: groupId) }
+            DispatchQueue.main.async { feedback.start(group: groupId, assembly: assembly) }
             
-            let assembly = AssemblyObject()
-            
-            for i in 0..<blocks.count {
-                let idx = Index(i+1)
-                let block = blocks[i]
+            for i in 0..<cmds.count {
+                let idx = Index(i)
+                let (block,cmd) = cmds[i]
                 
-                var rs: AnyObject? = nil
                 MMTry.try({ do {
-                    rs = try block(idx, nil, assembly)
-                    if rs != nil {
-                        assembly.set(result: rs!, index: idx)
-                    } else {
-                        assembly.set(error:NSError(domain: "RPC", code: -100, userInfo: [NSLocalizedDescriptionKey:"not result value"]), index: idx)
-                    }
-                    DispatchQueue.main.async { feedback.staged(index: idx, cmd: cmd, group: groupId, obj: rs, assembly: assembly) }
-                } catch {
+                    let rs = try block(idx, nil, assembly.resp)
+                    assembly.resp.set(result: rs, index: idx) // maybe not safty
                     DispatchQueue.main.async {
-                        let err = NSError(domain: "RPC", code: -101, userInfo: [NSLocalizedDescriptionKey:error.localizedDescription])
-                        assembly.set(error:err, index:idx)
+                        feedback.staged(index: idx, cmd: cmd, group: groupId, result: rs, assembly: assembly)
+                    }
+                } catch {
+                    let err = NSError(domain: "RPC", code: -101, userInfo: [NSLocalizedDescriptionKey:error.localizedDescription])
+                    assembly.resp.set(error:err, index:idx)
+                    DispatchQueue.main.async {
                         feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
                     } } }, catch: { (exception) in
+                        var msg = exception?.reason
+                        if msg == nil {
+                            msg = "not message"
+                        }
+                        let err = NSError(domain: "RPC", code: -102, userInfo: [NSLocalizedDescriptionKey:msg!])
+                        assembly.resp.set(error:err, index:idx)
                         DispatchQueue.main.async {
-                            let err = NSError(domain: "RPC", code: -102, userInfo: [NSLocalizedDescriptionKey:exception?.reason])
-                            assembly.set(error:err, index:idx)
                             feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
                         }
                 }, finally: nil)
@@ -249,7 +327,11 @@ public final class RPC {
     }
     
     // workQueue
-    private static let workQueue = DispatchQueue(label: "com.mm.rpc.queue", qos: DispatchQoS.background)
+    private static let workQueue = DispatchQueue(label: "com.mm.rpc.queue", qos: DispatchQoS.background, attributes:.concurrent)
+    
+    //
+//    private static let quantumQueue = DispatchQueue(label: "com.mm.rpc.quantum", qos: DispatchQoS.background)
+//    private static let quantumCahce = RigidCache()
     
 //    public init(_ quque:DispatchQueue, discrete: Bool = false, max size:Int = 6, interval:Int = 100) {
 //        _queue = quque

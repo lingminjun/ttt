@@ -36,6 +36,13 @@ public class RigidCache<T: NSObject> {
     }
     
     public func get(_ key:String, info:Dictionary<String,Any>? = nil) -> T? {
+        objc_sync_enter(self)
+        let obj = sync_get(key,info: info)
+        objc_sync_exit(self)
+        return obj
+    }
+    
+    private func sync_get(_ key:String, info:Dictionary<String,Any>? = nil) -> T? {
         let box = _cache[key]
         if box != nil {
             let obj = box!.get()

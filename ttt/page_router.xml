@@ -20,4 +20,9 @@
         controller="MMUIWebController"
         container=""
         description="浏览器"/>
+    <item url="https://m.mymm.com/profile.html"
+        key=""
+        controller="ProfileViewController"
+        container=""
+        description="信息"/>
 </items>
