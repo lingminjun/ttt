@@ -33,6 +33,7 @@
 		D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD14200C809E00C03276 /* VCNode.swift */; };
 		D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD16200C8F2700C03276 /* Urls.swift */; };
 		D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD19200CBB7900C03276 /* Injects.swift */; };
+		D9D2AA3C2018A738000B3681 /* Quantum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D2AA3B2018A738000B3681 /* Quantum.swift */; };
 		D9FDDBB42008672200A88631 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FDDBB32008672200A88631 /* AppDelegate.swift */; };
 		D9FDDBB62008672200A88631 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FDDBB52008672200A88631 /* ViewController.swift */; };
 		D9FDDBBB2008672200A88631 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9FDDBBA2008672200A88631 /* Assets.xcassets */; };
@@ -69,6 +70,7 @@
 		D9CCAD14200C809E00C03276 /* VCNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VCNode.swift; sourceTree = "<group>"; };
 		D9CCAD16200C8F2700C03276 /* Urls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Urls.swift; sourceTree = "<group>"; };
 		D9CCAD19200CBB7900C03276 /* Injects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Injects.swift; sourceTree = "<group>"; };
+		D9D2AA3B2018A738000B3681 /* Quantum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quantum.swift; sourceTree = "<group>"; };
 		D9FDDBB02008672200A88631 /* ttt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ttt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FDDBB32008672200A88631 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D9FDDBB52008672200A88631 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 				D94140662016D6420050132B /* RigidCache.swift */,
 				D94140682016F1120050132B /* CycleStack.swift */,
 				D941406A201721470050132B /* KeyCycleStack.swift */,
+				D9D2AA3B2018A738000B3681 /* Quantum.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -345,6 +348,7 @@
 				D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */,
 				D941405C20107C610050132B /* MMTry.m in Sources */,
 				D9CCAD11200C57B300C03276 /* Navigator.swift in Sources */,
+				D9D2AA3C2018A738000B3681 /* Quantum.swift in Sources */,
 				D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */,
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public final class KeyCycleStack<K: Hashable,T: NSObject> {
+public final class KeyCycleStack<K: Hashable,T: AnyObject> {
     private var _keys:[K?]!
     private var _stack:Dictionary<K,T>!
     private var _idx:Int = 0

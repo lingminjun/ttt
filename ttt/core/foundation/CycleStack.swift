@@ -8,7 +8,7 @@
 
 import Foundation
 
-public final class CycleStack<T: NSObject> {
+public final class CycleStack<T: Equatable> {
     private var _stack:[T?]!
     private var _idx: Int = 0
     private var MAX_SIZE:Int = 10
