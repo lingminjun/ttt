@@ -14,7 +14,7 @@ public let QUANTUM_DEFAULT_INTERVAL = UInt64(100) //0.1毫秒
 
 public class Quantum<T: Equatable> {
     
-    public typealias Express = (Quantum<T>, [T] )
+    public typealias Express = (Quantum<T>, [T]) throws -> Void
     
     /**
      * 构造函数
@@ -33,17 +33,18 @@ public class Quantum<T: Equatable> {
      * @param obj
      */
     public func push(_ obj:T) {
-    
-       dispatch_block_cancel(delayExpress)
-    _stack.push(obj);
-    
-    if (_stack.isFull()) {//直接播发
-    let objs = _stack.toList()
-    _stack.clear()
-    express(objs)
-    } else {//延后播发
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.init(uptimeNanoseconds: _interval * 1000), execute: delayExpress)
-    }
+        
+        _block?.cancel()
+        _block = generateBlock()
+        _stack.push(obj);
+        
+        if (_stack.isFull()) {//直接播发
+            let objs = _stack.toList()
+            _stack.clear()
+            express(objs)
+        } else {//延后播发
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.init(uptimeNanoseconds: _interval * 1000), execute: _block!)
+        }
     }
     
     /**
@@ -51,30 +52,31 @@ public class Quantum<T: Equatable> {
      * @param objs
      */
     public func pushAll(_ objs:[T]) {
-    if (objs.isEmpty) {return}
-    
-    dispatch_block_cancel(delayExpress)
-    
+        if (objs.isEmpty) {return}
+        
+        _block?.cancel()
+        _block = generateBlock()
+        
         var list:[T]? = nil
-    for (T obj : objs) {
-    if (list != nil) {//说明栈已经满，为了节约播发次数，不做拆分，一次播放
-    list.add(obj);
-    continue;
-    }
-    
-    _stack.push(obj);
-    
-    if (_stack.isFull()) {//满了后，直接赋值给list
-    list = _stack.toList();
-    _stack.clear();
-    }
-    }
-    
-    if (list != nil) {
-    express(list);
-    } else {//延后播发
-    DispatchQueue.main.asyncAfter(deadline: DispatchTime.init(uptimeNanoseconds: _interval * 1000), execute: delayExpress)
-    }
+        for obj in objs {
+            if (list != nil) {//说明栈已经满，为了节约播发次数，不做拆分，一次播放
+                list!.append(obj);
+                continue;
+            }
+            
+            _stack.push(obj);
+            
+            if (_stack.isFull()) {//满了后，直接赋值给list
+                list = _stack.toList();
+                _stack.clear();
+            }
+        }
+        
+        if (list != nil) {
+            express(list!);
+        } else {//延后播发
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: _interval * 1000), execute: _block!)
+        }
     }
     
     /**
@@ -93,34 +95,36 @@ public class Quantum<T: Equatable> {
      * 设置播放器实现
      * @param express
      */
-    public func setExpress(express:Express) {
+    public func setExpress(_ express:@escaping Express) {
         _express = express;
     }
     
     
     private func express(_ objs:[T]) {
-    if (objs.isEmpty) { return }
-    
-    if (_express != null) { try {
-    _express.express(this,objs);
-    } catch (Throwable e) {}}
+        if (objs.isEmpty) { return }
+        
+        if (_express != nil) {
+            MMTry.try({ do {
+                try self._express!(self,objs);
+            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        } else {
+            print("no express! ")
+        }
     }
-    
-    
-    let delayExpress:dispatch_block_t = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS) { // 创建一个block，block的标志是DISPATCH_BLOCK_INHERIT_QOS_CLASS
-        let objs = _stack.toList();
-        _stack.clear();
-        express(objs);
+
+    private func generateBlock() -> DispatchWorkItem {
+        let item = DispatchWorkItem(block: { [weak self] () in // 创建一个block，block的标志是DISPATCH_BLOCK_INHERIT_QOS_CLASS
+            guard let objs = self?._stack.toList() else {return}
+            self?._stack.clear();
+            self?.express(objs);
+        })
+        return item
     }
-   
-    }
-    
-    
-    
     
     private var _maxCount:Int;
     private var _interval:UInt64;//mis
     
     private var _stack:CycleStack<T>!//采用循环栈存储数据
     private var _express:Express? = nil
+    private var _block:DispatchWorkItem? = nil // cycle reference
 }
