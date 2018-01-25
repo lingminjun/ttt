@@ -11,7 +11,6 @@ import Foundation
 public let QUANTUM_DEFAULT_MAX_COUNT = 100
 public let QUANTUM_DEFAULT_INTERVAL = UInt64(100) //0.1毫秒
 
-
 public final class Quantum<T: Equatable> {
     
     public typealias Express = (Quantum<T>, [T]) throws -> Void
