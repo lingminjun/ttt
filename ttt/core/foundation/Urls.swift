@@ -297,7 +297,7 @@ public final class Urls {
     /// just uri:<scheme>://<host>:<port>/<path>;<params>
     /// *param: only is just url path
     /// *param: sensitve is path case sensitve
-    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = false, scheme:String? = nil, host:String? = nil) -> String {
+    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = false, scheme:String? = nil, host:String? = nil, query: Dictionary<String,QValue>? = nil) -> String {
         //decoding and encoding can compatibility more scene
         let surl = encoding(url: url)
         
@@ -368,10 +368,17 @@ public final class Urls {
         }
         
         //query
-        let query = uri?.query
+        var qry:Dictionary<String,QValue>? = nil
         if query != nil {
-            let dic = self.query(query: query!)
-            let str = self.queryString(dic: dic)
+            qry = query
+        } else {
+            let strqry = uri?.query
+            if strqry != nil {
+                qry = self.query(query: strqry!)
+            }
+        }
+        if qry != nil {
+            let str = self.queryString(dic: qry!)
             if !str.isEmpty {
                 result += "?" + str
             }

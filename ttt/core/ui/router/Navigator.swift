@@ -219,7 +219,15 @@ public final class Navigator: NSObject {
             }
             router!.node.path = router!.id
             
-            query[LOAD_URL_KEY] = QValue(url)
+            //Complement parameters
+            var q = Urls.query(url: router!.node.url);
+            for (k,v) in query {
+                if q[k] == nil && k != LOAD_URL_KEY  {
+                    q[k] = v;
+                }
+            }
+            
+            query[LOAD_URL_KEY] = QValue(Urls.tidy(url: router!.node.url, query: q))
             query.removeValue(forKey: ON_BROWSER_KEY)
         } else {
             router = routerNode(url: url)
