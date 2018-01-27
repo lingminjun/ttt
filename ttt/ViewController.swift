@@ -316,7 +316,7 @@ extension ViewController {
     }
     func orderThreadInsert() {
         let queue = DispatchQueue(label: "com.geselle.demoQueue")
-        queue.async { [weak self] () -> () in
+        queue.async { [weak self] () in
             try! self?.xxxx()
         }
     }
