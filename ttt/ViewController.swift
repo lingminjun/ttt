@@ -43,6 +43,7 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     @objc func rightAction() -> Void {
         let sheet = UIActionSheet(title: "跳转", delegate: self, cancelButtonTitle: "取消", destructiveButtonTitle: "百度")
         sheet.addButton(withTitle: "测试")
+        sheet.addButton(withTitle: "测试1")
         sheet.show(in: self.view)
     }
     
@@ -80,7 +81,9 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
             let params = ["_load_url":QValue("https://m.fengqu.com")]
 //            Navigator.shared.open("https://m.mymm.com/web.html",params:params)
             
-             Navigator.shared.open("https://mymm.com/p/243afdc9-f33c-4726-b9ca-f4b5ff64446f?_on_browser&cs=wechat&cm=message&ca=u:5d530d98-7c96-42d7-9b0f-fcb54be8359e&mw=1&h=https://api.mymm.cn")
+//             Navigator.shared.open("https://mymm.com/p/243afdc9-f33c-4726-b9ca-f4b5ff64446f?_on_browser&cs=wechat&cm=message&ca=u:5d530d98-7c96-42d7-9b0f-fcb54be8359e&mw=1&h=https://api.mymm.cn")
+            
+            Navigator.shared.open("https://cdnc.mymm.com/operations/2018/0129vday2/index.html")
         } else if (indexPath.row == 9) {
             self.fetchs.delete(at: indexPath)
         }
@@ -97,6 +100,8 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         let title = actionSheet.buttonTitle(at: buttonIndex)
         if title == "测试" {
            Navigator.shared.open("https://m.mymm.com/profile.html")
+        }else if title == "测试1" {
+            Navigator.shared.open("https://mymm.com/p/77243897-6f77-44c0-b6de-3ac0d057c0ba?h=https://admin.mymm.com:443&_on_browser")
         } else if title == "百度" {
              Navigator.shared.open("https://m.baidu.com?_on_browser")
             

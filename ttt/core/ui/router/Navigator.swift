@@ -55,7 +55,7 @@ public final class Navigator: NSObject {
             var regex = false
             if host.contains("**") {
                 // \w  [a-zA-Z_0-9]
-                value = value.replacingOccurrences(of: "**", with: "[\\w|.]+")
+                value = value.replacingOccurrences(of: "**", with: "[\\w|.]*")
                 value = value.replacingOccurrences(of: ".", with: "\\.")
                 regex = true
             } else if host.contains("*") {
@@ -69,7 +69,11 @@ public final class Navigator: NSObject {
             if _host.isEmpty {
                 if host.contains("**") {
                     var h = String(host.lowercased())
-                    h = h.replacingOccurrences(of: "**", with: "m")
+                    if h.contains("**.") {
+                        h = h.replacingOccurrences(of: "**", with: "m")
+                    } else {
+                        h = h.replacingOccurrences(of: "**", with: "m.")
+                    }
                     _host = h
                 } else if host.contains("*") {
                     var h = String(host.lowercased())
@@ -236,6 +240,9 @@ public final class Navigator: NSObject {
         if router == nil {
             return nil
         }
+        
+        // url hide value; simple:https://m.mymm.com/s/{skuId}.html
+        
         
         //out param
         container = router!.node.container

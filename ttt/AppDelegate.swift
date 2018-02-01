@@ -18,8 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         window = UIWindow(frame:UIScreen.main.bounds)
         Navigator.shared.launching(root: window!)
-        Navigator.shared.addHost(host: "**.mymm.com")
-        Navigator.shared.addHost(host: "mymm.com")
+        Navigator.shared.addHost(host: "**mymm.com")
         Navigator.shared.addHost(host: "*.fengqu.com")
         Navigator.shared.addHost(host: "*.baidu.com")
         Navigator.shared.addScheme(scheme: "https")
