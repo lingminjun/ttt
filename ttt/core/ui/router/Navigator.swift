@@ -245,24 +245,23 @@ public final class Navigator: NSObject {
             router!.id = "/app/browser.html"
             router!.node = VCNode()
             router!.node.controller = "MMUIWebController"
-            let uurl = query[LOAD_URL_KEY]?.string
-            if uurl == nil {
-                router!.node.url = url//comple(path: "/app/browser.html")
-                query[LOAD_URL_KEY] = QValue(url)
-            } else {
-                router!.node.url = uurl!
+            router!.node.url = comple(path: "/app/browser.html")
+            var uurl = url
+            if let v = query[LOAD_URL_KEY]?.string {
+                uurl = v
             }
+            
             router!.node.path = router!.id
             
             //Complement parameters
-            var q = Urls.query(url: router!.node.url);
+            var q = Urls.query(url: url);
             for (k,v) in query {
                 if q[k] == nil && k != LOAD_URL_KEY  {
                     q[k] = v;
                 }
             }
             
-            query[LOAD_URL_KEY] = QValue(Urls.tidy(url: router!.node.url, query: q))
+            query[LOAD_URL_KEY] = QValue(Urls.tidy(url: uurl, query: q))
             query.removeValue(forKey: ROUTER_ON_BROWSER_KEY)
         } else {
             router = routerNode(url: url, hintParams: &hintParams)
