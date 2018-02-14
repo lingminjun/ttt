@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
+		5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */; };
 		538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */; };
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
 		538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8F200A2DDE006B3A28 /* SettingNode.swift */; };
@@ -43,6 +44,7 @@
 		358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.release.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.release.xcconfig"; sourceTree = "<group>"; };
 		35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ttt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
+		5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRealmController.swift; sourceTree = "<group>"; };
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		538F9E8F200A2DDE006B3A28 /* SettingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNode.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				538F9E8D200A2D9C006B3A28 /* SettingCell.swift */,
 				538F9E8F200A2DDE006B3A28 /* SettingNode.swift */,
 				D99152D6201836EE00FD8B92 /* ProfileViewController.swift */,
+				5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -343,6 +346,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */,
 				D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */,
 				538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */,
 				D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */,

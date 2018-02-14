@@ -10,7 +10,6 @@ import UIKit
 
 public class MMUIController : UIViewController {
     
-    
     public func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>? = nil) {}
     /*
     public func onLoadView() -> Bool { return false }
@@ -98,10 +97,9 @@ public class MMUIController : UIViewController {
         } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         super.didReceiveMemoryWarning()
     }
-    
+        
     private var _stack_flag = false
     var _node = VCNode()
-    var _uri = ""
     
     private var _visible = VisibleStatus.didDisappear
     final func visible() -> VisibleStatus { return _visible }

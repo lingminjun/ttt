@@ -28,6 +28,8 @@ import UIKit
     func open(controller at:Int)
 }
 
+private var SSN_URI_PROPERTY = 0
+
 extension UIViewController: MMController {
     //The following is a safe life-cycle methods.
 //    public func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>? = nil) {}
@@ -38,6 +40,16 @@ extension UIViewController: MMController {
     public func onViewWillDisappear(_ animated: Bool) { }
     public func onViewDidDisappear(_ animated: Bool) { }
     public func onReceiveMemoryWarning() {}
+    
+    @objc var ssn_uri : String {
+        get{
+            guard let result = objc_getAssociatedObject(self, &SSN_URI_PROPERTY) as? String else {  return "" }
+            return result
+        }
+        set{
+            objc_setAssociatedObject(self, &SSN_URI_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+    }
 }
 
 extension UINavigationController: MMContainer {

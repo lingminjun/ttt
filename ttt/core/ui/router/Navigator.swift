@@ -9,7 +9,13 @@
 import Foundation
 import UIKit
 
-public let ON_BROWSER_KEY = "_on_browser"
+public let ROUTER_ON_BROWSER_KEY = "_on_browser"
+public let ROUTER_MODAL_STYLE = "__modal";
+
+public protocol Authorize {
+    func authorized() -> Bool//当前是否认证过
+    func howToAuthorize(url:String, query:Dictionary<String,QValue>) -> String//如何认证,返回认证的url
+}
 
 /// Routing app all scene pages.
 public final class Navigator: NSObject {
@@ -18,6 +24,7 @@ public final class Navigator: NSObject {
     private override init() {
         super.init()
         loadConfig()
+        UIViewController.router_hook()
         
         //add default schemes
     }
@@ -88,6 +95,11 @@ public final class Navigator: NSObject {
         }
     }
     
+    /// set authorize, attention the reference
+    public func setAuthorize(auth: Authorize) {
+        _auth = auth
+    }
+    
     /// Comple url from path
     open func comple(path: String) -> String {
         if path.isEmpty {
@@ -105,7 +117,7 @@ public final class Navigator: NSObject {
     }
     
     /// open url or open path
-    open func open(path:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false) -> Bool {
+    open func open(path:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = false) -> Bool {
         if path.isEmpty {
             return false
         }
@@ -118,13 +130,17 @@ public final class Navigator: NSObject {
     }
     
     /// open url
-    open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool = false, inner:Bool = false) -> Bool {
+    open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil, inner:Bool = false) -> Bool {
         if !isValid(url:url) {
             return false
         }
         var cc: String = ""
-        
-        guard let vc = genViewController(url, params: params, ext: ext, container: &cc) else {
+        var pd = false
+        guard let vc = genViewController(url, params: params, ext: ext, checkAuth:true, pending:&pd, container: &cc) else {
+            
+            if pd {
+                return true
+            }
             
             if inner {
                 return false
@@ -132,6 +148,7 @@ public final class Navigator: NSObject {
             
             let u = URL(string:url)
             if u != nil {
+                /*
                 let scms = Navigator.appURLSchemes()
                 let thescheme = u!.scheme
                 if thescheme != nil && !scms.contains(thescheme!) && UIApplication.shared.canOpenURL(u!) {
@@ -144,6 +161,7 @@ public final class Navigator: NSObject {
                     })
                     return true
                 }
+                 */
             }
             return false
         }
@@ -153,6 +171,16 @@ public final class Navigator: NSObject {
             cc = "UINavigationController"
         }
         
+        //设置modal展示的值
+        var isModal = false
+        if modal != nil {
+            isModal = modal!
+        } else if let v = vc as? MMUIController {
+            if v._node.modal != nil {
+                isModal = v._node.modal!
+            }
+        }
+        
         //open 主要是看top container和xml配置中是否同一个类型，若是，则不再new container
         if !cc.isEmpty {
             var xclazz = Navigator.reflectOCClass(name:cc)
@@ -160,7 +188,7 @@ public final class Navigator: NSObject {
                 let tclazz = type(of: tc) as Swift.AnyClass
                 
                 /// 不是同一个类型的或者是modal
-                if !Navigator.isSameKind(aClass:xclazz!,bClass:tclazz) || modal  {
+                if !Navigator.isSameKind(aClass:xclazz!,bClass:tclazz) || isModal  {
                     MMTry.try({
                         tc = (Navigator.reflectViewController(name:cc) as? MMContainer)! //若不满足协议则构建失败
                     }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
@@ -173,7 +201,7 @@ public final class Navigator: NSObject {
         //看看tc是否已经放入布局之中
         let ftc = topContainer(volatile: false)
         if tc !== ftc && tc is UIViewController {
-            if modal || ftc is UIViewController {
+            if isModal || ftc is UIViewController {
                 (ftc as! UIViewController).present((tc as! UIViewController), animated: true, completion: nil)
             } else {
                 ftc.add(controller: tc as! MMController, at: -1)
@@ -192,10 +220,11 @@ public final class Navigator: NSObject {
         return getViewController(url, params: params, ext: ext)
     }
     open func getViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
+        var temp = false
         var container = ""
-        return genViewController(url, params: params, ext: ext, container: &container)
+        return genViewController(url, params: params, ext: ext, pending:&temp, container: &container)
     }
-    fileprivate func genViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, container: inout String) -> UIViewController? {
+    fileprivate func genViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, checkAuth:Bool = false, pending: inout Bool, container: inout String) -> UIViewController? {
         if !isValid(url:url) {
             return nil
         }
@@ -209,7 +238,9 @@ public final class Navigator: NSObject {
         }
         
         var router: RouterNode? = nil
-        if query[ON_BROWSER_KEY] != nil {
+        var hintParams = Dictionary<String,QValue>()
+        let onBrowser = query[ROUTER_ON_BROWSER_KEY]
+        if onBrowser != nil && onBrowser!.bool != nil && onBrowser!.bool! {
             router = RouterNode()
             router!.id = "/app/browser.html"
             router!.node = VCNode()
@@ -232,9 +263,9 @@ public final class Navigator: NSObject {
             }
             
             query[LOAD_URL_KEY] = QValue(Urls.tidy(url: router!.node.url, query: q))
-            query.removeValue(forKey: ON_BROWSER_KEY)
+            query.removeValue(forKey: ROUTER_ON_BROWSER_KEY)
         } else {
-            router = routerNode(url: url)
+            router = routerNode(url: url, hintParams: &hintParams)
         }
         
         if router == nil {
@@ -242,7 +273,38 @@ public final class Navigator: NSObject {
         }
         
         // url hide value; simple:https://m.mymm.com/s/{skuId}.html
+        if !router!.node.param.isEmpty && hintParams.keys.contains(router!.node.param) {
+            query[router!.node.param] = hintParams[router!.node.param]
+        }
         
+        // check auth
+        if checkAuth && router!.node.auth {
+            if _auth == nil { return nil } //无法验证
+            pending = false
+            
+            //需要验证,且未登录
+            if !_auth!.authorized() {
+                _pendingUrl = Urls.tidy(url: url, query: query) //need append query
+                _authUri = Urls.getURLFinderPath(url: _pendingUrl)
+                _waiting = true
+                let auth = _auth!.howToAuthorize(url: url, query: query)
+                if auth.isEmpty {
+                    _pendingUrl = ""
+                    _waiting = false
+                    return nil
+                }
+                
+                if (!open(auth)) {
+                    _pendingUrl = ""
+                    _waiting = false
+                    return nil
+                }
+                
+                pending = true
+                
+                return nil
+            }
+        }
         
         //out param
         container = router!.node.container
@@ -256,6 +318,7 @@ public final class Navigator: NSObject {
         MMTry.try({
             viewController = Navigator.reflectViewController(name:vc)
             viewController?.title = router!.node.des
+            viewController?.ssn_uri = router!.id
         }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         if viewController == nil {
             return nil
@@ -263,7 +326,6 @@ public final class Navigator: NSObject {
         
         if let v = viewController as? MMUIController {
             v._node = router!.node
-            v._uri = router!.id
             MMTry.try({
                 v.onInit(params: query, ext: ext)
             }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
@@ -352,9 +414,10 @@ public final class Navigator: NSObject {
     
     /// get router
     open func getRouter(url:String) -> VCNode? {
-        return routerNode(url: url)?.node
+        var temp = Dictionary<String,QValue>()
+        return routerNode(url: url, hintParams: &temp)?.node
     }
-    fileprivate func routerNode(url:String) -> RouterNode? {
+    fileprivate func routerNode(url:String, hintParams: inout Dictionary<String,QValue>) -> RouterNode? {
         let uri = Urls.getURLFinderPath(url:url)
         if uri.isEmpty {
             return nil
@@ -366,6 +429,7 @@ public final class Navigator: NSObject {
         //开始兼容其他形式，如 detail/{_}.html 或者 detail/{_}/{_}.html
         let strs = uri.split(separator: "/")
         var builder = ""
+        var values = [] as [String];
         for  i in (0..<strs.count).reversed() {
             //最后一个，需要特殊处理下
             let str = strs[i]
@@ -374,11 +438,18 @@ public final class Navigator: NSObject {
                 if range != nil {
                     builder.append("{_}");
                     builder.append(String(str[range!.lowerBound..<str.endIndex]))
+                    
+                    //暂时仅仅支持最后一个
+                    values.append(String(str[str.startIndex..<range!.lowerBound]));
                 } else {
                     builder.append("{_}");
+                    
+                    values.append(String(str));
                 }
             } else {
                 builder.insert(contentsOf: "{_}/", at: builder.startIndex) // insert(0,"{_}/");//往前插入
+                
+                values.append(String(str));
             }
             
             var key = ""
@@ -388,8 +459,13 @@ public final class Navigator: NSObject {
             }
             
             key.append(builder);
-            let nn = _routers[key]
-            if (nn != nil) { return nn }
+            guard let nn = _routers[key] else { continue }
+            
+            if !nn.node.param.isEmpty && values.count > 0 {
+                hintParams[nn.node.param] = QValue(values[0])
+            }
+            
+            return nn
         }
         
         return nil;
@@ -432,12 +508,35 @@ public final class Navigator: NSObject {
         return false
     }
     
+    fileprivate func checkAuthPending(vc:UIViewController) {
+        if (_waiting && !_pendingUrl.isEmpty && !_authUri.isEmpty) {
+            if (vc.ssn_uri == _authUri) {
+                _waiting = false //表示等待结束
+            }
+        }
+    }
+    
+    fileprivate func dealAuthPending(vc:UIViewController) {
+        if (!_pendingUrl.isEmpty) {
+            if (_auth == nil) { _pendingUrl = "" }
+            if _auth!.authorized() {
+                let url = _pendingUrl
+                _pendingUrl = ""
+                open(url)
+            }
+        }
+    }
+    
     // member var
     var _scheme: String = "" // default scheme
     var _host: String = ""  // default host
     var _schemes: Set<String> = Set<String>(minimumCapacity:3)
     var _hosts: Set<HostMask> = Set<HostMask>(minimumCapacity:2)
     var _routers: Dictionary<String,RouterNode> = Dictionary<String,RouterNode>()
+    var _auth: Authorize? = nil  //
+    var _waiting:Bool = false
+    var _authUri = ""
+    var _pendingUrl = ""//pending task that  will be open after authored
     
     //
     private var _node: VCNode = VCNode()
@@ -502,6 +601,11 @@ extension Navigator : XMLParserDelegate {
                     _node.container = attributeValue
                 } else if attributeName == "description" {
                     _node.des = attributeValue
+                } else if attributeName == "modal" {
+                    _node.modal = QValue(attributeValue).bool
+                } else if attributeName == "auth" {
+                    guard let b = QValue(attributeValue).bool else { continue }
+                    _node.auth = b;
                 }
             }
         }
@@ -559,5 +663,39 @@ extension Navigator : XMLParserDelegate {
     
 }
 
+extension UIViewController {
+    fileprivate class func router_hook() {
+        // 确保不是子类
+        if self !== UIViewController.self {
+            return
+        }
+        
+        router_swizzle_method(target: UIViewController.self, #selector(UIViewController.viewDidAppear(_:)), #selector(UIViewController.router_viewDidAppear(_:)))
+        router_swizzle_method(target: UIViewController.self, #selector(UIViewController.viewDidDisappear(_:)), #selector(UIViewController.router_viewDidDisappear(_:)))
+    }
+    
+    fileprivate class func router_swizzle_method(target: UIViewController.Type, _ left: Selector, _ right: Selector) {
+        
+        let originalMethod = class_getInstanceMethod(target, left)
+        let swizzledMethod = class_getInstanceMethod(target, right)
+        
+        let didAddMethod = class_addMethod(target, left, method_getImplementation(swizzledMethod!), method_getTypeEncoding(swizzledMethod!))
+        
+        if didAddMethod {
+            class_replaceMethod(target, right, method_getImplementation(originalMethod!), method_getTypeEncoding(originalMethod!))
+        } else {
+            method_exchangeImplementations(originalMethod!, swizzledMethod!);
+        }
+    }
+        
+    @objc func router_viewDidAppear(_ animated: Bool) {
+        self.router_viewDidAppear(animated)
+        Navigator.shared.checkAuthPending(vc: self)
+    }
+    @objc func router_viewDidDisappear(_ animated: Bool) {
+        Navigator.shared.dealAuthPending(vc: self)
+        self.router_viewDidDisappear(animated)
+    }
+}
 
 

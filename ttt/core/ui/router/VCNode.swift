@@ -19,4 +19,7 @@ public struct VCNode {
     public var des: String = "" //描述
     
     public var param: String = "" //主键参数，针对url为 https://m.demo.com/detail/{skuid}.html这种
+    
+    public var modal: Bool? = nil//null表示不强制限定打开方式
+    public var auth: Bool = false
 }
