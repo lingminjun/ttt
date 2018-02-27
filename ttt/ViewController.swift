@@ -112,7 +112,7 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
             Navigator.shared.open("https://m.mymm.com/xxx/collect.html")
             
         } else if title == "一级" {
-            Navigator.shared.open("https://m.mymm.com/p/111")
+            Navigator.shared.open("https://m.mymm.com/p/111.html")
             
         } else if title == "二级" {
             Navigator.shared.open("https://m.mymm.com/p/123/about")

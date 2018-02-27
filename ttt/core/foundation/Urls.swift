@@ -526,9 +526,20 @@ public final class Urls {
             return ""
         }
         
-        for path in paths {
+        //从后往前找
+        var isLast = true
+        for var path in paths.reversed() {
             if (path.isEmpty || path == "/" || path == "." || path == "..") {
                 continue
+            }
+            
+            //去掉末尾的.html
+            if isLast {
+                isLast = false
+                let range = path.range(of: ".", options: .backwards)
+                if range != nil {
+                    path = String(path[path.startIndex..<range!.lowerBound]);
+                }
             }
             
             if !path.hasPrefix("-") || !path.hasSuffix("_") {

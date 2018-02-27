@@ -39,7 +39,7 @@
         container=""
         description="COLLECT"/>
         
-    <item url="https://m.mymm.com/p/{profile}"
+    <item url="https://m.mymm.com/p/{profile}.html"
         key=""
         controller="ProfileViewController"
         container=""
