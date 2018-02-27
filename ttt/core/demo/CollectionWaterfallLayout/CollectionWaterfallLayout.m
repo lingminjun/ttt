@@ -87,7 +87,9 @@ CGFloat const kSupplementaryViewKindHeaderPinnedHeight = 44.f;
         CGFloat y = MAX(0, offsetY-(height-kSupplementaryViewKindHeaderPinnedHeight));
         
         //默认先隐藏到屏幕之外
-        y = y + kHiddenSpace;
+        if (section > 0) {
+            y = y + kHiddenSpace;
+        }
         
         attributes.frame = CGRectMake(x, y, width, height);
         attributes.zIndex = 1024;//浮层
@@ -137,8 +139,8 @@ CGFloat const kSupplementaryViewKindHeaderPinnedHeight = 44.f;
 //    NSMutableIndexSet *sections = [NSMutableIndexSet indexSet];
     [self.attributes enumerateKeysAndObjectsUsingBlock:^(NSIndexPath * _Nonnull key, UICollectionViewLayoutAttributes * _Nonnull obj, BOOL * _Nonnull stop) {
         if (CGRectIntersectsRect(obj.frame, rect)) {
-            NSIndexPath *last = indexs[@(key.section)];
-            if (last != nil && last.row <= key.row) {
+            NSIndexPath *first = indexs[@(key.section)];
+            if (first != nil && first.row <= key.row) {
                 //nothing
             } else {
                 [indexs setObject:key forKey:@(key.section)];
@@ -157,7 +159,11 @@ CGFloat const kSupplementaryViewKindHeaderPinnedHeight = 44.f;
         UICollectionViewLayoutAttributes *cellAttributes = self.attributes[first];
         
         //非飘浮位置
-        frame.origin.y = cellAttributes.frame.origin.y - _itemSpacing - frame.size.height;
+        if (section.integerValue == 0) {
+            frame.origin.y = cellAttributes.frame.origin.y - frame.size.height;
+        } else {
+            frame.origin.y = cellAttributes.frame.origin.y - _itemSpacing - frame.size.height;
+        }
         CGFloat y = self.collectionView.contentOffset.y + self.collectionView.contentInset.top;
         frame.origin.y = MAX(frame.origin.y, y);
         attributes.frame = frame;
@@ -228,12 +234,12 @@ CGFloat const kSupplementaryViewKindHeaderPinnedHeight = 44.f;
     //headerView高度
 //    CGFloat headerHeight = [self.delegate collectionViewLayout:self heightForSupplementaryViewAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
     
-    //找出所有列中高度最小的
+    //找出所有列中高度最小的，先调整section位置
     if (indexPath.row == 0) {
         NSInteger index = [self columnOfMostHeight];
         CGFloat bottom = [self.columnHeights[index] floatValue];
         if (bottom == 0) {
-            bottom = _insets.top;
+//            bottom = _insets.top;
         } else {
             bottom = bottom + _itemSpacing;
         }
@@ -255,7 +261,7 @@ CGFloat const kSupplementaryViewKindHeaderPinnedHeight = 44.f;
     CGFloat width = (self.collectionView.bounds.size.width-(_insets.left+_insets.right)-_columnSpacing*(_columns-1)) / _columns;
     CGFloat height = itemHeight;
     CGFloat x = _insets.left+(width+_columnSpacing)*columnIndex;
-    CGFloat y = lessHeight+_itemSpacing;
+    CGFloat y = lessHeight + _itemSpacing;
     attributes.frame = CGRectMake(x, y, width, height);
     
     //testing index.row % 5 == 0 绘制一行
@@ -263,12 +269,12 @@ CGFloat const kSupplementaryViewKindHeaderPinnedHeight = 44.f;
         columnIndex = [self columnOfMostHeight];
         lessHeight = [self.columnHeights[columnIndex] floatValue];
         columnIndex = 0;
-
+        
         //计算LayoutAttributes //一行的宽度
         CGFloat width = (self.collectionView.bounds.size.width-(_insets.left+_insets.right));
         CGFloat height = itemHeight;
         CGFloat x = _insets.left + (width+_columnSpacing)*columnIndex;
-        CGFloat y = lessHeight+_itemSpacing;
+        CGFloat y = lessHeight + _itemSpacing;
         attributes.frame = CGRectMake(x, y, width, height);
         
         for (int i = 0; i < _columns; i++) {
@@ -277,9 +283,9 @@ CGFloat const kSupplementaryViewKindHeaderPinnedHeight = 44.f;
         }
         
     } else {
-    
-    //更新列高度
-    self.columnHeights[columnIndex] = @(y+height);
+        
+        //更新列高度
+        self.columnHeights[columnIndex] = @(y+height);
     }
     return attributes;
 }

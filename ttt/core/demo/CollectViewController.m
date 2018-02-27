@@ -89,10 +89,39 @@ static NSString *const kCollectionViewHeaderReusableID = @"kCollectionViewHeader
 
 - (void)buttonClick
 {
+    UIActionSheet * sheet = [[UIActionSheet alloc] initWithTitle:@"样式选择"
+                                                        delegate:self
+                                               cancelButtonTitle:@"取消"
+                                          destructiveButtonTitle:nil
+                                               otherButtonTitles:@"停靠瀑布流",
+                             @"简单瀑布流",
+                             @"停靠表格流",
+                             @"停靠固定行高流",
+                             nil];
+    [sheet showInView:self.view];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
+    if ([title isEqualToString:@"取消"]) {
+        return;
+    }
+    
+    if ([title isEqualToString:@"停靠瀑布流"]) {
+        //
+    } else if ([title isEqualToString:@"简单瀑布流"]) {
+        //
+    } else if ([title isEqualToString:@"停靠表格流"]) {
+        //
+    } else if ([title isEqualToString:@"固定行高表格流"]) {
+        //
+    }
+    
     [self setupDataList];
     [self.collectionView reloadData];
-    
 }
+
+
 #pragma mark - getter
 - (UICollectionView *)collectionView
 {
