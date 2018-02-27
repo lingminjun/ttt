@@ -44,7 +44,22 @@ extension UITableViewCell {
     }
 }
 
-/// UITableViewCell display support
+/// UICollectionReusableView display support
+extension UICollectionReusableView {
+    @objc var ssn_cellModel : MMCellModel? {
+        get{
+            guard let result = objc_getAssociatedObject(self, &CELL_MODEL_PROPERTY) as? MMCellModel else {  return nil }
+            return result
+        }
+    }
+    
+    //    func prepareForReuse()
+    @objc func ssn_onDisplay(_ tableView: UICollectionView, model: AnyObject,atIndexPath indexPath: IndexPath) {}
+    
+    fileprivate func ssn_set_cellModel(_ model:MMCellModel?) {
+        objc_setAssociatedObject(self, &CELL_MODEL_PROPERTY, model, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+    }
+}
 
 ///
 @objc public enum MMFetchChangeType : UInt {
