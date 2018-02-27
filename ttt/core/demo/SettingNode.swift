@@ -18,7 +18,7 @@ class SettingNode : NSObject,MMCellModel {
         return 44.0
     }
     
-    func ssn_isSectionHeader() -> Bool {
+    func ssn_canFloating() -> Bool {
         return false
     }
     

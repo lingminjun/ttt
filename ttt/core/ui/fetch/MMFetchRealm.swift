@@ -15,7 +15,7 @@ extension RealmSwift.Object : MMCellModel {
         return 44.0
     }
     
-    public func ssn_isSectionHeader() -> Bool {
+    public func ssn_canFloating() -> Bool {
         return false
     }
     

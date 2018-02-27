@@ -12,7 +12,7 @@
 		53822F2920440CD5009CDE66 /* WFHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 53822F2520440CD5009CDE66 /* WFHeaderView.xib */; };
 		53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2620440CD5009CDE66 /* CollectViewController.m */; };
 		53822F2E20440D28009CDE66 /* CollectionWaterfallLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */; };
-		53822F3120450B89009CDE66 /* MMCollectViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3020450B89009CDE66 /* MMCollectViewLayout.swift */; };
+		53822F3120450B89009CDE66 /* MMCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3020450B89009CDE66 /* MMCollectionViewLayout.swift */; };
 		5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */; };
 		538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */; };
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
@@ -56,7 +56,7 @@
 		53822F2620440CD5009CDE66 /* CollectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectViewController.m; sourceTree = "<group>"; };
 		53822F2C20440D28009CDE66 /* CollectionWaterfallLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionWaterfallLayout.h; sourceTree = "<group>"; };
 		53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionWaterfallLayout.m; sourceTree = "<group>"; };
-		53822F3020450B89009CDE66 /* MMCollectViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMCollectViewLayout.swift; sourceTree = "<group>"; };
+		53822F3020450B89009CDE66 /* MMCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMCollectionViewLayout.swift; sourceTree = "<group>"; };
 		5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRealmController.swift; sourceTree = "<group>"; };
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
@@ -117,7 +117,7 @@
 		53822F2F20450B18009CDE66 /* layout */ = {
 			isa = PBXGroup;
 			children = (
-				53822F3020450B89009CDE66 /* MMCollectViewLayout.swift */,
+				53822F3020450B89009CDE66 /* MMCollectionViewLayout.swift */,
 			);
 			path = layout;
 			sourceTree = "<group>";
@@ -397,7 +397,7 @@
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
 				53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
-				53822F3120450B89009CDE66 /* MMCollectViewLayout.swift in Sources */,
+				53822F3120450B89009CDE66 /* MMCollectionViewLayout.swift in Sources */,
 				D94140692016F1120050132B /* CycleStack.swift in Sources */,
 				D99152D7201836EE00FD8B92 /* ProfileViewController.swift in Sources */,
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
