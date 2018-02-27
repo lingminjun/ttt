@@ -45,6 +45,8 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         sheet.addButton(withTitle: "测试")
         sheet.addButton(withTitle: "测试1")
         sheet.addButton(withTitle: "瀑布")
+        sheet.addButton(withTitle: "一级")
+        sheet.addButton(withTitle: "二级")
         sheet.show(in: self.view)
     }
     
@@ -108,6 +110,12 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
             
         } else if title == "瀑布" {
             Navigator.shared.open("https://m.mymm.com/xxx/collect.html")
+            
+        } else if title == "一级" {
+            Navigator.shared.open("https://m.mymm.com/p/111")
+            
+        } else if title == "二级" {
+            Navigator.shared.open("https://m.mymm.com/p/123/about")
             
         }
     }

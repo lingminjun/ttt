@@ -38,4 +38,15 @@
         controller="CollectViewController"
         container=""
         description="COLLECT"/>
+        
+    <item url="https://m.mymm.com/p/{profile}"
+        key=""
+        controller="ProfileViewController"
+        container=""
+        description="一级"/>
+    <item url="https://m.mymm.com/p/{profile}/about"
+        key=""
+        controller="ProfileViewController"
+        container=""
+        description="二级"/>
 </items>

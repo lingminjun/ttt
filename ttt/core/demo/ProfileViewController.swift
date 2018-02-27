@@ -9,6 +9,9 @@
 import Foundation
 
 class ProfileViewController: MMUITableController<MMCellModel> {
+    
+    var profile:String = ""
+    
     override func loadFetchs() -> [MMFetch<MMCellModel>] {
         //使用默认的数据库
         var list = [] as [MMCellModel]
@@ -18,6 +21,8 @@ class ProfileViewController: MMUITableController<MMCellModel> {
     
     override func onViewDidLoad() {
         super.onViewDidLoad()
+        
+        var profile = ssn_Arguments?["profile"]?.string
         
         // Provisional request
         RPC.exec(task: { (idx, cmd, resp) -> Any in

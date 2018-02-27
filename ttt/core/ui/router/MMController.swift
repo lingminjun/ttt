@@ -29,6 +29,7 @@ import UIKit
 }
 
 private var SSN_URI_PROPERTY = 0
+private var VC_PARAMS_PROPERTY = 0
 
 extension UIViewController: MMController {
     //The following is a safe life-cycle methods.
@@ -41,13 +42,24 @@ extension UIViewController: MMController {
     public func onViewDidDisappear(_ animated: Bool) { }
     public func onReceiveMemoryWarning() {}
     
-    @objc var ssn_uri : String {
+    @objc public final var ssn_uri : String {
         get{
             guard let result = objc_getAssociatedObject(self, &SSN_URI_PROPERTY) as? String else {  return "" }
             return result
         }
         set{
             objc_setAssociatedObject(self, &SSN_URI_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+    
+    //参数存储
+    public final var ssn_Arguments : Dictionary<String,QValue>? {
+        get{
+            guard let result = objc_getAssociatedObject(self, &VC_PARAMS_PROPERTY) as? Dictionary<String,QValue> else {  return nil }
+            return result
+        }
+        set{
+            objc_setAssociatedObject(self, &VC_PARAMS_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
     }
 }

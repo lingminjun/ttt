@@ -456,9 +456,14 @@ public final class Urls {
      * @param url
      * @return
      */
-    public static func getURLFinderPath(url: String) -> String  {
+    public static func getURLFinderPath(url: String, config:Bool = false) -> String  {
         let surl = encoding(url: url)
-        let uri = URL(string:surl)
+        var u = surl
+        if config {
+            u = surl.replacingOccurrences(of: "{", with: "-")
+            u = u.replacingOccurrences(of: "}", with: "_")
+        }
+        let uri = URL(string:u)
         
         if (uri == nil) {return ""}
         
@@ -478,8 +483,8 @@ public final class Urls {
             if (!p.isEmpty && p != "/" && p != "." && p != "..") {
                 var str = p;
                 //contain param key
-                if p.contains("{") && p.contains("}") {
-                    let range = p.range(of: "}")!.upperBound ..< str.endIndex
+                if p.contains("-") && p.contains("_") {
+                    let range = p.range(of: "_")!.upperBound ..< str.endIndex
                     str = "{_}" + p[range];
                 }
                 
@@ -504,7 +509,9 @@ public final class Urls {
     
     // just support last component param key
     public static func getURLPathParamKey(url: String) -> String  {
-        let surl = encoding(url: url)
+        var surl = encoding(url: url)
+        surl = surl.replacingOccurrences(of: "{", with: "-")
+        surl = surl.replacingOccurrences(of: "}", with: "_")
         let uri = URL(string:surl)
         
         if (uri == nil) {return ""}
@@ -524,11 +531,11 @@ public final class Urls {
                 continue
             }
             
-            if !path.contains("{") && !path.contains("}") {
-                return "";
+            if !path.hasPrefix("-") || !path.hasSuffix("_") {
+                continue;
             }
             
-            let range = path.range(of: "{")!.upperBound ..< path.range(of: "}")!.lowerBound
+            let range = path.range(of: "-")!.upperBound ..< path.range(of: "_")!.lowerBound
             return String(path[range])
         }
         

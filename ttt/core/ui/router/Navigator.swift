@@ -318,6 +318,7 @@ public final class Navigator: NSObject {
             viewController = Navigator.reflectViewController(name:vc)
             viewController?.title = router!.node.des
             viewController?.ssn_uri = router!.id
+            viewController?.ssn_Arguments = query;
         }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
         if viewController == nil {
             return nil
@@ -416,6 +417,8 @@ public final class Navigator: NSObject {
         var temp = Dictionary<String,QValue>()
         return routerNode(url: url, hintParams: &temp)?.node
     }
+    
+    
     fileprivate func routerNode(url:String, hintParams: inout Dictionary<String,QValue>) -> RouterNode? {
         let uri = Urls.getURLFinderPath(url:url)
         if uri.isEmpty {
@@ -425,10 +428,76 @@ public final class Navigator: NSObject {
         let node = _routers[uri]
         if (node != nil) {return node}
         
-        //开始兼容其他形式，如 detail/{_}.html 或者 detail/{_}/{_}.html
-        let strs = uri.split(separator: "/")
-        var builder = ""
+        ///开始兼容其他形式，如 detail/{_}.html 或者 detail/{_}/about.html 或者 detail/{_}/{_}.html
+        
+        /*//笛卡尔积，下面只选择已经标记
+         detail/fff/ddd/ttt/{_}------1
+         detail/fff/ddd/{_}/ooo------2
+         detail/fff/{_}/ttt/ooo------3
+         detail/{_}/ddd/ttt/ooo------4
+         
+         detail/kkk/lll/{_}/{_}------5
+         detail/kkk/{_}/{_}/aaa------6
+         detail/{_}/{_}/ddd/aaa------7
+         detail/kkk/{_}/ddd/{_}
+         detail/{_}/lll/{_}/aaa
+         detail/{_}/lll/ddd/{_}
+         
+         detail/xxx/{_}/{_}/{_}------8
+         detail/{_}/kkk/{_}/{_}
+         detail/{_}/{_}/ddd/{_}
+         detail/{_}/{_}/{_}/aaa------9
+         
+         detail/{_}/{_}/{_}/{_}------10
+         */
+        
+        let range = uri.range(of: ".", options: .backwards)
+        var paths:String = uri
+        var ext:String = ""
+        if range != nil {
+            ext = String(uri[range!.lowerBound..<uri.endIndex])
+            paths = String(uri[uri.startIndex..<range!.lowerBound]);
+        }
+        
+        let strs = paths.split(separator: "/")
         var values = [] as [String];
+        
+        //需要查找的次数
+        for times in (1..<strs.count).reversed() {//需要查找的次数
+            
+            let len = strs.count - times //替换长度
+            
+            //第几次查找
+            for n in 1...times {
+                var key:String = String(strs[0])
+                values.removeAll()
+                
+                let start = strs.count - n - (len - 1) //开始替换位置
+                
+                //开始拼接key
+                for j in 1..<strs.count {
+                    if (j >= start && j < start + len) {//替换位置
+                        key = key + "/{_}"
+                        values.append(String(strs[j]))
+                    } else {
+                        key = key + "/" + strs[j]
+                    }
+                }
+                
+                key = key + ext
+                
+                //尝试取值
+                guard let nn = _routers[key] else { continue }
+                
+                if !nn.node.param.isEmpty && values.count > 0 {
+                    hintParams[nn.node.param] = QValue(values[0])
+                }
+                
+                return nn
+            }
+        }
+        
+        /*
         for  i in (0..<strs.count).reversed() {
             //最后一个，需要特殊处理下
             let str = strs[i]
@@ -466,7 +535,7 @@ public final class Navigator: NSObject {
             
             return nn
         }
-        
+        */
         return nil;
     }
     
@@ -590,7 +659,7 @@ extension Navigator : XMLParserDelegate {
                 }
                 if attributeName == "url" {
                     _node.url = attributeValue
-                    _node.path = Urls.getURLFinderPath(url: attributeValue)
+                    _node.path = Urls.getURLFinderPath(url: attributeValue, config: true)
                     _node.param = Urls.getURLPathParamKey(url: attributeValue)
                 } else if attributeName == "key" {
                     _node.key = attributeValue
