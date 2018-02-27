@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
+		53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2220440CD5009CDE66 /* WFHeaderView.m */; };
+		53822F2920440CD5009CDE66 /* WFHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 53822F2520440CD5009CDE66 /* WFHeaderView.xib */; };
+		53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2620440CD5009CDE66 /* CollectViewController.m */; };
+		53822F2E20440D28009CDE66 /* CollectionWaterfallLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */; };
 		5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */; };
 		538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */; };
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
@@ -44,6 +48,13 @@
 		358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.release.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.release.xcconfig"; sourceTree = "<group>"; };
 		35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ttt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
+		53822F2220440CD5009CDE66 /* WFHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFHeaderView.m; sourceTree = "<group>"; };
+		53822F2320440CD5009CDE66 /* CollectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectViewController.h; sourceTree = "<group>"; };
+		53822F2420440CD5009CDE66 /* WFHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WFHeaderView.h; sourceTree = "<group>"; };
+		53822F2520440CD5009CDE66 /* WFHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WFHeaderView.xib; sourceTree = "<group>"; };
+		53822F2620440CD5009CDE66 /* CollectViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectViewController.m; sourceTree = "<group>"; };
+		53822F2C20440D28009CDE66 /* CollectionWaterfallLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionWaterfallLayout.h; sourceTree = "<group>"; };
+		53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionWaterfallLayout.m; sourceTree = "<group>"; };
 		5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRealmController.swift; sourceTree = "<group>"; };
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
@@ -92,6 +103,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		53822F2B20440CF6009CDE66 /* CollectionWaterfallLayout */ = {
+			isa = PBXGroup;
+			children = (
+				53822F2C20440D28009CDE66 /* CollectionWaterfallLayout.h */,
+				53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */,
+			);
+			path = CollectionWaterfallLayout;
+			sourceTree = "<group>";
+		};
 		538F9E91200A47AF006B3A28 /* fetch */ = {
 			isa = PBXGroup;
 			children = (
@@ -141,6 +161,12 @@
 		D958F7832008690800E3F0C5 /* demo */ = {
 			isa = PBXGroup;
 			children = (
+				53822F2B20440CF6009CDE66 /* CollectionWaterfallLayout */,
+				53822F2320440CD5009CDE66 /* CollectViewController.h */,
+				53822F2620440CD5009CDE66 /* CollectViewController.m */,
+				53822F2420440CD5009CDE66 /* WFHeaderView.h */,
+				53822F2220440CD5009CDE66 /* WFHeaderView.m */,
+				53822F2520440CD5009CDE66 /* WFHeaderView.xib */,
 				D958F78E2008694900E3F0C5 /* DemoListController.swift */,
 				D9917D2920089F56003682AD /* Dog.swift */,
 				D9917D2B2008AF73003682AD /* DogCell.swift */,
@@ -280,6 +306,7 @@
 			files = (
 				D9FDDBBB2008672200A88631 /* Assets.xcassets in Resources */,
 				D9CCAD13200C5C4B00C03276 /* page_router.xml in Resources */,
+				53822F2920440CD5009CDE66 /* WFHeaderView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,10 +379,12 @@
 				D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */,
 				D941405C20107C610050132B /* MMTry.m in Sources */,
 				D9CCAD11200C57B300C03276 /* Navigator.swift in Sources */,
+				53822F2E20440D28009CDE66 /* CollectionWaterfallLayout.m in Sources */,
 				D9D2AA3C2018A738000B3681 /* Quantum.swift in Sources */,
 				D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */,
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
+				53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
 				D94140692016F1120050132B /* CycleStack.swift in Sources */,
 				D99152D7201836EE00FD8B92 /* ProfileViewController.swift in Sources */,
@@ -369,6 +398,7 @@
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D94140652011DC8E0050132B /* MMUIWebController.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
+				53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */,
 				D941406B201721470050132B /* KeyCycleStack.swift in Sources */,
 				D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */,
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,

@@ -44,6 +44,7 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         let sheet = UIActionSheet(title: "跳转", delegate: self, cancelButtonTitle: "取消", destructiveButtonTitle: "百度")
         sheet.addButton(withTitle: "测试")
         sheet.addButton(withTitle: "测试1")
+        sheet.addButton(withTitle: "瀑布")
         sheet.show(in: self.view)
     }
     
@@ -103,7 +104,10 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         }else if title == "测试1" {
             Navigator.shared.open("https://mymm.com/p/77243897-6f77-44c0-b6de-3ac0d057c0ba?h=https://admin.mymm.com:443&_on_browser=1")
         } else if title == "百度" {
-             Navigator.shared.open("https://m.baidu.com?_on_browser=1")
+            Navigator.shared.open("https://m.baidu.com?_on_browser=1")
+            
+        } else if title == "瀑布" {
+            Navigator.shared.open("https://m.mymm.com/xxx/collect.html")
             
         }
     }

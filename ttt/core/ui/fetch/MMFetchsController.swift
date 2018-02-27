@@ -15,6 +15,10 @@ import UIKit
     func ssn_cell(_ cellID : String) -> UITableViewCell
     func ssn_canEdit() -> Bool
     func ssn_canMove() -> Bool
+    func ssn_cellHeight() -> Float //UITableViewDelegate heightForRowAt or UICollectionViewLayout layoutAttributesForItemAtIndexPath
+    func ssn_isSectionHeader() -> Bool
+    func ssn_isExclusiveLine() -> Bool
+    func ssn_cellGridSpanSize() -> UInt //占用列数
 }
 
 private var CELL_MODEL_PROPERTY = 0
@@ -39,6 +43,8 @@ extension UITableViewCell {
         objc_setAssociatedObject(self, &CELL_MODEL_PROPERTY, model, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
     }
 }
+
+/// UITableViewCell display support
 
 ///
 @objc public enum MMFetchChangeType : UInt {
@@ -163,67 +169,6 @@ public class MMFetch<T: MMCellModel> {
     public func indexOf(_ object: T) -> Int? {return 0}
     public func filter(_ predicate: NSPredicate) -> [T] {return []}
     
-    
-    
-    /// MARK: Sorting
-//    func sorted(property: String, ascending: Bool) -> MMFetch
-    
-    
-    /**
-     Returns a sorted `Results` from the collection.
-     
-     - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
-     
-     - returns: A `Results` sorted by the specified properties.
-     */
-//    func sorted(sortDescriptors: [NSSortDescriptor]) -> MMFetch
-    
-    
-    // MARK: Aggregate Operations
-    
-    /**
-     Returns the minimum (lowest) value of the given property among all the objects represented by the collection.
-     
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
-     
-     - parameter property: The name of a property whose minimum value is desired.
-     
-     - returns: The minimum value of the property, or `nil` if the collection is empty.
-     */
-    //public func min(property: String) -> MMCellModel? {return nil}
-    
-    /**
-     Returns the maximum (highest) value of the given property among all the objects represented by the collection.
-     
-     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
-     
-     - parameter property: The name of a property whose minimum value is desired.
-     
-     - returns: The maximum value of the property, or `nil` if the collection is empty.
-     */
-    //public func max(property: String) -> MMCellModel? {return nil}
-    
-    /**
-     Returns the sum of the values of a given property over all the objects represented by the collection.
-     
-     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
-     
-     - parameter property: The name of a property whose values should be summed.
-     
-     - returns: The sum of the given property.
-     */
-    //public func sum(property: String) -> MMCellModel? {return nil}
-    
-    /**
-     Returns the average value of a given property over all the objects represented by the collection.
-     
-     - warning: Only the name of a property whose type conforms to the `AddableType` protocol can be specified.
-     
-     - parameter property: The name of a property whose average value should be calculated.
-     
-     - returns: The average value of the given property, or `nil` if the collection is empty.
-     */
-    //public func average(property: String) -> MMCellModel? {return nil}
 }
 
 /// Listening the fetch controller changes

@@ -33,4 +33,9 @@
         controller="LoginViewController"
         container=""
         description="信息"/>
+    <item url="https://m.mymm.com/xxx/collect.html"
+        key=""
+        controller="CollectViewController"
+        container=""
+        description="COLLECT"/>
 </items>

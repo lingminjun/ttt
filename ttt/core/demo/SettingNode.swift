@@ -10,6 +10,22 @@ import Foundation
 import UIKit
 
 class SettingNode : NSObject,MMCellModel {
+    func ssn_cellGridSpanSize() -> UInt {
+        return 1
+    }
+    
+    func ssn_cellHeight() -> Float {
+        return 44.0
+    }
+    
+    func ssn_isSectionHeader() -> Bool {
+        return false
+    }
+    
+    func ssn_isExclusiveLine() -> Bool {
+        return false
+    }
+    
     func ssn_cellID() -> String {
         return String(describing: type(of: self))
     }

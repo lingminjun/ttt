@@ -11,6 +11,22 @@ import RealmSwift
 import UIKit
 
 extension RealmSwift.Object : MMCellModel {
+    public func ssn_cellHeight() -> Float {
+        return 44.0
+    }
+    
+    public func ssn_isSectionHeader() -> Bool {
+        return false
+    }
+    
+    public func ssn_isExclusiveLine() -> Bool {
+        return false
+    }
+    
+    public func ssn_cellGridSpanSize() -> UInt {
+        return 1
+    }
+    
     @objc public func ssn_cellID() -> String { return String(describing: type(of: self)) }
     @objc public func ssn_cell(_ cellID : String) -> UITableViewCell { return UITableViewCell(style: .default, reuseIdentifier: cellID)}
     @objc public func ssn_canEdit() -> Bool { return false }
