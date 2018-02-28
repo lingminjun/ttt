@@ -38,6 +38,11 @@
         controller="CollectViewController"
         container=""
         description="COLLECT"/>
+    <item url="https://m.mymm.com/yyy/collect.html"
+        key=""
+        controller="SCollectionViewController"
+        container=""
+        description="COLLECT"/>
         
     <item url="https://m.mymm.com/p/{profile}.html"
         key=""

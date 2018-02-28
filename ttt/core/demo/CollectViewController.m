@@ -126,11 +126,15 @@ static NSString *const kCollectionViewHeaderReusableID = @"kCollectionViewHeader
 - (UICollectionView *)collectionView
 {
     if(!_collectionView){
+        
         _waterfallLayout = [[CollectionWaterfallLayout alloc] init];
         _waterfallLayout.delegate = self;
         _waterfallLayout.columns = 2;
         _waterfallLayout.columnSpacing = 10;
         _waterfallLayout.insets = UIEdgeInsetsMake(10, 10, 10, 10);
+        
+//        MMCollectionViewLayout *layout = [[MMCollectionViewLayout alloc] init];
+//        layout.config =
         
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, ScreenWidth, ScreenHeight-StatusBarHeight-NavigationBarHeight) collectionViewLayout:_waterfallLayout];
         _collectionView.delegate = self;

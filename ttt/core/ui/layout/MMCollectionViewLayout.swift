@@ -84,16 +84,16 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     //采用一次性布局
     private var _cellLayouts:[IndexPath:UICollectionViewLayoutAttributes] = [:]
     private var _headIndexs:[IndexPath] = [] //header形式
-    private var _bottoms:[UInt] = []
+    private var _bottoms:[CGFloat] = []
 
-    // 
+    // 准备布局
     override func prepare() {
         super.prepare()
         
         //起始位计算
         _bottoms.removeAll()
         for _ in 0..<_config.columnCount {
-            _bottoms.append(0)
+            _bottoms.append(0.0)
         }
         _cellLayouts.removeAll();
         _headIndexs.removeAll();
@@ -110,6 +110,10 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         let floating = _config.floating
         let rowHeight = _config.rowHeight
         let columnCount = _config.columnCount
+        let floatingWidth = view.bounds.size.width
+//        let lineWidth = view.bounds.size.width - (_config.insets.left + _config.insets.right)
+        let cellWidth = (view.bounds.size.width - (_config.insets.left + _config.insets.right) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount)
+        
         
         let sectionCount = view.numberOfSections
         
@@ -121,9 +125,12 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 let indexPath = IndexPath(row: row, section: section)
                 
                 //是否漂浮
-                var isFloating:Bool = false
+                var isFloating:Bool = _config.floating
                 if floating && respondCanFloating {
                     isFloating = ds!.collectionView!(view, canFloatingCellAt: indexPath)
+                }
+                if isFloating {
+                    _headIndexs.append(indexPath)
                 }
                 
                 //行高
@@ -150,27 +157,167 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 } else {
                     attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)//layoutAttributesForCellWithIndexPath
                 }
-                _cellLayouts[indexPath] = attributes
+                _cellLayouts[indexPath] = attributes//记录下来，防止反复创建
                 
+                var suitableSetion = self.sectionOfLessHeight
+                var y = _bottoms[suitableSetion] //起始位置
                 
+                //说明当前位置并不合适,换到新的一行开始处理
+                if isFloating || suitableSetion + spanSize > columnCount {
+                    let mostSetion = self.sectionOfMostHeight
+                    y = _bottoms[mostSetion] //起始位置
+                    suitableSetion = 0 //new line
+                }
                 
-                //仅仅支持sectionHeader
-//                let attributes = UICollectionViewLayoutAttributes.layoutAttributes(supplementaryViewOfKind:COLLECTION_HEADER_KIND withIndexPath:indexPath)
-//
-//                if (attributes != nil) {
-//                    [self.attributes setObject:attributes forKey:indexPath];
-//                }
+                //起始行特别处理
+                if section == 0 && row == 0 && y == 0.0 && !isFloating {
+                    y = y + _config.insets.top
+                }
                 
-                //            NSInteger less = [self columnOfLessHeight];
-                //            if (self.columnHeights[less].integerValue > screenBottom) {
-                //                break;
-                //            }
+                //x起始位和宽度
+                var x = _config.insets.left + (cellWidth + _config.columnSpace) * CGFloat(suitableSetion)
+                var width = cellWidth * CGFloat(spanSize) + _config.columnSpace * CGFloat(spanSize - 1)
+                
+                //对于floating,满行处理
+                if isFloating {
+                    x = 0
+                    width = floatingWidth
+                }
+                
+                attributes.frame = CGRect(x:x, y:y, width:width, height:height)
+                
+                //更新每列位置信息
+                for index in suitableSetion..<spanSize {
+                    _bottoms[index] = y + height + _config.rowDefaultSpace
+                }
             }
         }
     }
     
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        
+        //存在飘浮cell
+        let hasFloating = !_headIndexs.isEmpty
+        
+        var csets:Set<IndexPath> = Set<IndexPath>() //所有被列入的key
+//        var hsets:Set<IndexPath> = Set<IndexPath>() //所有被列入header的key
+        var minCIndexPath:IndexPath? = nil
+        var minHIndexPath:IndexPath? = nil
+        
+        //遍历所有 Attributes 看看哪些符合 rect
+        var list:[UICollectionViewLayoutAttributes] = []
+        _cellLayouts.forEach { (key,value) in
+            
+            //存在交集
+            if rect.intersects(value.frame) {
+                list.append(value)
+                
+                csets.insert(key)
+                
+                //记录正常情况下包含的set
+                if hasFloating && value.representedElementKind == COLLECTION_HEADER_KIND {
+//                    hsets.insert(key)
+                    
+                    //取最小位置的header
+                    if minHIndexPath == nil || minHIndexPath! > key {
+                        minHIndexPath = key
+                    }
+                } else {//取最小位置的header
+                    if minCIndexPath == nil || minCIndexPath! > key {
+                        minCIndexPath = key
+                    }
+                }
+            }
+        }
+        
+        //没有飘浮处理，直接返回好了
+        if !hasFloating {
+            return list
+        }
+        
+        
+        if minHIndexPath == nil && (minCIndexPath == nil || _headIndexs[0] <= minCIndexPath!) {
+            minHIndexPath = _headIndexs[0]
+        }
+        
+        //往前寻找一个飘浮的cell
+        if minCIndexPath != nil && minHIndexPath != nil && minCIndexPath! < minHIndexPath! {
+            if let idx = _headIndexs.index(of: minHIndexPath!) {
+                if idx > 0 {
+                    minHIndexPath = _headIndexs[idx - 1]
+                }
+            }
+        }
+        
+        if minHIndexPath == nil { return list }
+        
+        guard let view = self.collectionView else {
+            return list
+        }
+        
+        guard let value = _cellLayouts[minHIndexPath!] else { return list }
+        var frame = value.frame
+        
+        let viewTop = view.contentOffset.y + view.contentInset.top //表头
+        if viewTop < frame.origin.y {
+            return list
+        }
+        
+        //调整最小值
+        var nextHeightTop = viewTop + 2*UIScreen.main.bounds.height //下一个head的头，默认值设置得比较大
+        if minHIndexPath != _headIndexs.last {//不等于最后一个,取下一个header的顶部
+            if let next = _headIndexs.index(of: minHIndexPath!) {
+                if let nextValue = _cellLayouts[_headIndexs[(next + 1)]] {
+                    nextHeightTop = nextValue.frame.origin.y
+                }
+            }
+        }
+        
+        frame.origin.y = min(nextHeightTop - frame.size.height, viewTop)
+        value.frame = frame;
+        
+        return list
+    }
+    
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        guard let attributes = _cellLayouts[indexPath] else { return nil }
+        if attributes.representedElementKind == COLLECTION_HEADER_KIND {
+            return nil
+        } else {
+            return attributes
+        }
+    }
+    
+    override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        guard let attributes = _cellLayouts[indexPath] else { return nil }
+        if attributes.representedElementKind == COLLECTION_HEADER_KIND {
+            return attributes
+        } else {
+            return nil
+        }
+    }
+    
+//    // If the layout supports any supplementary or decoration view types, it should also implement the respective atIndexPath: methods for those types.
+//    - (nullable NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect; // return an array layout attributes instances for all the views in the given rect
+//    - (nullable UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath;
+//    - (nullable UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath;
+//    - (nullable UICollectionViewLayoutAttributes *)layoutAttributesForDecorationViewOfKind:(NSString*)elementKind atIndexPath:(NSIndexPath *)indexPath;
+//
+//    - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds; // return YES to cause the collection view to requery the layout for geometry information
+//    - (UICollectionViewLayoutInvalidationContext *)invalidationContextForBoundsChange:(CGRect)newBounds NS_AVAILABLE_IOS(7_0);
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         return _config.floating
+    }
+    
+    override var collectionViewContentSize: CGSize {
+        get {
+            guard let view = self.collectionView else {
+                return CGSize.zero
+            }
+            let width = view.bounds.size.width
+            let height = _config.insets.bottom + _bottoms[self.sectionOfMostHeight]
+            return CGSize(width:width,height:height)
+        }
     }
     
     

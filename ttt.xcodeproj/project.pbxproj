@@ -13,6 +13,7 @@
 		53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2620440CD5009CDE66 /* CollectViewController.m */; };
 		53822F2E20440D28009CDE66 /* CollectionWaterfallLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */; };
 		53822F3120450B89009CDE66 /* MMCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3020450B89009CDE66 /* MMCollectionViewLayout.swift */; };
+		53822F3720467E16009CDE66 /* SCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3620467E16009CDE66 /* SCollectionViewController.swift */; };
 		5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */; };
 		538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */; };
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
@@ -57,6 +58,7 @@
 		53822F2C20440D28009CDE66 /* CollectionWaterfallLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionWaterfallLayout.h; sourceTree = "<group>"; };
 		53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionWaterfallLayout.m; sourceTree = "<group>"; };
 		53822F3020450B89009CDE66 /* MMCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMCollectionViewLayout.swift; sourceTree = "<group>"; };
+		53822F3620467E16009CDE66 /* SCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SCollectionViewController.swift; sourceTree = "<group>"; };
 		5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRealmController.swift; sourceTree = "<group>"; };
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
@@ -186,6 +188,7 @@
 				538F9E8F200A2DDE006B3A28 /* SettingNode.swift */,
 				D99152D6201836EE00FD8B92 /* ProfileViewController.swift */,
 				5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */,
+				53822F3620467E16009CDE66 /* SCollectionViewController.swift */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -412,6 +415,7 @@
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
 				53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */,
 				D941406B201721470050132B /* KeyCycleStack.swift in Sources */,
+				53822F3720467E16009CDE66 /* SCollectionViewController.swift in Sources */,
 				D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */,
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,
 				D9917D2C2008AF73003682AD /* DogCell.swift in Sources */,
@@ -536,6 +540,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = MGL332UAE8;
 				INFOPLIST_FILE = ttt/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -556,6 +561,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = MGL332UAE8;
 				INFOPLIST_FILE = ttt/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
