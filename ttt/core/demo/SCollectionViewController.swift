@@ -16,6 +16,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
     var _layout:MMCollectionViewLayout!
     var _table:UICollectionView!
     var _datas:[[Int]] = []
+    var _config:LayoutConfig = LayoutConfig()
     
     
     //
@@ -23,10 +24,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         self.view = UIView(frame:UIScreen.main.bounds)
         self.view.backgroundColor = UIColor.white
         
-        var config = LayoutConfig()
-        config.floating = true
-        config.columnCount = 2
-        _layout = MMCollectionViewLayout(config)
+        _layout = MMCollectionViewLayout(_config)
         
         _table = UICollectionView(frame: self.view.bounds, collectionViewLayout: _layout)
         _table.dataSource = self
@@ -46,6 +44,8 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         let item = UIBarButtonItem(title: "选项", style: UIBarButtonItemStyle.plain, target: self, action: #selector(SCollectionViewController.rightAction))
         self.navigationItem.rightBarButtonItem=item
         
+//        self.automaticallyAdjustsScrollViewInsets = false
+        
         setupDataList()
     }
     
@@ -56,7 +56,45 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         sheet.addButton(withTitle: "多列飘浮")
         sheet.addButton(withTitle: "瀑布流")
         sheet.addButton(withTitle: "瀑布流飘浮")
+        sheet.addButton(withTitle: "重置数据")
         sheet.show(in: self.view)
+    }
+    
+    func actionSheet(_ actionSheet: UIActionSheet, clickedButtonAt buttonIndex: Int) {
+        let title = actionSheet.buttonTitle(at: buttonIndex)
+        if title == "重置数据" {
+            setupDataList()
+            _table.reloadData()
+            return
+        }
+        
+        if title == "取消" {
+            return
+        }
+        
+        if title == "非固定行高" {
+            _config.rowHeight = 0
+            _config.columnCount = 1
+            _config.floating = false
+        }else if title == "定高多列" {
+            _config.rowHeight = 44
+            _config.columnCount = 3
+            _config.floating = false
+        } else if title == "多列飘浮" {
+            _config.rowHeight = 44
+            _config.columnCount = 2
+            _config.floating = true
+        } else if title == "瀑布流" {
+            _config.rowHeight = 0
+            _config.columnCount = 2
+            _config.floating = false
+        } else if title == "瀑布流飘浮" {
+            _config.rowHeight = 0
+            _config.columnCount = 2
+            _config.floating = true
+        }
+        
+        _layout.config = _config
     }
     
     override func onViewDidDisappear(_ animated: Bool) {
@@ -84,8 +122,6 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
             }
             _datas.append(list)
         }
-        
-        _table.reloadData()
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -98,6 +134,10 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
     
     func collectionView(_ collectionView: UICollectionView, canFloatingCellAt indexPath: IndexPath) -> Bool {
         return indexPath.row % 7 == 0
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, heightForCellAt indexPath: IndexPath) -> CGFloat {
+        return CGFloat(_datas[indexPath.section][indexPath.row])
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

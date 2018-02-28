@@ -129,6 +129,14 @@ public final class Navigator: NSObject {
         return aClass.isSubclass(of: bClass) || bClass.isSubclass(of: aClass)
     }
     
+    /// do open url, no result
+    open func dopen(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil) {
+        let isOpen = open(url,params:params,ext:ext,modal:modal,inner:false)
+        if !isOpen {
+            print("open the url:\(url) failed!")
+        }
+    }
+    
     /// open url
     open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil, inner:Bool = false) -> Bool {
         if !isValid(url:url) {

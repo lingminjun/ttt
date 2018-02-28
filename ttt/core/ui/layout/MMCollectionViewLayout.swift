@@ -64,6 +64,12 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             if _config.rowDefaultSpace < 0 {//防止设置为非法数字
                 _config.rowDefaultSpace = 1
             }
+            
+//            guard let view = self.collectionView else {
+//                invalidateLayout()
+//                return
+//            }
+//            view.reloadData()
             invalidateLayout()
         }
     }
@@ -135,7 +141,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 
                 //行高
                 var height:CGFloat = rowHeight
-                if height == 0 && respondHeightForCell {
+                if height <= 0 && respondHeightForCell {
                     height = ds!.collectionView!(view, heightForCellAt: indexPath)
                 }
             
@@ -154,6 +160,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 var attributes:UICollectionViewLayoutAttributes!
                 if isFloating {
                     attributes = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: COLLECTION_HEADER_KIND, with: indexPath)
+                    attributes.zIndex = 1024
                 } else {
                     attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)//layoutAttributesForCellWithIndexPath
                 }
@@ -187,7 +194,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 attributes.frame = CGRect(x:x, y:y, width:width, height:height)
                 
                 //更新每列位置信息
-                for index in suitableSetion..<spanSize {
+                for index in suitableSetion..<(suitableSetion + spanSize) {
                     _bottoms[index] = y + height + _config.rowDefaultSpace
                 }
             }
@@ -216,13 +223,15 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 
                 //记录正常情况下包含的set
                 if hasFloating && value.representedElementKind == COLLECTION_HEADER_KIND {
-//                    hsets.insert(key)
+                    
+                    //先还原布局
+                    resetFloatingCellLayout(indexPath: key)
                     
                     //取最小位置的header
                     if minHIndexPath == nil || minHIndexPath! > key {
                         minHIndexPath = key
                     }
-                } else {//取最小位置的header
+                } else {//取最小位置的cell
                     if minCIndexPath == nil || minCIndexPath! > key {
                         minCIndexPath = key
                     }
@@ -236,8 +245,9 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         }
         
         
-        if minHIndexPath == nil && (minCIndexPath == nil || _headIndexs[0] <= minCIndexPath!) {
+        if minHIndexPath == nil && (minCIndexPath == nil || _headIndexs[0] < minCIndexPath!) {
             minHIndexPath = _headIndexs[0]
+            resetFloatingCellLayout(indexPath: _headIndexs[0])//先还原布局
         }
         
         //往前寻找一个飘浮的cell
@@ -245,36 +255,15 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             if let idx = _headIndexs.index(of: minHIndexPath!) {
                 if idx > 0 {
                     minHIndexPath = _headIndexs[idx - 1]
+                    resetFloatingCellLayout(indexPath: _headIndexs[idx - 1])//先还原布局
                 }
             }
         }
         
         if minHIndexPath == nil { return list }
         
-        guard let view = self.collectionView else {
-            return list
-        }
-        
-        guard let value = _cellLayouts[minHIndexPath!] else { return list }
-        var frame = value.frame
-        
-        let viewTop = view.contentOffset.y + view.contentInset.top //表头
-        if viewTop < frame.origin.y {
-            return list
-        }
-        
-        //调整最小值
-        var nextHeightTop = viewTop + 2*UIScreen.main.bounds.height //下一个head的头，默认值设置得比较大
-        if minHIndexPath != _headIndexs.last {//不等于最后一个,取下一个header的顶部
-            if let next = _headIndexs.index(of: minHIndexPath!) {
-                if let nextValue = _cellLayouts[_headIndexs[(next + 1)]] {
-                    nextHeightTop = nextValue.frame.origin.y
-                }
-            }
-        }
-        
-        frame.origin.y = min(nextHeightTop - frame.size.height, viewTop)
-        value.frame = frame;
+        //设置飘浮状态
+        setFloatingCellLayout(indexPath: minHIndexPath!)
         
         return list
     }
@@ -320,6 +309,98 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         }
     }
     
+    //设置飘浮位置
+    fileprivate final func setFloatingCellLayout(indexPath:IndexPath) {
+        guard let view = self.collectionView else {
+            return
+        }
+        
+        guard let value = _cellLayouts[indexPath] else { return }
+        var frame = value.frame
+        
+        let offsetY = originOffsetY + view.contentOffset.y + view.contentInset.top //基准线
+        if offsetY < frame.origin.y {
+            return
+        }
+        
+        //调整最靠近offsetY的基准线的cell需要调整
+        var nextHeightTop = offsetY + 2*UIScreen.main.bounds.height //下一个head的头，默认值设置得比较大
+        if indexPath != _headIndexs.last {//不等于最后一个,取下一个header的顶部
+            if let next = _headIndexs.index(of: indexPath) {
+                if let nextValue = _cellLayouts[_headIndexs[(next + 1)]] {
+                    nextHeightTop = nextValue.frame.origin.y
+                }
+            }
+        }
+        
+        frame.origin.y = min(nextHeightTop - frame.size.height, offsetY)
+        
+        //说明已经隐藏在停靠点内，不再需要修改布局，而是计算下一个header
+        if frame.origin.y + frame.size.height <= offsetY {
+            if let next = _headIndexs.index(of: indexPath) {
+                if next + 1 < _headIndexs.count {
+                    setFloatingCellLayout(indexPath: _headIndexs[next + 1])
+                }
+            }
+        } else {
+            value.frame = frame;
+        }
+    }
+    
+    fileprivate final func resetFloatingCellLayout(indexPath:IndexPath) {
+        guard let attributes = _cellLayouts[indexPath] else {
+            return
+        }
+        
+        var frame = attributes.frame
+        
+        if indexPath.section == 0 && indexPath.row == 0 {
+            frame.origin.y = 0
+        } else {
+            var next:IndexPath? = IndexPath(row:indexPath.row + 1,section:indexPath.section)
+            if !_cellLayouts.keys.contains(next!) {
+                next = IndexPath(row:0,section:indexPath.section + 1)
+                if !_cellLayouts.keys.contains(next!) {
+                    next = nil
+                }
+            }
+            
+            //重新布局下header
+            if next != nil {
+                if let nextValue = _cellLayouts[next!] {
+                    frame.origin.y = nextValue.frame.origin.y - _config.rowDefaultSpace - frame.height
+                }
+            }
+        }
+        attributes.frame = frame
+    }
+    
+    var _setedOffsetY = false
+    var _offsetY:CGFloat = 0.0
+    //原点的offset位置
+    fileprivate final var originOffsetY:CGFloat {
+        get {
+            if _setedOffsetY {
+                return _offsetY
+            }
+            
+            guard let view = self.collectionView else {
+                return _offsetY
+            }
+            
+            if view.contentSize.height == 0.0 {
+                return _offsetY
+            }
+            _setedOffsetY = true
+            if view.bounds.origin.y < 0 {
+                _offsetY = 0 - view.bounds.origin.y
+            } else if view.frame.origin.y < 0 {
+                _offsetY = 0 - view.frame.origin.y
+            }
+            return _offsetY
+//            view.contentSize.height - (view.contentOffset.y + view.frame.size.height)
+        }
+    }
     
     fileprivate final var sectionOfLessHeight:Int {
         get {
