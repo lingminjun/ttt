@@ -118,7 +118,8 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         let columnCount = _config.columnCount
         let floatingWidth = view.bounds.size.width
 //        let lineWidth = view.bounds.size.width - (_config.insets.left + _config.insets.right)
-        let cellWidth = CGFloat(floorf(Float((view.bounds.size.width - (_config.insets.left + _config.insets.right) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
+        let cellWidth = CGFloat(roundf(Float((view.bounds.size.width - (_config.insets.left + _config.insets.right) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
+        let diffWidth = view.bounds.size.width - (_config.insets.left + _config.insets.right) - _config.columnSpace * CGFloat(columnCount - 1) - cellWidth * CGFloat(columnCount)
         
         
         let sectionCount = view.numberOfSections
@@ -186,6 +187,10 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 //x起始位和宽度
                 var x = _config.insets.left + (cellWidth + _config.columnSpace) * CGFloat(suitableSetion)
                 var width = cellWidth * CGFloat(spanSize) + _config.columnSpace * CGFloat(spanSize - 1)
+                //最后的宽度修正
+                if diffWidth != 0 && abs(view.bounds.size.width - (x + width)) < abs(diffWidth) + 0.1 {
+                    width = width + diffWidth
+                }
                 
                 //对于floating,满行处理
                 if isFloating {
@@ -300,7 +305,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 return CGSize.zero
             }
             let width = view.bounds.size.width
-            let height = _config.insets.bottom + _bottoms[self.sectionOfMostHeight]
+            let height = _config.insets.top + _config.insets.bottom + _bottoms[self.sectionOfMostHeight]
             return CGSize(width:width,height:height)
         }
     }
