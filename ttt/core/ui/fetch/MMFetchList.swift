@@ -36,7 +36,7 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
         if b != nil {
             MMTry.try({ do {
                 try b!()
-            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         }
         _listener?.ssn_fetch_end_change(self)
     }

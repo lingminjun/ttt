@@ -35,11 +35,11 @@ public final class Quantum<T: Equatable> {
         
         _block?.cancel()
         _block = generateBlock()
-        _stack.push(obj);
+        _ = _stack.push(obj);
         
         if (_stack.isFull()) {//直接播发
             let objs = _stack.toList()
-            _stack.clear()
+            _ = _stack.clear()
             express(objs)
         } else {//延后播发
             DispatchQueue.main.asyncAfter(deadline: DispatchTime.init(uptimeNanoseconds: _interval * 1000), execute: _block!)
@@ -63,11 +63,11 @@ public final class Quantum<T: Equatable> {
                 continue;
             }
             
-            _stack.push(obj);
+            _ = _stack.push(obj);
             
             if (_stack.isFull()) {//满了后，直接赋值给list
                 list = _stack.toList();
-                _stack.clear();
+                _ = _stack.clear();
             }
         }
         
@@ -105,7 +105,7 @@ public final class Quantum<T: Equatable> {
         if (_express != nil) {
             MMTry.try({ do {
                 try self._express!(self,objs);
-            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+            } catch { print("error:\(error)") }}, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         } else {
             print("no express! ")
         }
@@ -113,9 +113,10 @@ public final class Quantum<T: Equatable> {
 
     private func generateBlock() -> DispatchWorkItem {
         let item = DispatchWorkItem(block: { [weak self] () in // 创建一个block，block的标志是DISPATCH_BLOCK_INHERIT_QOS_CLASS
-            guard let objs = self?._stack.toList() else {return}
-            self?._stack.clear();
-            self?.express(objs);
+            guard let sself = self else { return }
+            let objs = sself._stack.toList()
+            _ = sself._stack.clear();
+            sself.express(objs);
         })
         return item
     }

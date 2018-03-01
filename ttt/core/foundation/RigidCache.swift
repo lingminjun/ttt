@@ -54,13 +54,13 @@ public class RigidCache<T: NSObject> {
         }
         
         var obj:T? = nil
-        MMTry.try({ do {
-            obj = try self._creator(key,info)
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        MMTry.try({
+            obj = self._creator(key,info)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         
         // cache
         if obj != nil {
-            _hold.push(obj!)
+            _ = _hold.push(obj!)
             _cache[key] = WeakBox(obj!)
         }
         

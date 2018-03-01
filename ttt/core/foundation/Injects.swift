@@ -104,21 +104,21 @@ final public class Injects {
         let oldv = va!
         
         if self.isType(obj, type: type(of: oldv))  {//子类，可以赋值
-            MMTry.try({ obj.setValue(value, forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+            MMTry.try({ obj.setValue(value, forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         } else if isBaseType(value) && isBaseType(oldv) {
             let v = "\(value)"
-            if oldv is Int { MMTry.try({  obj.setValue(Int(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is Int8 { MMTry.try({ obj.setValue(Int8(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is Int16 { MMTry.try({ obj.setValue(Int16(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is Int32 { MMTry.try({ obj.setValue(Int32(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is Int64 { MMTry.try({ obj.setValue(Int64(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is UInt { MMTry.try({ obj.setValue(UInt(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is UInt8 { MMTry.try({ obj.setValue(UInt8(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is UInt16 { MMTry.try({ obj.setValue(UInt16(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is UInt32 { MMTry.try({ obj.setValue(UInt32(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is UInt64 { MMTry.try({ obj.setValue(UInt64(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is Float { MMTry.try({ obj.setValue(Float(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
-            else if oldv is Double { MMTry.try({ obj.setValue(Double(v), forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil) }
+            if oldv is Int { MMTry.try({  obj.setValue(Int(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is Int8 { MMTry.try({ obj.setValue(Int8(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is Int16 { MMTry.try({ obj.setValue(Int16(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is Int32 { MMTry.try({ obj.setValue(Int32(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is Int64 { MMTry.try({ obj.setValue(Int64(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is UInt { MMTry.try({ obj.setValue(UInt(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is UInt8 { MMTry.try({ obj.setValue(UInt8(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is UInt16 { MMTry.try({ obj.setValue(UInt16(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is UInt32 { MMTry.try({ obj.setValue(UInt32(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is UInt64 { MMTry.try({ obj.setValue(UInt64(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is Float { MMTry.try({ obj.setValue(Float(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
+            else if oldv is Double { MMTry.try({ obj.setValue(Double(v), forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil) }
             
             else if oldv is String || oldv is Substring {
                 MMTry.try({
@@ -131,16 +131,16 @@ final public class Injects {
             else if oldv is Bool {
                 let bs = v.lowercased()
                 if bs == "true" || bs == "yes" || bs == "on" || bs == "1" || bs == "t" || bs == "y" {
-                    MMTry.try({ obj.setValue(true, forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                    MMTry.try({ obj.setValue(true, forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
                 } else if bs == "false" || bs == "no" || bs == "off" || bs == "0" || bs == "f" || bs == "n" {
-                    MMTry.try({ obj.setValue(false, forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                    MMTry.try({ obj.setValue(false, forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
                 } else {
                     print("\(type(of: obj))  the \(property) unable to set value [\(v)]")
                 }
             }
             else if oldv is Character {
                 if v.count == 1 {
-                    MMTry.try({ obj.setValue(v[v.startIndex], forKey: property) }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                    MMTry.try({ obj.setValue(v[v.startIndex], forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
                 } else {
                     print("\(type(of: obj)) the \(property) unable to set value [\(v)]")
                 }

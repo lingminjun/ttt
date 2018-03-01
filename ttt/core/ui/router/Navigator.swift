@@ -201,7 +201,7 @@ public final class Navigator: NSObject {
                         if let ttc = Navigator.reflectViewController(name:cc) as? MMContainer {//若不满足协议则构建失败
                             tc = ttc
                         }
-                    }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                    }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
                 }
             }
         }
@@ -329,7 +329,7 @@ public final class Navigator: NSObject {
             viewController?.title = router!.node.des
             viewController?.ssn_uri = router!.id
             viewController?.ssn_Arguments = query;
-        }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         if viewController == nil {
             return nil
         }
@@ -338,7 +338,7 @@ public final class Navigator: NSObject {
             v._node = router!.node
             MMTry.try({
                 v.onInit(params: query, ext: ext)
-            }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+            }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         }
         
         return viewController
@@ -371,12 +371,12 @@ public final class Navigator: NSObject {
         var clazz: Swift.AnyClass? = nil
         MMTry.try({
             clazz = NSClassFromString(vcname)
-        }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         
         if clazz == nil {
             MMTry.try({
                 clazz = NSClassFromString(name) //如果是系统看，则不需要取报名
-            }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+            }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         }
         return clazz
     }

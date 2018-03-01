@@ -198,7 +198,7 @@ enum MMTable {
 */
 
 /// Listening the fetch controller changes
-@objc public protocol MMFetchsControllerDelegate {
+@objc public protocol MMFetchsControllerDelegate : NSObjectProtocol {
     
     //参照写法
     //        _notice?.stop()
@@ -379,7 +379,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     /* delete indexPath.
      */
     public func delete(at indexPath: IndexPath) {
-        self[indexPath.section]?.delete(indexPath.row)
+        _ = self[indexPath.section]?.delete(indexPath.row)
     }
     
     /* insert indexPath.
@@ -532,43 +532,74 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         // 使用普通方式创建cell
         var cellID = "cell"
         var isFloating = false
-        let model = self[indexPath.section]?[indexPath.row]
-        if model != nil {
-            cellID = model!.ssn_cellID()
-            isFloating = model!.ssn_canFloating()
-        }
         
-        
-        // 1.创建cell,此时cell是可选类型
         var table:UITableView? = nil
         var collection:UICollectionView? = nil
         var cell:UIView? = nil
         if view is UITableView {
-            table = (view as! UITableView)
-            cell = table!.dequeueReusableCell(withIdentifier:cellID)
+            table = (view as? UITableView)
         } else if (view is UICollectionView) {
-            collection = (view as! UICollectionView)
+            collection = (view as? UICollectionView)
+        }
+        
+        guard let model = self[indexPath.section]?[indexPath.row] else {
+            if table != nil {
+                cell = UITableViewCell(style: .default, reuseIdentifier: cellID)
+            } else {
+                cell = UICollectionViewCell()
+            }
+            return cell!
+        }
+        
+        cellID = model.ssn_cellID()
+        isFloating = model.ssn_canFloating()
+        
+        
+        // 1.创建cell,此时cell是可选类型
+        if let table = table {
+            cell = table.dequeueReusableCell(withIdentifier:cellID)
         }
         
         // 2.判断cell是否为nil
-        if cell == nil && model != nil{
-            if table != nil && model!.responds(to: #selector(MMCellModel.ssn_cell(_:))) {
-                MMTry.try({ do {
-                    cell = try model!.ssn_cell!(cellID)
-                } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
-            } else if model!.responds(to: #selector(MMCellModel.ssn_cellNib(_:isFloating:))) {
+        if cell == nil {
+            if table != nil && model.responds(to: #selector(MMCellModel.ssn_cell(_:))) {
+                MMTry.try({
+                    cell = model.ssn_cell!(cellID)
+                }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+            } else if model.responds(to: #selector(MMCellModel.ssn_cellNib(_:isFloating:))) {
                 if !_isRgst.contains(cellID) {
                     _isRgst.insert(cellID)
-                    MMTry.try({ do {
-                        let nib = try model!.ssn_cellNib!(cellID,isFloating: isFloating)
+                    MMTry.try({
+                        let nib = model.ssn_cellNib!(cellID,isFloating: isFloating)
                         if table != nil {
-                            table!.register(nib, forCellReuseIdentifier: cellID)
+                            table?.register(nib, forCellReuseIdentifier: cellID)
                         } else {
-                            collection!.register(nib, forCellWithReuseIdentifier: cellID)
+                            collection?.register(nib, forCellWithReuseIdentifier: cellID)
                         }
-                    } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                    }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
                 }
-                MMTry.try({ do {
+                MMTry.try({
+                    if table != nil {
+                        cell = table?.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
+                    } else if isFloating {
+                        cell = collection?.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
+                    } else {
+                        cell = collection?.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                    }
+                }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+            } else if model.responds(to: #selector(MMCellModel.ssn_cellClass(_:isFloating:))) {
+                if !_isRgst.contains(cellID) {
+                    _isRgst.insert(cellID)
+                    MMTry.try({
+                        let clz:AnyClass = model.ssn_cellClass!(cellID,isFloating: isFloating)
+                        if table != nil {
+                            table?.register(clz, forCellReuseIdentifier: cellID)
+                        } else {
+                            collection?.register(clz, forCellWithReuseIdentifier: cellID)
+                        }
+                    }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+                }
+                MMTry.try({
                     if table != nil {
                         cell = table!.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
                     } else if isFloating {
@@ -576,28 +607,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                     } else {
                         cell = collection!.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
                     }
-                } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
-            } else if model!.responds(to: #selector(MMCellModel.ssn_cellClass(_:isFloating:))) {
-                if !_isRgst.contains(cellID) {
-                    _isRgst.insert(cellID)
-                    MMTry.try({ do {
-                        let clz = try model!.ssn_cellClass!(cellID,isFloating: isFloating)
-                        if table != nil {
-                            table!.register(clz, forCellReuseIdentifier: cellID)
-                        } else {
-                            collection!.register(clz, forCellWithReuseIdentifier: cellID)
-                        }
-                    } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
-                }
-                MMTry.try({ do {
-                    if table != nil {
-                        cell = table!.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
-                    } else if isFloating {
-                        cell = collection!.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
-                    } else {
-                        cell = collection!.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
-                    }
-                } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
             }
         }
         
@@ -612,12 +622,10 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
         
         // 3.设置cell数据
-        if model != nil {
-            MMTry.try({ do {
-                cell?.ssn_set_cellModel(model) //提前设置model的值
-                try cell!.ssn_onDisplay(view, model: model!, atIndexPath: indexPath)
-            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
-        }
+        MMTry.try({
+            cell?.ssn_set_cellModel(model) //提前设置model的值
+            cell?.ssn_onDisplay(view, model: model, atIndexPath: indexPath)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         
         return cell!
     }
@@ -700,16 +708,18 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     // Data manipulation - insert and delete support
     public func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         var rt: Bool = false
-        if _delegate != nil {
-            MMTry.try({ do {
-                rt = try self._delegate!.ssn_controller!(self, tableView: tableView, commitEditingStyle: editingStyle, forRowAtIndexPath: indexPath)
-            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        if let delegate = _delegate {
+            if delegate.responds(to: #selector(MMFetchsControllerDelegate.ssn_controller(_:tableView:commitEditingStyle:forRowAtIndexPath:))) {
+                MMTry.try({
+                    rt = delegate.ssn_controller!(self, tableView: tableView, commitEditingStyle: editingStyle, forRowAtIndexPath: indexPath)
+                }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+            }
         }
         if !rt {
             //default delete cell
             if (editingStyle == UITableViewCellEditingStyle.delete) {
                 //add code here for when you hit delete
-                self[indexPath.section]?.delete(indexPath.row)
+                _ = self[indexPath.section]?.delete(indexPath.row)
                 /// the action delete cell will do at notice call back
 //                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Fade)//
             }
@@ -718,9 +728,13 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     // Data manipulation - reorder / moving support
     public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        MMTry.try({ do {
-            try self.delegate?.ssn_controller!(self, tableView: tableView, moveRowAtIndexPath: sourceIndexPath, toIndexPath: destinationIndexPath)
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        if let delegate = _delegate {
+            if delegate.responds(to: #selector(MMFetchsControllerDelegate.ssn_controller(_:tableView:moveRowAtIndexPath:toIndexPath:))) {
+                MMTry.try({
+                    delegate.ssn_controller!(self, tableView: tableView, moveRowAtIndexPath: sourceIndexPath, toIndexPath: destinationIndexPath)
+                }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+            }
+        }
     }
 }
 

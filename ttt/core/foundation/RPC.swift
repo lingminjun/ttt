@@ -276,9 +276,7 @@ public final class RPC {
                     MMTry.try({ do {
                         let rs = try block(idx, nil, assembly.resp)
                         assembly.resp.set(result: rs, index: idx) // maybe not safty
-                        DispatchQueue.main.async {
-                            feedback.staged(index: idx, cmd: cmd, group: groupId, result: rs, assembly: assembly)
-                        }
+                        DispatchQueue.main.async { feedback.staged(index: idx, cmd: cmd, group: groupId, result: rs, assembly: assembly) }
                     } catch {
                         let err = NSError(domain: "RPC", code: -101, userInfo: [NSLocalizedDescriptionKey:error.localizedDescription])
                         assembly.resp.set(error:err, index:idx)

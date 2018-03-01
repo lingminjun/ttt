@@ -33,9 +33,9 @@ public class MMUIController : UIViewController {
     override final public func loadView() {
         if _stack_flag { return } else { _stack_flag = true }
         var rt = false
-        MMTry.try({ do {
-            rt = try self.onLoadView()
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        MMTry.try({
+            rt = self.onLoadView()
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         _stack_flag = false
         if !rt {
             super.loadView()
@@ -44,9 +44,9 @@ public class MMUIController : UIViewController {
     
     override final public func viewDidLoad() {
         if _stack_flag { return } else { _stack_flag = true }
-        MMTry.try({ do {
-            try self.onViewDidLoad()
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        MMTry.try({
+            self.onViewDidLoad()
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         _stack_flag = false
         super.viewDidLoad();
     }
@@ -54,9 +54,9 @@ public class MMUIController : UIViewController {
     override final public func viewWillAppear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
         _visible = VisibleStatus.willAppear
-        MMTry.try({ do {
-            try self.onViewWillAppear(animated)
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        MMTry.try({
+            self.onViewWillAppear(animated)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         _stack_flag = false
         super.viewWillAppear(animated)
     }
@@ -64,18 +64,18 @@ public class MMUIController : UIViewController {
     override final public func viewDidAppear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
         _visible = VisibleStatus.didAppear
-        MMTry.try({ do {
-            try self.onViewDidAppear(animated)
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        MMTry.try({
+            self.onViewDidAppear(animated)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         _stack_flag = false
         super.viewDidAppear(animated)
     }
     
     override final public func viewWillDisappear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
-        MMTry.try({ do {
-            try self.onViewWillDisappear(animated)
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        MMTry.try({
+            self.onViewWillDisappear(animated)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         _stack_flag = false
         super.viewWillDisappear(animated)
         _visible = VisibleStatus.willDisappear
@@ -83,18 +83,18 @@ public class MMUIController : UIViewController {
     
     override final public func viewDidDisappear(_ animated: Bool) {
         if _stack_flag { return } else { _stack_flag = true }
-        MMTry.try({ do {
-            try self.onViewDidDisappear(animated)
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        MMTry.try({
+            self.onViewDidDisappear(animated)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         _stack_flag = false
         super.viewDidDisappear(animated)
         _visible = VisibleStatus.didDisappear
     }
     
     override final public func didReceiveMemoryWarning() {
-        MMTry.try({ do {
-            try self.onReceiveMemoryWarning()
-        } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        MMTry.try({
+            self.onReceiveMemoryWarning()
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         super.didReceiveMemoryWarning()
     }
         
