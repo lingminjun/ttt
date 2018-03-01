@@ -38,6 +38,10 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         //title: String?, style: UIBarButtonItemStyle, target: Any?, action: Selector?
         let item = UIBarButtonItem(title: "选项", style: UIBarButtonItemStyle.plain, target: self, action: sel)
         self.navigationItem.rightBarButtonItem=item
+        
+        
+//        guard let v = Int("aaa") else { return }
+//        print("====\(v)")
     }
     
     @objc func rightAction() -> Void {

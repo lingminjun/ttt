@@ -181,24 +181,26 @@ public final class Navigator: NSObject {
         
         //设置modal展示的值
         var isModal = false
-        if modal != nil {
-            isModal = modal!
+        if let modal = modal {
+            isModal = modal
         } else if let v = vc as? MMUIController {
-            if v._node.modal != nil {
-                isModal = v._node.modal!
+            if let value = v._node.modal {
+                isModal = value
             }
         }
         
         //open 主要是看top container和xml配置中是否同一个类型，若是，则不再new container
         if !cc.isEmpty {
             var xclazz = Navigator.reflectOCClass(name:cc)
-            if xclazz != nil {
+            if let xclazz = xclazz {
                 let tclazz = type(of: tc) as Swift.AnyClass
                 
                 /// 不是同一个类型的或者是modal
-                if !Navigator.isSameKind(aClass:xclazz!,bClass:tclazz) || isModal  {
+                if !Navigator.isSameKind(aClass:xclazz,bClass:tclazz) || isModal  {
                     MMTry.try({
-                        tc = (Navigator.reflectViewController(name:cc) as? MMContainer)! //若不满足协议则构建失败
+                        if let ttc = Navigator.reflectViewController(name:cc) as? MMContainer {//若不满足协议则构建失败
+                            tc = ttc
+                        }
                     }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
                 }
             }
