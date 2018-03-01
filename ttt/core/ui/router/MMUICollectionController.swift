@@ -20,7 +20,7 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     public override func onLoadView() -> Bool {
         self.view = UIView(frame:UIScreen.main.bounds)
         _layout = MMCollectionViewLayout(loadLayoutConfig())
-        _table = UICollectionView.init(frame: self.view.bounds, collectionViewLayout: layout)
+        _table = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
         _table.delegate = self
         self.view.addSubview(_table)
         return true

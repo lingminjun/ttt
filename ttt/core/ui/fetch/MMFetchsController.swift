@@ -313,9 +313,16 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     	sectionNameKeyPath - keypath on resulting objects that returns the section name. This will be used to pre-compute the section information.
     	cacheName - Section info is cached persistently to a private file under this name. Cached sections are checked to see if the time stamp matches the store, but not if you have illegally mutated the readonly fetch request, predicate, or sort descriptor.
      */
+    public convenience init(fetch: MMFetch<T>) {
+        self.init(fetchs: [fetch])
+    }
+    
     public init(fetchs: [MMFetch<T>]) {
         super.init()
         _fetchs = fetchs
+        if _fetchs.isEmpty {
+            _fetchs.append(MMFetchList(tag:"default"))
+        }
         for fetch in fetchs {
             fetch._listener = self
         }
@@ -324,6 +331,13 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     /// The number of Fetchs in the controller.
     public func count() -> Int {
         return _fetchs.count
+    }
+    
+    /// get the first fetch. It is convenience to use
+    public var fetch:MMFetch<T> {
+        get {
+            return self[0]!
+        }
     }
     
     /**

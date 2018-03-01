@@ -87,13 +87,13 @@ extension CltProfileViewController : Feedback {
             let node = SettingNode()
             node.title = "数据0" + cmd + " " + group
             node.subTitle = "99"
-            fetchs[0]!.append(node)
+            fetchs.fetch.append(node)
             break
         default:
             let node = SettingNode()
             node.title = "数据\(index.value)" + cmd + " " + group
             node.subTitle = "99"
-            fetchs[0]!.insert(node, atIndex: index.value)
+            fetchs.fetch.insert(node, atIndex: index.value)
         }
     }
     
