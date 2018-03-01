@@ -118,7 +118,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         let columnCount = _config.columnCount
         let floatingWidth = view.bounds.size.width
 //        let lineWidth = view.bounds.size.width - (_config.insets.left + _config.insets.right)
-        let cellWidth = (view.bounds.size.width - (_config.insets.left + _config.insets.right) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount)
+        let cellWidth = CGFloat(floorf(Float((view.bounds.size.width - (_config.insets.left + _config.insets.right) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
         
         
         let sectionCount = view.numberOfSections
@@ -153,6 +153,8 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                     spanSize = ds!.collectionView!(view, spanSizeForCellAt: indexPath)
                     if spanSize > columnCount {
                         spanSize = columnCount
+                    } else if spanSize < 1 {
+                        spanSize = 1
                     }
                 }
                 

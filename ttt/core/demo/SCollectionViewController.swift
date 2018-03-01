@@ -163,6 +163,10 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("selcected indexPath(\(indexPath.row),\(indexPath.section))")
+    }
+    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == COLLECTION_HEADER_KIND {
             var cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath)
