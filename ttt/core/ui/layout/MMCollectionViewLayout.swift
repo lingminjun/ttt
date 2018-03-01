@@ -207,7 +207,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         let hasFloating = !_headIndexs.isEmpty
         
         var csets:Set<IndexPath> = Set<IndexPath>() //所有被列入的key
-//        var hsets:Set<IndexPath> = Set<IndexPath>() //所有被列入header的key
+        var hsets:Set<IndexPath> = Set<IndexPath>() //所有被列入header的key
         var minCIndexPath:IndexPath? = nil
         var minHIndexPath:IndexPath? = nil
         
@@ -223,6 +223,8 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 
                 //记录正常情况下包含的set
                 if hasFloating && value.representedElementKind == COLLECTION_HEADER_KIND {
+                    
+                    hsets.insert(key)
                     
                     //先还原布局
                     resetFloatingCellLayout(indexPath: key)
@@ -263,7 +265,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         if minHIndexPath == nil { return list }
         
         //设置飘浮状态
-        setFloatingCellLayout(indexPath: minHIndexPath!)
+        setFloatingCellLayout(indexPath: minHIndexPath!,hsets: hsets, list: &list)
         
         return list
     }
@@ -286,14 +288,6 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         }
     }
     
-//    // If the layout supports any supplementary or decoration view types, it should also implement the respective atIndexPath: methods for those types.
-//    - (nullable NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect; // return an array layout attributes instances for all the views in the given rect
-//    - (nullable UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath;
-//    - (nullable UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath;
-//    - (nullable UICollectionViewLayoutAttributes *)layoutAttributesForDecorationViewOfKind:(NSString*)elementKind atIndexPath:(NSIndexPath *)indexPath;
-//
-//    - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds; // return YES to cause the collection view to requery the layout for geometry information
-//    - (UICollectionViewLayoutInvalidationContext *)invalidationContextForBoundsChange:(CGRect)newBounds NS_AVAILABLE_IOS(7_0);
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         return _config.floating
     }
@@ -310,12 +304,16 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     }
     
     //设置飘浮位置
-    fileprivate final func setFloatingCellLayout(indexPath:IndexPath) {
+    fileprivate final func setFloatingCellLayout(indexPath:IndexPath,hsets:Set<IndexPath>, list:inout [UICollectionViewLayoutAttributes]) {
         guard let view = self.collectionView else {
             return
         }
         
         guard let value = _cellLayouts[indexPath] else { return }
+        if !hsets.contains(indexPath) {
+            list.append(value)
+        }
+        
         var frame = value.frame
         
         let offsetY = originOffsetY + view.contentOffset.y + view.contentInset.top //基准线
@@ -339,7 +337,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         if frame.origin.y + frame.size.height <= offsetY {
             if let next = _headIndexs.index(of: indexPath) {
                 if next + 1 < _headIndexs.count {
-                    setFloatingCellLayout(indexPath: _headIndexs[next + 1])
+                    setFloatingCellLayout(indexPath: _headIndexs[next + 1], hsets: hsets, list: &list)
                 }
             }
         } else {
@@ -375,6 +373,17 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         attributes.frame = frame
     }
     
+//    weak var _cview:UICollectionView? = nil
+//    override open var collectionView: UICollectionView? {
+//        get { return _cview == nil ? super.collectionView : _cview }
+//        set {
+//            _cview = newValue
+//            if newValue != nil {
+//                _offsetY = newValue!.bounds.origin.y
+//            }
+//        }
+//    }
+    
     var _setedOffsetY = false
     var _offsetY:CGFloat = 0.0
     //原点的offset位置
@@ -383,22 +392,52 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             if _setedOffsetY {
                 return _offsetY
             }
-            
+
             guard let view = self.collectionView else {
                 return _offsetY
             }
             
-            if view.contentSize.height == 0.0 {
+            if #available(iOS 11.0, *) {//高于 iOS 11.0
+//                _setedOffsetY = true
+                return view.adjustedContentInset.top
+            } else { //低于 iOS 11.0
+                guard let superview = view.superview else {
+                    return _offsetY
+                }
+                var responder = superview.next
+                var vcontroller:UIViewController? = nil
+                while responder != nil {
+                    if responder is UIViewController {
+                        _setedOffsetY = true
+                        vcontroller = responder as! UIViewController
+                        break
+                    } else if responder is UIWindow {
+                        _setedOffsetY = true
+                        return _offsetY
+                    }
+                }
+                
+                guard let vc = vcontroller else {
+                    return _offsetY
+                }
+                
+                _setedOffsetY = true
+                
+                //@available(iOS, introduced: 7.0, deprecated: 11.0, message: "Use UIScrollView's contentInsetAdjustmentBehavior instead")
+                if vc.automaticallyAdjustsScrollViewInsets {
+                    //ios 7.0
+                    if !UIApplication.shared.isStatusBarHidden && !vc.prefersStatusBarHidden {
+                        _offsetY = _offsetY + UIApplication.shared.statusBarFrame.height
+                    }
+                    
+                    if vc.navigationController != nil && !vc.navigationController!.isNavigationBarHidden {
+                        _offsetY = _offsetY + vc.navigationController!.navigationBar.frame.size.height
+                    }
+                }
+                
                 return _offsetY
+                
             }
-            _setedOffsetY = true
-            if view.bounds.origin.y < 0 {
-                _offsetY = 0 - view.bounds.origin.y
-            } else if view.frame.origin.y < 0 {
-                _offsetY = 0 - view.frame.origin.y
-            }
-            return _offsetY
-//            view.contentSize.height - (view.contentOffset.y + view.frame.size.height)
         }
     }
     
