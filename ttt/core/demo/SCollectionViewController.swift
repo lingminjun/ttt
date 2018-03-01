@@ -9,14 +9,14 @@
 import Foundation
 import UIKit
 
-class SCollectionViewController : MMUIController,UICollectionViewDelegate,UICollectionViewDataSource,MMCollectionViewDataSource,UIActionSheetDelegate {
+class SCollectionViewController : MMUIController,UICollectionViewDelegate,UICollectionViewDataSource,MMCollectionViewDelegate,UIActionSheetDelegate {
     
     
     
     var _layout:MMCollectionViewLayout!
     var _table:UICollectionView!
     var _datas:[[Int]] = []
-    var _config:LayoutConfig = LayoutConfig()
+    var _config:MMLayoutConfig = MMLayoutConfig()
     
     
     //

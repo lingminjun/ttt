@@ -27,6 +27,11 @@
         container=""
         auth="true"
         description="信息"/>
+    <item url="https://m.mymm.com/profilev2.html"
+        key=""
+        controller="CltProfileViewController"
+        container=""
+        description="信息V2"/>
     <item url="https://m.mymm.com/user/login.html"
         key=""
         modal="true"

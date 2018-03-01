@@ -103,22 +103,23 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     func actionSheet(_ actionSheet: UIActionSheet, clickedButtonAt buttonIndex: Int) {
         let title = actionSheet.buttonTitle(at: buttonIndex)
         if title == "测试" {
-           Navigator.shared.open("https://m.mymm.com/profile.html")
+           Navigator.shared.dopen("https://m.mymm.com/profile.html")
         }else if title == "测试1" {
-            Navigator.shared.open("https://mymm.com/p/77243897-6f77-44c0-b6de-3ac0d057c0ba?h=https://admin.mymm.com:443&_on_browser=1")
+            Navigator.shared.dopen("https://m.mymm.com/profilev2.html")
+//            Navigator.shared.dopen("https://mymm.com/p/77243897-6f77-44c0-b6de-3ac0d057c0ba?h=https://admin.mymm.com:443&_on_browser=1")
         } else if title == "百度" {
-            Navigator.shared.open("https://m.baidu.com?_on_browser=1")
+            Navigator.shared.dopen("https://m.baidu.com?_on_browser=1")
             
         } else if title == "瀑布" {
-            Navigator.shared.open("https://m.mymm.com/xxx/collect.html")
+            Navigator.shared.dopen("https://m.mymm.com/xxx/collect.html")
 //            https://m.mymm.com/yyy/collect.html
         } else if title == "瀑布2" {
-            Navigator.shared.open("https://m.mymm.com/yyy/collect.html")
+            Navigator.shared.dopen("https://m.mymm.com/yyy/collect.html")
         } else if title == "一级" {
-            Navigator.shared.open("https://m.mymm.com/p/111.html")
+            Navigator.shared.dopen("https://m.mymm.com/p/111.html")
             
         } else if title == "二级" {
-            Navigator.shared.open("https://m.mymm.com/p/123/about")
+            Navigator.shared.dopen("https://m.mymm.com/p/123/about")
             
         }
     }

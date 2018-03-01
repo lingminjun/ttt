@@ -42,6 +42,10 @@ class SettingNode : NSObject,MMCellModel {
         return false
     }
     
+    func ssn_cellClass(_ cellID: String, isFloating: Bool) -> AnyClass {
+        return SettingV1Cell.self
+    }
+    
     public var title: String = ""
     public var subTitle: String = ""
 }

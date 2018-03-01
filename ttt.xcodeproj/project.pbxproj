@@ -14,6 +14,9 @@
 		53822F2E20440D28009CDE66 /* CollectionWaterfallLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */; };
 		53822F3120450B89009CDE66 /* MMCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3020450B89009CDE66 /* MMCollectionViewLayout.swift */; };
 		53822F3720467E16009CDE66 /* SCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3620467E16009CDE66 /* SCollectionViewController.swift */; };
+		53822F392047D474009CDE66 /* MMUICollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F382047D474009CDE66 /* MMUICollectionController.swift */; };
+		53822F3B2047E766009CDE66 /* CltProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3A2047E766009CDE66 /* CltProfileViewController.swift */; };
+		53822F3D2047EAC2009CDE66 /* SettingV1Cell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3C2047EAC2009CDE66 /* SettingV1Cell.swift */; };
 		5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */; };
 		538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */; };
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
@@ -59,6 +62,9 @@
 		53822F2D20440D28009CDE66 /* CollectionWaterfallLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionWaterfallLayout.m; sourceTree = "<group>"; };
 		53822F3020450B89009CDE66 /* MMCollectionViewLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMCollectionViewLayout.swift; sourceTree = "<group>"; };
 		53822F3620467E16009CDE66 /* SCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SCollectionViewController.swift; sourceTree = "<group>"; };
+		53822F382047D474009CDE66 /* MMUICollectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMUICollectionController.swift; sourceTree = "<group>"; };
+		53822F3A2047E766009CDE66 /* CltProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CltProfileViewController.swift; sourceTree = "<group>"; };
+		53822F3C2047EAC2009CDE66 /* SettingV1Cell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingV1Cell.swift; sourceTree = "<group>"; };
 		5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRealmController.swift; sourceTree = "<group>"; };
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
@@ -174,6 +180,8 @@
 		D958F7832008690800E3F0C5 /* demo */ = {
 			isa = PBXGroup;
 			children = (
+				53822F3C2047EAC2009CDE66 /* SettingV1Cell.swift */,
+				53822F3A2047E766009CDE66 /* CltProfileViewController.swift */,
 				53822F2B20440CF6009CDE66 /* CollectionWaterfallLayout */,
 				53822F2320440CD5009CDE66 /* CollectViewController.h */,
 				53822F2620440CD5009CDE66 /* CollectViewController.m */,
@@ -202,6 +210,7 @@
 				D9414060201096CC0050132B /* MMController.swift */,
 				D94140622011CCBD0050132B /* MMUITableController.swift */,
 				D94140642011DC8E0050132B /* MMUIWebController.swift */,
+				53822F382047D474009CDE66 /* MMUICollectionController.swift */,
 			);
 			path = router;
 			sourceTree = "<group>";
@@ -406,14 +415,17 @@
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
 				D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */,
 				D94140672016D6420050132B /* RigidCache.swift in Sources */,
+				53822F3D2047EAC2009CDE66 /* SettingV1Cell.swift in Sources */,
 				5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */,
 				538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */,
 				D94140632011CCBD0050132B /* MMUITableController.swift in Sources */,
 				D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */,
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D94140652011DC8E0050132B /* MMUIWebController.swift in Sources */,
+				53822F3B2047E766009CDE66 /* CltProfileViewController.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
 				53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */,
+				53822F392047D474009CDE66 /* MMUICollectionController.swift in Sources */,
 				D941406B201721470050132B /* KeyCycleStack.swift in Sources */,
 				53822F3720467E16009CDE66 /* SCollectionViewController.swift in Sources */,
 				D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */,

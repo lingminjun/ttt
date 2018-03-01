@@ -10,7 +10,7 @@ import UIKit
 
 let COLLECTION_HEADER_KIND = "Header"
 
-struct LayoutConfig {
+public struct MMLayoutConfig {
     var floating:Bool = false//存在某些cell飘浮，此选项开启，会造成性能损耗
     
     //默认UITable风格
@@ -21,7 +21,7 @@ struct LayoutConfig {
     var insets:UIEdgeInsets = UIEdgeInsets.zero //header将忽略左右上下的间距，只有cell有效
 }
 
-@objc protocol MMCollectionViewDataSource : UICollectionViewDataSource {
+@objc protocol MMCollectionViewDelegate : UICollectionViewDelegate {
     
     //可以漂浮停靠在界面顶部
     @objc optional func collectionView(_ collectionView: UICollectionView, canFloatingCellAt indexPath: IndexPath) -> Bool
@@ -36,9 +36,9 @@ struct LayoutConfig {
 
 //控制UICollect所有瀑布流，无section headerView和footerView支持，
 class MMCollectionViewLayout: UICollectionViewLayout {
-    private var _config:LayoutConfig = LayoutConfig()
+    private var _config:MMLayoutConfig = MMLayoutConfig()
     
-    public init(_ config:LayoutConfig = LayoutConfig()) {
+    public init(_ config:MMLayoutConfig = MMLayoutConfig()) {
         super.init()
         _config = config;
     }
@@ -48,7 +48,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
 //        fatalError("init(coder:) has not been implemented")
     }
     
-    open var config:LayoutConfig {
+    open var config:MMLayoutConfig {
         get { return _config; }
         set {
             _config = newValue
@@ -76,11 +76,11 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     
 //    weak fileprivate final var delegate: UICollectionViewDelegate? { get { return collectionView?.delegate } }
 //    weak fileprivate final var collectionDataSource: UICollectionViewDataSource? { get { return collectionView?.dataSource } }
-    weak fileprivate final var dataSource: MMCollectionViewDataSource? {
+    weak fileprivate final var delegate: MMCollectionViewDelegate? {
         get {
-            guard let ds = self.collectionView?.dataSource else { return nil }
-            if ds is MMCollectionViewDataSource {
-                return ds as? MMCollectionViewDataSource
+            guard let ds = self.collectionView?.delegate else { return nil }
+            if ds is MMCollectionViewDelegate {
+                return ds as? MMCollectionViewDelegate
             }
             return nil
         }
@@ -108,10 +108,10 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             return
         }
         
-        let ds = self.dataSource
-        let respondCanFloating = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDataSource.collectionView(_:canFloatingCellAt:)))
-        let respondHeightForCell = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDataSource.collectionView(_:heightForCellAt:)))
-        let respondSpanSize = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDataSource.collectionView(_:spanSizeForCellAt:)))
+        let ds = self.delegate
+        let respondCanFloating = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:canFloatingCellAt:)))
+        let respondHeightForCell = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:heightForCellAt:)))
+        let respondSpanSize = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:spanSizeForCellAt:)))
         
         let floating = _config.floating
         let rowHeight = _config.rowHeight
