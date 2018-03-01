@@ -24,6 +24,8 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         self.view = UIView(frame:UIScreen.main.bounds)
         self.view.backgroundColor = UIColor.white
         
+        _config.columnSpace = 6
+        _config.rowDefaultSpace = 6
         _layout = MMCollectionViewLayout(_config)
         
         _table = UICollectionView(frame: self.view.bounds, collectionViewLayout: _layout)
@@ -130,6 +132,10 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return _datas[section].count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, spanSizeForCellAt indexPath: IndexPath) -> Int {
+        return indexPath.row % 5 % 3
     }
     
     func collectionView(_ collectionView: UICollectionView, canFloatingCellAt indexPath: IndexPath) -> Bool {
