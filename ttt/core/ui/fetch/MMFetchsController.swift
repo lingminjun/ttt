@@ -10,21 +10,25 @@ import Foundation
 import UIKit
 
 /// Cell model is data obj
-@objc public protocol MMCellModel : AnyObject {
+@objc public protocol MMCellModel : NSObjectProtocol {
     func ssn_cellID() -> String
-    func ssn_cell(_ cellID : String) -> UITableViewCell
+    @objc optional func ssn_cell(_ cellID : String) -> UITableViewCell //适应于UITableView，尽量不采用反射方式
     func ssn_canEdit() -> Bool
     func ssn_canMove() -> Bool
     func ssn_cellHeight() -> Float //UITableViewDelegate heightForRowAt or UICollectionViewLayout layoutAttributesForItemAtIndexPath
     func ssn_canFloating() -> Bool
     func ssn_isExclusiveLine() -> Bool
     func ssn_cellGridSpanSize() -> UInt //占用列数
+    
+    @objc optional func ssn_cellClass(_ cellID : String, isFloating:Bool) -> Swift.AnyClass //返回cell class类型
+    @objc optional func ssn_cellNib(_ cellID : String, isFloating:Bool) -> UINib //返回cell class类型
+    
 }
 
 private var CELL_MODEL_PROPERTY = 0
 
-/// UITableViewCell display support
-extension UITableViewCell {
+/// UITableViewCell display support or UICollectionReusableView display support
+extension UIView {
     
     @objc var ssn_cellModel : MMCellModel? {
         get{
@@ -37,7 +41,7 @@ extension UITableViewCell {
     }
     
 //    func prepareForReuse()
-    @objc func ssn_onDisplay(_ tableView: UITableView, model: AnyObject,atIndexPath indexPath: IndexPath) {}
+    @objc func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject,atIndexPath indexPath: IndexPath) {}
     
     fileprivate func ssn_set_cellModel(_ model:MMCellModel?) {
         objc_setAssociatedObject(self, &CELL_MODEL_PROPERTY, model, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
@@ -45,21 +49,21 @@ extension UITableViewCell {
 }
 
 /// UICollectionReusableView display support
-extension UICollectionReusableView {
-    @objc var ssn_cellModel : MMCellModel? {
-        get{
-            guard let result = objc_getAssociatedObject(self, &CELL_MODEL_PROPERTY) as? MMCellModel else {  return nil }
-            return result
-        }
-    }
-    
-    //    func prepareForReuse()
-    @objc func ssn_onDisplay(_ tableView: UICollectionView, model: AnyObject,atIndexPath indexPath: IndexPath) {}
-    
-    fileprivate func ssn_set_cellModel(_ model:MMCellModel?) {
-        objc_setAssociatedObject(self, &CELL_MODEL_PROPERTY, model, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-    }
-}
+//extension UICollectionReusableView {
+//    @objc var ssn_cellModel : MMCellModel? {
+//        get{
+//            guard let result = objc_getAssociatedObject(self, &CELL_MODEL_PROPERTY) as? MMCellModel else {  return nil }
+//            return result
+//        }
+//    }
+//
+//    //    func prepareForReuse()
+//    @objc func ssn_onDisplay(_ tableView: UICollectionView, model: AnyObject,atIndexPath indexPath: IndexPath) {}
+//
+//    fileprivate func ssn_set_cellModel(_ model:MMCellModel?) {
+//        objc_setAssociatedObject(self, &CELL_MODEL_PROPERTY, model, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+//    }
+//}
 
 ///
 @objc public enum MMFetchChangeType : UInt {
@@ -186,6 +190,13 @@ public class MMFetch<T: MMCellModel> {
     
 }
 
+/*
+enum MMTable {
+    case tableView(UITableView)
+    case collectionView(UICollectionView)
+}
+*/
+
 /// Listening the fetch controller changes
 @objc public protocol MMFetchsControllerDelegate {
     
@@ -263,18 +274,20 @@ public class MMFetch<T: MMCellModel> {
     
     
     // Data manipulation - insert and delete support
-    @objc optional func ssn_controller(_ controller: AnyObject, tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: IndexPath) -> Bool
+    @objc optional func ssn_controller(_ controller: AnyObject, tableView: UIScrollView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: IndexPath) -> Bool
     
     // Data manipulation - reorder / moving support
-    @objc optional func ssn_controller(_ controller: AnyObject, tableView: UITableView, moveRowAtIndexPath sourceIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath)
+    @objc optional func ssn_controller(_ controller: AnyObject, tableView: UIScrollView, moveRowAtIndexPath sourceIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath)
 }
 
 /**
- *
+ * MMFetchsController实现UITableViewDataSource
  */
-public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource /*,UITableViewDelegate*/ {
+public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource,UICollectionViewDataSource /*,UITableViewDelegate*/ {
     
     var _fetchs = [] as [MMFetch<T>]
+    var _isRgst:Set<String> = Set<String>()
+    
     
     weak var _delegate : MMFetchsControllerDelegate?
     
@@ -501,8 +514,126 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         ssn_end_change(flag)
     }
     
+    fileprivate func generateCell(_ view: UIScrollView, cellForRowAt indexPath: IndexPath) -> UIView {
+        // 使用普通方式创建cell
+        var cellID = "cell"
+        var isFloating = false
+        let model = self[indexPath.section]?[indexPath.row]
+        if model != nil {
+            cellID = model!.ssn_cellID()
+            isFloating = model!.ssn_canFloating()
+        }
+        
+        
+        // 1.创建cell,此时cell是可选类型
+        var table:UITableView? = nil
+        var collection:UICollectionView? = nil
+        var cell:UIView? = nil
+        if view is UITableView {
+            table = (view as! UITableView)
+            cell = table!.dequeueReusableCell(withIdentifier:cellID)
+        } else if (view is UICollectionView) {
+            collection = (view as! UICollectionView)
+        }
+        
+        // 2.判断cell是否为nil
+        if cell == nil && model != nil{
+            if table != nil && model!.responds(to: #selector(MMCellModel.ssn_cell(_:))) {
+                MMTry.try({ do {
+                    cell = try model!.ssn_cell!(cellID)
+                } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+            } else if model!.responds(to: #selector(MMCellModel.ssn_cellNib(_:isFloating:))) {
+                if !_isRgst.contains(cellID) {
+                    _isRgst.insert(cellID)
+                    MMTry.try({ do {
+                        let nib = try model!.ssn_cellNib!(cellID,isFloating: isFloating)
+                        if table != nil {
+                            table!.register(nib, forCellReuseIdentifier: cellID)
+                        } else {
+                            collection!.register(nib, forCellWithReuseIdentifier: cellID)
+                        }
+                    } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                }
+                MMTry.try({ do {
+                    if table != nil {
+                        cell = table!.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
+                    } else if isFloating {
+                        cell = collection!.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
+                    } else {
+                        cell = collection!.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                    }
+                } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+            } else if model!.responds(to: #selector(MMCellModel.ssn_cellClass(_:isFloating:))) {
+                if !_isRgst.contains(cellID) {
+                    _isRgst.insert(cellID)
+                    MMTry.try({ do {
+                        let clz = try model!.ssn_cellClass!(cellID,isFloating: isFloating)
+                        if table != nil {
+                            table!.register(clz, forCellReuseIdentifier: cellID)
+                        } else {
+                            collection!.register(clz, forCellWithReuseIdentifier: cellID)
+                        }
+                    } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+                }
+                MMTry.try({ do {
+                    if table != nil {
+                        cell = table!.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
+                    } else if isFloating {
+                        cell = collection!.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
+                    } else {
+                        cell = collection!.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                    }
+                } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+            }
+        }
+        
+        if cell == nil {
+            if table != nil {
+                cell = UITableViewCell(style: .default, reuseIdentifier: cellID)
+            } else if isFloating {
+                cell = UICollectionReusableView()
+            } else {
+                cell = UICollectionViewCell()
+            }
+        }
+        
+        // 3.设置cell数据
+        if model != nil {
+            MMTry.try({ do {
+                cell?.ssn_set_cellModel(model) //提前设置model的值
+                try cell!.ssn_onDisplay(view, model: model!, atIndexPath: indexPath)
+            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
+        }
+        
+        return cell!
+    }
+    
+    // MARK UIUICollectionViewDataSource
+    public func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return _fetchs.count
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if let fetch = self[section] {
+            return fetch.count()
+        } else {
+            return 0
+        }
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        return generateCell(collectionView, cellForRowAt: indexPath)  as! UICollectionViewCell
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        return generateCell(collectionView, cellForRowAt: indexPath)  as! UICollectionReusableView
+    }
     
     // MARK UITableViewDataSource
+    public func numberOfSections(in tableView: UITableView) -> Int {// section个数
+        return _fetchs.count
+    }
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let fetch = self[section] {
             return fetch.count()
@@ -511,49 +642,11 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
     }
     
-    // section个数
-    public func numberOfSections(in tableView: UITableView) -> Int {
-        return _fetchs.count
-    }
-    
     // Row display. Implementers should *always* try to reuse cells by setting each cell's reuseIdentifier and querying for available reusable cells with dequeueReusableCellWithIdentifier:
     // Cell gets various attributes set automatically based on table (separators) and data source (accessory views, editing controls)
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        
-        // ----------------------------------------------------------------
-        // 使用普通方式创建cell
-        var cellID = "cell"
-        let model = self[indexPath.section]?[indexPath.row]
-        if model != nil {
-            cellID = model!.ssn_cellID()
-        }
-        
-        
-        // 1.创建cell,此时cell是可选类型
-        var cell = tableView.dequeueReusableCell(withIdentifier:cellID)
-        
-        // 2.判断cell是否为nil
-        if cell == nil {
-            MMTry.try({ do {
-                cell = try model?.ssn_cell(cellID)
-            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
-        }
-        
-        if cell == nil {
-            cell = UITableViewCell(style: .default, reuseIdentifier: cellID)
-        }
-        
-        // 3.设置cell数据
-        if model != nil {
-            MMTry.try({ do {
-                cell?.ssn_set_cellModel(model)//提前设置model的值
-                try cell!.ssn_onDisplay(tableView, model: model!, atIndexPath: indexPath)
-            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
-        }
-        
-        return cell!
+        return generateCell(tableView, cellForRowAt: indexPath) as! UITableViewCell
     }
     
     public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -616,3 +709,4 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(exception)") }, finally: nil)
     }
 }
+

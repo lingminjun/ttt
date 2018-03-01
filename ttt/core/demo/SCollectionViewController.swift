@@ -42,6 +42,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         
         _table.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "CELLID")
         _table.register(UICollectionViewCell.self, forSupplementaryViewOfKind: COLLECTION_HEADER_KIND, withReuseIdentifier: "header")
+//        _table.register(UINib?, forCellWithReuseIdentifier: <#T##String#>)
         
         let item = UIBarButtonItem(title: "选项", style: UIBarButtonItemStyle.plain, target: self, action: #selector(SCollectionViewController.rightAction))
         self.navigationItem.rightBarButtonItem=item

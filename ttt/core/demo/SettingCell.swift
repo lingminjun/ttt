@@ -14,7 +14,7 @@ class SettingCell: UITableViewCell {
         self.textLabel?.text = ""
     }
     
-    @objc override func ssn_onDisplay(_ tableView: UITableView, model: AnyObject,atIndexPath indexPath: IndexPath) {
+    @objc override func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject,atIndexPath indexPath: IndexPath) {
         let node: SettingNode = model as! SettingNode
         self.textLabel?.text = node.title
         self.detailTextLabel?.text = node.subTitle
