@@ -18,16 +18,10 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
     public var currentUrl: String? { get { return _web.request?.url?.absoluteString } }
     
     public override func onInit(params: Dictionary<String, QValue>?, ext: Dictionary<String, Any>?) {
-        var url = params?[LOAD_URL_KEY]?.string
-        if url == nil && ext != nil {
-            let v = ext![LOAD_URL_KEY]
-            if v != nil && (v is String || v is Substring) {
-                url = "\(v!)"
-            }
-        }
-        
-        if url != nil {
-            _url = Urls.tidy(url: url!)
+        if let url = params?[LOAD_URL_KEY]?.string {
+            _url = Urls.tidy(url: url)
+        } else if let ext = ext, let v = ext[LOAD_URL_KEY], (v is String || v is Substring) {
+            _url = "\(v)"
         }
     }
     
@@ -62,23 +56,22 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         if (!_wload) {
             _wload = true
         }
-        let title = _web.stringByEvaluatingJavaScript(from: "document.title")
-        if title != nil && !title!.isEmpty {
+        if let title = _web.stringByEvaluatingJavaScript(from: "document.title"), !title.isEmpty {
             self.title = title
         }
     }
     
     public func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
         
-        let url = request.url?.absoluteString
-        if url == nil || url!.isEmpty || url == "about:blank" {
+        guard let url = request.url?.absoluteString else { return true }
+        if url.isEmpty || url == "about:blank" {
             return true
         }
         
         print("should load \(url)")
         switch navigationType {
         case .linkClicked:
-            return checkGotoOtherWebController(url: url!)
+            return checkGotoOtherWebController(url: url)
 //        case .other:
 //            return checkGotoOtherWebController(url: url!)
         default:

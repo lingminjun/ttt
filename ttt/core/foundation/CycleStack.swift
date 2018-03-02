@@ -104,9 +104,9 @@ public final class CycleStack<T: Equatable> {
     public func clear() -> [T] {
         var list = [T]()
         for _ in 0..<MAX_SIZE {
-            let obj = pop();
-            if (obj == nil) {break;}
-            list.insert(obj!, at: 0) //保持原有顺序
+            if let obj = pop() {
+                list.insert(obj, at: 0) //保持原有顺序
+            } else { break }
         }
         return list;
     }
@@ -120,10 +120,9 @@ public final class CycleStack<T: Equatable> {
         for i in 1...MAX_SIZE {
             
             let idx = (_idx + MAX_SIZE - i) % MAX_SIZE;
-            let obj = _stack[idx % MAX_SIZE]//取出栈顶元素
-            
-            if (obj == nil) { break }
-            list.insert(obj!, at: 0) //保持原有顺序
+            if let obj = _stack[idx % MAX_SIZE] {
+                list.insert(obj, at: 0) //保持原有顺序
+            } else { break }
         }
         return list;
     }
@@ -137,11 +136,9 @@ public final class CycleStack<T: Equatable> {
         for i in 1...MAX_SIZE {
             
             let idx = (_idx + MAX_SIZE - i) % MAX_SIZE;
-            let obj = _stack[idx % MAX_SIZE];//取出栈顶元素
-            
-            if (obj == nil) { break }
-            
-            list.append(obj!) //保持原有顺序
+            if let obj = _stack[idx % MAX_SIZE] {
+                list.append(obj) //保持原有顺序
+            } else { break }
         }
         return list;
     }
@@ -155,12 +152,11 @@ public final class CycleStack<T: Equatable> {
         //从栈顶开始取，直到取到为null为止
         for i in 1...MAX_SIZE {
             let idx = (_idx + MAX_SIZE - i) % MAX_SIZE
-            let o = _stack[idx % MAX_SIZE];//取出栈顶元素
-            if (o == nil) {break}
-            
-            if (o! == obj) {
-                return true;
-            }
+            if let o = _stack[idx % MAX_SIZE] {
+                if (o == obj) {
+                    return true;
+                }
+            } else { break }
         }
         
         return false;
@@ -175,16 +171,15 @@ public final class CycleStack<T: Equatable> {
         
         for i in 1...MAX_SIZE {
             let idx = (_idx + MAX_SIZE - i) % MAX_SIZE;
-            let o = _stack[idx % MAX_SIZE]//取出栈顶元素
-            if (o == nil) { break }
-            
-            if (o! == obj) {//开始移位排序
-                for j in 1..<i {
-                    _stack[(idx + j - 1 + MAX_SIZE) % MAX_SIZE] = _stack[(idx + j) % MAX_SIZE];
+            if let o = _stack[idx % MAX_SIZE] {//取出栈顶元素
+                if (o == obj) {//开始移位排序
+                    for j in 1..<i {
+                        _stack[(idx + j - 1 + MAX_SIZE) % MAX_SIZE] = _stack[(idx + j) % MAX_SIZE];
+                    }
+                    _stack[(idx + i - 1) % MAX_SIZE] = o//最后将数据提前
+                    return obj;
                 }
-                _stack[(idx + i - 1) % MAX_SIZE] = o!//最后将数据提前
-                return obj;
-            }
+            } else { break }
         }
         
         //不包含则直接压入栈顶

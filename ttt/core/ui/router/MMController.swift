@@ -78,13 +78,13 @@ extension UINavigationController: MMContainer {
     }
     
     public func add(controller: MMController, at: Int = -1) {
-        if controller is UIViewController {
+        if let vc = controller as? UIViewController {
             var vs = self.viewControllers
             if at >= 0 && at < vs.count {
-                vs.append((controller as! UIViewController))
+                vs.append(vc)
                 self.setViewControllers(vs, animated: false)
             } else {// push
-                self.pushViewController((controller as! UIViewController), animated: true)
+                self.pushViewController(vc, animated: true)
             }
         }
     }
@@ -113,16 +113,18 @@ extension UITabBarController: MMContainer {
     }
     
     public func add(controller: MMController, at: Int = -1) {
-        if controller is UIViewController {
-            var vs = self.viewControllers
-            if vs == nil {
-                vs = []
+        if let vc = controller as? UIViewController {
+            var vs:[UIViewController] = []
+            if let ovc = self.viewControllers {
+                vs = ovc
             }
-            if at >= 0 && at < vs!.count {
-                vs!.insert((controller as! UIViewController), at: at)
+            if at >= 0 && at < vs.count {
+                vs.insert(vc, at: at)
             } else {
-                vs!.append((controller as! UIViewController))
+                vs.append(vc)
             }
+            
+            self.setViewControllers(vs, animated: false)
         }
     }
     
@@ -149,16 +151,13 @@ extension UIWindow: MMContainer {
     }
     
     public func childrenControllers() -> [MMController] {
-        let root = self.rootViewController
-        if root == nil {
-            return []
-        }
-        return [root!]
+        guard let root = self.rootViewController else { return [] }
+        return [root]
     }
     
     public func add(controller: MMController, at: Int) {
-        if controller is UIViewController && self.rootViewController == nil {
-            self.rootViewController = (controller as! UIViewController)
+        if let vc = controller as? UIViewController, self.rootViewController == nil {
+            self.rootViewController = vc
         }
     }
     
@@ -171,18 +170,16 @@ extension UIWindow: MMContainer {
 
 extension UIViewController {
     @objc public func theContainer() -> MMContainer? {
-        let vc = self.navigationController
-        if vc != nil {
-            return vc!
+        if let vc = self.navigationController {
+            return vc
         }
         
-        let tv = self.tabBarController
-        if tv != nil {
-            return tv!
+        if let tv = self.tabBarController {
+            return tv
         }
         
-        if (self.view.window?.rootViewController == self) {
-            return self.view.window
+        if let window = self.view.window, window.rootViewController == self {
+            return window
         }
         
         return nil
@@ -191,19 +188,15 @@ extension UIViewController {
     public func ssn_back() {
         let nav = self.navigationController
         var presenting = self.presentingViewController
-        
-        if nav != nil {
-            let idx = nav!.viewControllers.index(of: self)
-            if idx != nil && idx! > 0 {
-                nav!.popToViewController(nav!.viewControllers[idx!-1], animated: true)
+        if let nav = nav {
+            if let idx = nav.viewControllers.index(of: self), idx > 0 {
+                nav.popToViewController(nav.viewControllers[idx-1], animated: true)
                 return
             }
             
-            presenting = nav!.presentingViewController
+            presenting = nav.presentingViewController
         }
         
-        if presenting != nil {
-            presenting!.dismiss(animated: true, completion: nil)
-        }
+        presenting?.dismiss(animated: true, completion: nil)
     }
 }

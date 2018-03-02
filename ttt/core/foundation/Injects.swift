@@ -16,7 +16,7 @@ final public class Injects {
         
         var mr: Mirror = Mirror(reflecting: obj)
         for child in mr.children {
-            if child.label! == property {
+            if let label = child.label, label == property {
                 return child.value
             }
         }
@@ -24,7 +24,7 @@ final public class Injects {
         //recursive
         while let parent = mr.superclassMirror {
             for child in parent.children {
-                if child.label! == property {
+                if let label = child.label, label == property {
                     return child.value
                 }
             }
@@ -95,14 +95,10 @@ final public class Injects {
     
     /// Set property
     open static func set<T: NSObject>(_ value:Any,to property:String, of obj: T) {
-        let va = self.get(property:property,of:obj)
-        if va == nil {
+        guard let oldv = self.get(property:property,of:obj) else {
             print("\(type(of: obj)) without \(property) property")
             return
         }
-        
-        let oldv = va!
-        
         if self.isType(obj, type: type(of: oldv))  {//子类，可以赋值
             MMTry.try({ obj.setValue(value, forKey: property) }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         } else if isBaseType(value) && isBaseType(oldv) {

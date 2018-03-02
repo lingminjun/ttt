@@ -132,11 +132,10 @@ public enum QValue {
         for (key,value) in dic {
             if Injects.isBaseType(value) {
                 query[key] = QValue("\(value)")
-            } else if value is MMJsonable {
-                let entity = value as! MMJsonable
+            } else if let entity = value as? MMJsonable {
                 query[key] = QValue("\(entity.ssn_jsonString())")
-            } else if value is QValue {
-                query[key] = value as! QValue
+            } else if let v = value as? QValue {
+                query[key] = v
             }
         }
         return query
@@ -162,20 +161,18 @@ public final class Urls {
     
     /// query url encode
     public static func encoded(str:String) -> String {
-        let value = str.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
-        if value == nil {
+        guard let value = str.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             return str
         }
-        return value!
+        return value
     }
     
     /// query url decode
     public static func decoded(str:String) -> String {
-        let value = str.removingPercentEncoding
-        if value == nil {
+        guard let value = str.removingPercentEncoding else {
             return str
         }
-        return value!
+        return value
     }
     
     /// get url query dictionary
@@ -208,9 +205,10 @@ public final class Urls {
             } else if (ss.count == 1) {
                 key = String(ss[0])
             } else if (ss.count > 2) {
-                let range = str.range(of:"=")
-                key = String(str[str.startIndex...range!.lowerBound])
-                value = String(str[range!.upperBound..<str.endIndex])
+                if let range = str.range(of:"=") {
+                    key = String(str[str.startIndex...range.lowerBound])
+                    value = String(str[range.upperBound..<str.endIndex])
+                }
             }
             if !key.isEmpty {
                 
@@ -218,9 +216,8 @@ public final class Urls {
                     value = decoded(str: value)
                 }
                 
-                let v = map[key]
-                if v != nil {
-                    switch v! {
+                if let v = map[key] {
+                    switch v {
                         case QValue.value(let vv):
                             var list = [vv,value]
                             list.sort()
@@ -245,32 +242,32 @@ public final class Urls {
         var result = ""
         let keys = dic.keys.sorted()
         for key in keys {
-            let qvalue = dic[key]
-            
-            switch qvalue! {
-            case QValue.value(let value):
-                if !result.isEmpty {
-                    result += "&"
-                }
-                if encode {
-                    result += key + "=" + self.encoded(str: value)
-                } else {
-                    result += key + "=" + value
-                }
-                break
-            case QValue.array(let array):
-                let list = array.sorted()
-                for str in list {
+            if let qvalue = dic[key] {
+                switch qvalue {
+                case QValue.value(let value):
                     if !result.isEmpty {
                         result += "&"
                     }
                     if encode {
-                        result += key + "=" + self.encoded(str: str)
+                        result += key + "=" + self.encoded(str: value)
                     } else {
-                        result += key + "=" + str
+                        result += key + "=" + value
                     }
+                    break
+                case QValue.array(let array):
+                    let list = array.sorted()
+                    for str in list {
+                        if !result.isEmpty {
+                            result += "&"
+                        }
+                        if encode {
+                            result += key + "=" + self.encoded(str: str)
+                        } else {
+                            result += key + "=" + str
+                        }
+                    }
+                    break
                 }
-                break
             }
         }
         
@@ -284,13 +281,9 @@ public final class Urls {
     
     
     public static func encoding(url:String) -> String {
-        var surl = url.removingPercentEncoding
-        if surl != nil {
-            surl = surl!.addingPercentEncoding(withAllowedCharacters: URL_ALLOWED_CHARS)
-        } else {
-            surl = url
-        }
-        return surl!
+        guard let surl = url.removingPercentEncoding else { return url }
+        guard let tsurl = surl.addingPercentEncoding(withAllowedCharacters: URL_ALLOWED_CHARS) else { return url }
+        return tsurl
     }
     
     /// tidy <scheme>://<host>:<port>/<path>;<params>?<query>#<fragment> , case sensitive path
@@ -301,65 +294,58 @@ public final class Urls {
         //decoding and encoding can compatibility more scene
         let surl = encoding(url: url)
         
-        let uri = URL(string:surl)
-        if (uri == nil) {return url}
+        guard let uri = URL(string:surl) else { return url }
+
         var result = ""
         
         // scheme
-        var schm = scheme;
-        if schm == nil || schm!.isEmpty {
-            schm = uri?.scheme
-        }
-        if schm != nil {
-            result = schm!.lowercased() + "://"
+        var theSchm = ""
+        if let schm = scheme, !schm.isEmpty {
+            theSchm = schm.lowercased()
+        } else if let schm = uri.scheme, !schm.isEmpty {
+            theSchm = schm.lowercased()
         } else {//default https
-            result = "https://"
+            theSchm = "https"
         }
+        result = theSchm + "://"
         
         //user and password
-        let user = uri?.user
-        let pswd = uri?.password
-        if user != nil && pswd != nil {
-            result += user! + ":" + pswd! + "@"
-        } else if user != nil {
-            result += user! + "@"
+        if let user = uri.user, let pswd = uri.password {
+            result += user + ":" + pswd + "@"
+        } else if let user = uri.user {
+            result += user + "@"
         }
         
         // host
-        var hst = host
-        if hst == nil || hst!.isEmpty {
-            hst = uri?.host
-        }
-        if hst != nil {
-            result += hst!.lowercased()
+        if let hst = host, !hst.isEmpty {
+            result += hst.lowercased()
+        } else if let hst = uri.host, !hst.isEmpty {
+            result += hst.lowercased()
         } else {//default https
             result += "m.mymm.com"
         }
         
         // port
-        let port = uri?.port
-        if port != nil {
-            if schm!.lowercased() == "http" && port! == 80 {
+        if let port = uri.port {
+            if port == 80 && theSchm.lowercased() == "http" {
                 // normal
-            } else if schm!.lowercased() == "https" && port! == 443 {
+            } else if port == 443 && theSchm.lowercased() == "https"  {
                 // normal
             } else {
-                result += ":\(port!)"
+                result += ":\(port)"
             }
         }
         
         // path
-        let paths = uri?.pathComponents
-        if paths != nil {
-            for path in paths! {
-                if (path.isEmpty || path == "/" || path == "." || path == "..") {
-                    continue
-                }
-                if sensitve {
-                    result += "/" + path
-                } else {
-                    result += "/" + path.lowercased()
-                }
+        let paths = uri.pathComponents
+        for path in paths {
+            if (path.isEmpty || path == "/" || path == "." || path == "..") {
+                continue
+            }
+            if sensitve {
+                result += "/" + path
+            } else {
+                result += "/" + path.lowercased()
             }
         }
         
@@ -368,20 +354,15 @@ public final class Urls {
         }
         
         //query
-        var qry:Dictionary<String,QValue>? = nil
-        if query != nil {
+        var qry:Dictionary<String,QValue> = [:]
+        if let query = query {
             qry = query
-        } else {
-            let strqry = uri?.query
-            if strqry != nil {
-                qry = self.query(query: strqry!)
-            }
+        } else if let strqry = uri.query {
+            qry = self.query(query: strqry)
         }
-        if qry != nil {
-            let str = self.queryString(dic: qry!)
-            if !str.isEmpty {
-                result += "?" + str
-            }
+        let str = self.queryString(dic: qry)
+        if !str.isEmpty {
+            result += "?" + str
         }
         
         if nofragment {
@@ -389,11 +370,10 @@ public final class Urls {
         }
         
         //fragment
-        let fragment = uri?.fragment
-        if fragment != nil {
-            let dic = self.query(query: fragment!)
+        if let fragment = uri.fragment {
+            let dic = self.query(query: fragment)
             if dic.isEmpty {//just string 
-                result += "#" + fragment!
+                result += "#" + fragment
             } else {
                 let str = self.queryString(dic: dic)
                 if !str.isEmpty {
@@ -460,51 +440,53 @@ public final class Urls {
         let surl = encoding(url: url)
         var u = surl
         if config {
-            u = surl.replacingOccurrences(of: "{", with: "-")
-            u = u.replacingOccurrences(of: "}", with: "_")
-        }
-        let uri = URL(string:u)
-        
-        if (uri == nil) {return ""}
-        
-        let host = uri!.host
-        if (host == nil || host!.isEmpty) {
-            return "";
+            u = surl.replacingOccurrences(of: "{", with: "-")//替换成允许的字符
+            u = u.replacingOccurrences(of: "}", with: "_")//替换成允许的字符
         }
         
-        let paths = uri!.pathComponents
+        guard let uri = URL(string:u) else { return "" }
+        guard let host = uri.host else {
+            return ""
+        }
+        if host.isEmpty {
+            return ""
+        }
+        
+        let paths = uri.pathComponents
         if (paths.isEmpty) {//home page: https://m.mymm.com
-            return "/";
+            return "/"
         }
         
-        var builder = String();
+        var builder = String()
         var isFirst = true;
         for p in paths {
-            if (!p.isEmpty && p != "/" && p != "." && p != "..") {
-                var str = p;
-                //contain param key
-                if p.contains("-") && p.contains("_") {
-                    let range = p.range(of: "_")!.upperBound ..< str.endIndex
-                    str = "{_}" + p[range];
-                }
-                
-                if (isFirst) {
-                    isFirst = false;
-                }
-                else {
-                    builder.append("/");
-                }
-                
-                // 不区分大小写，不一定合理，兼容方案; Not case sensitive.
-                builder.append(str.lowercased());
+            if (p.isEmpty || p == "/" || p == "." || p == "..") {
+                continue
             }
+            
+            var str = p
+            if p.hasPrefix("-") && p.contains("_") {
+                if let range = p.range(of: "_",options: .backwards) {
+                    str = "{_}" + p[range.upperBound..<p.endIndex]
+                }
+            }
+            
+            if (isFirst) {
+                isFirst = false;
+            }
+            else {
+                builder.append("/");
+            }
+            
+            // 不区分大小写，不一定合理，兼容方案; Not case sensitive.
+            builder.append(str.lowercased());
         }
         
         if builder.isEmpty {
             return "/"
         }
         
-        return builder;
+        return builder
     }
     
     // just support last component param key
@@ -512,16 +494,15 @@ public final class Urls {
         var surl = encoding(url: url)
         surl = surl.replacingOccurrences(of: "{", with: "-")
         surl = surl.replacingOccurrences(of: "}", with: "_")
-        let uri = URL(string:surl)
-        
-        if (uri == nil) {return ""}
-        
-        let host = uri!.host
-        if (host == nil || host!.isEmpty) {
+        guard let uri = URL(string:surl) else { return "" }
+        guard let host = uri.host else {
+            return ""
+        }
+        if host.isEmpty {
             return ""
         }
         
-        let paths = uri!.pathComponents
+        let paths = uri.pathComponents
         if (paths.isEmpty) {//home page: https://m.mymm.com
             return ""
         }
@@ -536,9 +517,8 @@ public final class Urls {
             //去掉末尾的.html
             if isLast {
                 isLast = false
-                let range = path.range(of: ".", options: .backwards)
-                if range != nil {
-                    path = String(path[path.startIndex..<range!.lowerBound]);
+                if let range = path.range(of: ".", options: .backwards) {
+                    path = String(path[path.startIndex..<range.lowerBound]);
                 }
             }
             
@@ -546,7 +526,9 @@ public final class Urls {
                 continue;
             }
             
-            let range = path.range(of: "-")!.upperBound ..< path.range(of: "_")!.lowerBound
+            let begin = path.index(path.startIndex, offsetBy: 1)
+            let end = path.index(path.endIndex, offsetBy: -1)
+            let range = begin ..< end
             return String(path[range])
         }
         

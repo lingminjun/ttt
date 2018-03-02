@@ -41,8 +41,8 @@ public final class Quantum<T: Equatable> {
             let objs = _stack.toList()
             _ = _stack.clear()
             express(objs)
-        } else {//延后播发
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime.init(uptimeNanoseconds: _interval * 1000), execute: _block!)
+        } else if let block = _block {//延后播发
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime.init(uptimeNanoseconds: _interval * 1000), execute: block)
         }
     }
     
@@ -59,7 +59,7 @@ public final class Quantum<T: Equatable> {
         var list:[T]? = nil
         for obj in objs {
             if (list != nil) {//说明栈已经满，为了节约播发次数，不做拆分，一次播放
-                list!.append(obj);
+                list?.append(obj);
                 continue;
             }
             
@@ -71,10 +71,10 @@ public final class Quantum<T: Equatable> {
             }
         }
         
-        if (list != nil) {
-            express(list!);
-        } else {//延后播发
-            DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: _interval * 1000), execute: _block!)
+        if let list = list {
+            express(list);
+        } else if let block = _block {//延后播发
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: _interval * 1000), execute: block)
         }
     }
     
@@ -102,9 +102,9 @@ public final class Quantum<T: Equatable> {
     private func express(_ objs:[T]) {
         if (objs.isEmpty) { return }
         
-        if (_express != nil) {
+        if let express = self._express {
             MMTry.try({ do {
-                try self._express!(self,objs);
+                try express(self,objs);
             } catch { print("error:\(error)") }}, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         } else {
             print("no express! ")

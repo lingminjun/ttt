@@ -96,7 +96,11 @@ public class MMFetch<T: MMCellModel> {
     
     /// Access the `index`th element. Reading is O(1).  Writing is
     /// O(1) unless `self`'s storage is shared with another live array; O(`count`) if `self` does not wrap a bridged `NSArray`; otherwise the efficiency is unspecified..
-    public final subscript (index: Int) -> T? { get{ return self.get(index)} set(newValue) { if newValue != nil {self.insert(newValue!, atIndex: index)}} }
+    public final subscript (index: Int) -> T? { get{ return self.get(index)} set(newValue) {
+        if let newValue = newValue {
+            self.insert(newValue, atIndex: index)}
+        }
+    }
     
     /// Gets the first element in the array.
     public final func first() -> T? { if self.count() > 0 { return get(0) } else { return nil }}
@@ -131,9 +135,8 @@ public class MMFetch<T: MMCellModel> {
     
     /// Returns the index of the first object matching the predicate. Derived class implements.
     public final func indexOf(_ predicate: NSPredicate) -> Int? {
-        let model = self.get(predicate)
-        if model != nil {
-            return indexOf(model!)
+        if let model = self.get(predicate) {
+            return indexOf(model)
         }
         return nil
     }
@@ -465,8 +468,8 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             if !_changing {
                 _changing = true
                 
-                if _delegate != nil {
-                    _delegate!.ssn_controllerWillChangeContent(self)
+                if let delegate = _delegate {
+                    delegate.ssn_controllerWillChangeContent(self)
                 }
             }
         }
@@ -478,8 +481,8 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             if _flags.count == 0 && _changing {
                 _changing = false
                 
-                if _delegate != nil {
-                    _delegate!.ssn_controllerDidChangeContent(self)
+                if let delegate = _delegate {
+                    delegate.ssn_controllerDidChangeContent(self)
                 }
             }
         }
@@ -495,16 +498,13 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     /// no data modify. just notice controller changes
     public func ssn_fetch(_ fetch: MMFetch<T>, didChange anObject: T?, at index: Int, for type: MMFetchChangeType, newIndex: Int) {
-        if _delegate == nil {
+        guard let delegate = _delegate else {
             return
         }
         
-        let section = self.indexOf(fetch)
-        if section == nil {
-            return
-        }
+        guard let section = self.indexOf(fetch) else { return }
         
-        let indexPath = IndexPath(row:index,section:section!)
+        let indexPath = IndexPath(row:index,section:section)
         
         let flag = "FetchsInner"
         ssn_begin_change(flag)
@@ -512,16 +512,16 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         switch type {
         case MMFetchChangeType.insert:
 //            _fetchs[index].insert(anObject, atIndex: index)
-            _delegate?.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.insert, newIndexPath: indexPath)
+            delegate.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.insert, newIndexPath: indexPath)
             break
         case MMFetchChangeType.delete:
-            _delegate?.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.delete, newIndexPath: indexPath)
+            delegate.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.delete, newIndexPath: indexPath)
             break
         case MMFetchChangeType.update:
-            _delegate?.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.update, newIndexPath: indexPath)
+            delegate.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.update, newIndexPath: indexPath)
             break
         case MMFetchChangeType.move:
-            _delegate?.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.move, newIndexPath: IndexPath(row:newIndex,section:section!))
+            delegate.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.move, newIndexPath: IndexPath(row:newIndex,section:section))
             break
         }
         
@@ -601,11 +601,11 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                 }
                 MMTry.try({
                     if table != nil {
-                        cell = table!.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
+                        cell = table?.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
                     } else if isFloating {
-                        cell = collection!.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
+                        cell = collection?.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
                     } else {
-                        cell = collection!.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                        cell = collection?.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
                     }
                 }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
             }
@@ -644,11 +644,17 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return generateCell(collectionView, cellForRowAt: indexPath)  as! UICollectionViewCell
+        if let cell = generateCell(collectionView, cellForRowAt: indexPath)  as? UICollectionViewCell {
+            return cell
+        }
+        return UICollectionViewCell()
     }
     
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        return generateCell(collectionView, cellForRowAt: indexPath)  as! UICollectionReusableView
+        if let cell = generateCell(collectionView, cellForRowAt: indexPath)  as? UICollectionReusableView {
+            return cell
+        }
+        return UICollectionReusableView()
     }
     
     // MARK UITableViewDataSource
@@ -668,7 +674,10 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     // Cell gets various attributes set automatically based on table (separators) and data source (accessory views, editing controls)
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return generateCell(tableView, cellForRowAt: indexPath) as! UITableViewCell
+        if let cell = generateCell(tableView, cellForRowAt: indexPath) as? UITableViewCell {
+            return cell
+        }
+        return UITableViewCell()
     }
     
     public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {

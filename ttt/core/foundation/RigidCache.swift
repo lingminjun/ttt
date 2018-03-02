@@ -43,11 +43,9 @@ public class RigidCache<T: NSObject> {
     }
     
     private func sync_get(_ key:String, info:Dictionary<String,Any>? = nil) -> T? {
-        let box = _cache[key]
-        if box != nil {
-            let obj = box!.get()
-            if obj != nil {
-                return obj!
+        if let box = _cache[key] {
+            if let obj = box.get() {
+                return obj
             } else {
                 _cache.removeValue(forKey: key)
             }
@@ -59,9 +57,9 @@ public class RigidCache<T: NSObject> {
         }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         
         // cache
-        if obj != nil {
-            _ = _hold.push(obj!)
-            _cache[key] = WeakBox(obj!)
+        if let obj = obj {
+            _ = _hold.push(obj)
+            _cache[key] = WeakBox(obj)
         }
         
         return obj

@@ -19,8 +19,8 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
     
     public init(list:[T]?) {
         super.init(tag:"list:")
-        if list != nil {
-            _list = list!
+        if let list = list {
+            _list = list
         }
     }
     
@@ -33,9 +33,9 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
         guard let obj = self[idx] else {return}
         _listener?.ssn_fetch_begin_change(self)
         _listener?.ssn_fetch(self,didChange: obj, at:idx, for: MMFetchChangeType.update, newIndex:idx)
-        if b != nil {
+        if let b = b {
             MMTry.try({ do {
-                try b!()
+                try b()
             } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         }
         _listener?.ssn_fetch_end_change(self)

@@ -164,8 +164,8 @@ public final class RPC {
         }
         
         fileprivate func set(result:Any, index:Index) {
-            if result is Result {
-                _resp[index.value] = result as! Result
+            if let rt = result as? Result {
+                _resp[index.value] = rt
             } else {
                 _resp[index.value] = Result.value(result)
             }
@@ -283,11 +283,11 @@ public final class RPC {
                         DispatchQueue.main.async {
                             feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
                         } } }, catch: { (exception) in
-                            var msg = exception?.reason
-                            if msg == nil {
-                                msg = "not message"
+                            var msg = "not message"
+                            if let tmsg = exception?.reason {
+                                msg = tmsg
                             }
-                            let err = NSError(domain: "RPC", code: -102, userInfo: [NSLocalizedDescriptionKey:msg!])
+                            let err = NSError(domain: "RPC", code: -102, userInfo: [NSLocalizedDescriptionKey:msg])
                             assembly.resp.set(error:err, index:idx)
                             DispatchQueue.main.async {
                                 feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
@@ -332,11 +332,11 @@ public final class RPC {
                         feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)
                     } } }, catch: { (exception) in
                         isError = true
-                        var msg = exception?.reason
-                        if msg == nil {
-                            msg = "not message"
+                        var msg = "not message"
+                        if let tmsg = exception?.reason {
+                            msg = tmsg
                         }
-                        let err = NSError(domain: "RPC", code: -102, userInfo: [NSLocalizedDescriptionKey:msg!])
+                        let err = NSError(domain: "RPC", code: -102, userInfo: [NSLocalizedDescriptionKey:msg])
                         assembly.resp.set(error:err, index:idx)
                         DispatchQueue.main.async {
                             feedback.failed(index: idx, cmd: cmd, group: groupId, error: err)

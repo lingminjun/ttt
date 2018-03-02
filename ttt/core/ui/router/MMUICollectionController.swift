@@ -68,9 +68,9 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     private class Node {
         var object: MMCellModel?
         var type:MMFetchChangeType
-        var indexPath:IndexPath?
+        var indexPath:IndexPath
         var newIndexPath:IndexPath?
-        init(type: MMFetchChangeType, object: MMCellModel?, indexPath: IndexPath?, newIndexPath: IndexPath?) {
+        init(type: MMFetchChangeType, object: MMCellModel?, indexPath: IndexPath, newIndexPath: IndexPath?) {
             self.type = type
             self.object = object
             self.indexPath = indexPath
@@ -80,7 +80,9 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     private var _ups:[Node] = []
     
     public func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?) {
-        _ups.append(Node(type:type,object:anObject,indexPath:indexPath,newIndexPath:newIndexPath))
+        if let indexPath = indexPath {
+            _ups.append(Node(type:type,object:anObject,indexPath:indexPath,newIndexPath:newIndexPath))
+        }
     }
     
     public func ssn_controllerWillChangeContent(_ controller: AnyObject) {
@@ -94,14 +96,16 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
             for node in sself._ups {
                 switch node.type {
                 case .delete:
-                    sself._table.deleteItems(at: [node.indexPath!])
+                    sself._table.deleteItems(at: [node.indexPath])
                 case .insert:
-                    sself._table.insertItems(at: [node.indexPath!])
+                    sself._table.insertItems(at: [node.indexPath])
                 case .update:
-                    sself._table.reloadItems(at: [node.indexPath!])
+                    sself._table.reloadItems(at: [node.indexPath])
                 default:
-                    sself._table.deleteItems(at: [node.indexPath!])
-                    sself._table.insertItems(at: [node.newIndexPath!])
+                    if let newIndexPath = node.newIndexPath {
+                        sself._table.deleteItems(at: [node.indexPath])
+                        sself._table.insertItems(at: [newIndexPath])
+                    }
                 }
             }
         }, completion: { [weak self] (b) in

@@ -108,10 +108,15 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             return
         }
         
+        var respondCanFloating = false
+        var respondHeightForCell = false
+        var respondSpanSize = false
         let ds = self.delegate
-        let respondCanFloating = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:canFloatingCellAt:)))
-        let respondHeightForCell = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:heightForCellAt:)))
-        let respondSpanSize = ds == nil ? false : ds!.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:spanSizeForCellAt:)))
+        if let ds = ds {
+            respondCanFloating = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:canFloatingCellAt:)))
+            respondHeightForCell = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:heightForCellAt:)))
+            respondSpanSize = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:spanSizeForCellAt:)))
+        }
         
         let floating = _config.floating
         let rowHeight = _config.rowHeight
@@ -133,8 +138,8 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 
                 //是否漂浮
                 var isFloating:Bool = _config.floating
-                if floating && respondCanFloating {
-                    isFloating = ds!.collectionView!(view, canFloatingCellAt: indexPath)
+                if let ds = ds, (floating && respondCanFloating) {
+                    isFloating = ds.collectionView!(view, canFloatingCellAt: indexPath)
                 }
                 if isFloating {
                     _headIndexs.append(indexPath)
@@ -142,16 +147,16 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 
                 //行高
                 var height:CGFloat = rowHeight
-                if height <= 0 && respondHeightForCell {
-                    height = ds!.collectionView!(view, heightForCellAt: indexPath)
+                if let ds = ds, ( height <= 0 && respondHeightForCell ) {
+                    height = ds.collectionView!(view, heightForCellAt: indexPath)
                 }
             
                 //占用各数
                 var spanSize = 1
                 if isFloating {//肯定是占满一行
                     spanSize = columnCount
-                } else if columnCount > 1 && respondSpanSize {
-                    spanSize = ds!.collectionView!(view, spanSizeForCellAt: indexPath)
+                } else if let ds = ds, ( columnCount > 1 && respondSpanSize ) {
+                    spanSize = ds.collectionView!(view, spanSizeForCellAt: indexPath)
                     if spanSize > columnCount {
                         spanSize = columnCount
                     } else if spanSize < 1 {
@@ -254,14 +259,16 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         }
         
         
-        if minHIndexPath == nil && (minCIndexPath == nil || _headIndexs[0] < minCIndexPath!) {
-            minHIndexPath = _headIndexs[0]
-            resetFloatingCellLayout(indexPath: _headIndexs[0])//先还原布局
+        if minHIndexPath == nil {
+            if let minC = minCIndexPath, _headIndexs[0] < minC {
+                minHIndexPath = _headIndexs[0]
+                resetFloatingCellLayout(indexPath: _headIndexs[0])//先还原布局
+            }
         }
         
         //往前寻找一个飘浮的cell
-        if minCIndexPath != nil && minHIndexPath != nil && minCIndexPath! < minHIndexPath! {
-            if let idx = _headIndexs.index(of: minHIndexPath!) {
+        if let minH = minHIndexPath, let minC = minCIndexPath, minC < minH {
+            if let idx = _headIndexs.index(of: minH) {
                 if idx > 0 {
                     minHIndexPath = _headIndexs[idx - 1]
                     resetFloatingCellLayout(indexPath: _headIndexs[idx - 1])//先还原布局
@@ -269,10 +276,12 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             }
         }
         
-        if minHIndexPath == nil { return list }
+        guard let minH = minHIndexPath else {
+            return list
+        }
         
         //设置飘浮状态
-        setFloatingCellLayout(indexPath: minHIndexPath!,hsets: hsets, list: &list)
+        setFloatingCellLayout(indexPath: minH,hsets: hsets, list: &list)
         
         return list
     }
@@ -371,8 +380,8 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             }
             
             //重新布局下header
-            if next != nil {
-                if let nextValue = _cellLayouts[next!] {
+            if let next = next {
+                if let nextValue = _cellLayouts[next] {
                     frame.origin.y = nextValue.frame.origin.y - _config.rowDefaultSpace - frame.height
                 }
             }
@@ -414,14 +423,15 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 var responder = superview.next
                 var vcontroller:UIViewController? = nil
                 while responder != nil {
-                    if responder is UIViewController {
+                    if let res = responder as? UIViewController {
                         _setedOffsetY = true
-                        vcontroller = responder as! UIViewController
+                        vcontroller = res
                         break
                     } else if responder is UIWindow {
                         _setedOffsetY = true
                         return _offsetY
                     }
+                    responder = responder?.next
                 }
                 
                 guard let vc = vcontroller else {
@@ -437,8 +447,8 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                         _offsetY = _offsetY + UIApplication.shared.statusBarFrame.height
                     }
                     
-                    if vc.navigationController != nil && !vc.navigationController!.isNavigationBarHidden {
-                        _offsetY = _offsetY + vc.navigationController!.navigationBar.frame.size.height
+                    if let nv = vc.navigationController, !nv.isNavigationBarHidden {
+                        _offsetY = _offsetY + nv.navigationBar.frame.size.height
                     }
                 }
                 

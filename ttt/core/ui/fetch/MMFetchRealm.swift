@@ -35,7 +35,7 @@ extension RealmSwift.Object : MMCellModel {
 
 public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     //使用默认的数据库
-    var _list : Results<T>? = nil
+    var _list : Results<T>!
     var _notice: NotificationToken? = nil
     lazy var _realm = try! Realm()
     
@@ -58,35 +58,36 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
         }*/
         _notice?.invalidate()
         _notice = _list?._observe { [weak self] (changes: RealmCollectionChange) in
-            guard let delegate = self?._listener else { return }
+            guard let sself = self else { return }
+            guard let delegate = sself._listener else { return }
             switch changes {
             case .initial:
                 // tableView.reloadData()
                 print("realm result initial...")
                 break
             case .update(_, let deletions, let insertions, let modifications):
-                delegate.ssn_fetch_begin_change(self!)
+                delegate.ssn_fetch_begin_change(sself)
                 
                 //删除者已经拿不到数据
                 if deletions.count > 0 {
                     for idx in deletions {
-                        delegate.ssn_fetch(self!, didChange: nil, at: idx, for: MMFetchChangeType.delete, newIndex: idx)
+                        delegate.ssn_fetch(sself, didChange: nil, at: idx, for: MMFetchChangeType.delete, newIndex: idx)
                     }
                 }
                 if insertions.count > 0 {
                     for idx in insertions {
-                        let obj = self!._list![idx]
-                        delegate.ssn_fetch(self!, didChange: obj, at: idx, for: MMFetchChangeType.insert, newIndex: idx)
+                        let obj = sself._list[idx]
+                        delegate.ssn_fetch(sself, didChange: obj, at: idx, for: MMFetchChangeType.insert, newIndex: idx)
                     }
                 }
                 if modifications.count > 0 {
                     for idx in modifications {
-                        let obj = self!._list![idx]
-                        delegate.ssn_fetch(self!, didChange: obj, at: idx, for: MMFetchChangeType.update, newIndex: idx)
+                        let obj = sself._list[idx]
+                        delegate.ssn_fetch(sself, didChange: obj, at: idx, for: MMFetchChangeType.update, newIndex: idx)
                     }
                 }
                 
-                delegate.ssn_fetch_end_change(self!)
+                delegate.ssn_fetch_end_change(sself)
                 break
             case .error(let error):
                 print("Error: \(error)")
@@ -96,8 +97,8 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     }
     
     /// 
-    override public func count() -> Int { return _list!.count }
-    override public func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return Array(_list!)}
+    override public func count() -> Int { return _list.count }
+    override public func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return Array(_list)}
     
     /// Update
     override public func update(_ idx: Int, _ b: (() throws -> Void)?) {
@@ -106,9 +107,9 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
             try _realm.write {
                 _realm.add(obj, update: true);//(newObjects)
                 
-                if b != nil {
+                if let b = b {
                     do {
-                        try b!()
+                        try b()
                     } catch {
                         print("error:\(error)")
                     }
@@ -131,10 +132,10 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     
     /// Remove and return the element at index `i`. Derived class implements.
     override public func delete(_ index: Int) -> T? {
-        if index < 0 || index >= _list!.count {
+        if index < 0 || index >= _list.count {
             return nil
         }
-        let obj = _list![index]
+        let obj = _list[index]
         do {
             try _realm.write {
                 _realm.delete(obj)
@@ -147,8 +148,8 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     override public func delete(_ index: Int, length: Int) {
         var objs = [T]()
         for i in (0..<length).reversed() {
-            if i + index < _list!.count {
-                objs.insert(_list![i + index], at: 0)
+            if i + index < _list.count {
+                objs.insert(_list[i + index], at: 0)
             }
         }
         do {
@@ -164,7 +165,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     override public func clear() {
         do {
             try _realm.write {
-                _realm.delete(_list!)
+                _realm.delete(_list)
             }
         } catch {
             print("error:\(error)")
@@ -173,18 +174,18 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     
     /// Get element at index. Derived class implements.
     override public func get(_ index: Int) -> T? {
-        if index < 0 || index >= _list!.count {
+        if index < 0 || index >= _list.count {
             return nil
         }
-        return _list![index]
+        return _list[index]
     }
     
     /// Returns the index of an object in the results collection. Derived class implements.
     override public func indexOf(_ object: T) -> Int? {
-        return _list!.index(of: object)
+        return _list.index(of: object)
     }
     override public func filter(_ predicate: NSPredicate) -> [T] {
-        let rs = _list!.filter(predicate)
+        let rs = _list.filter(predicate)
         if rs.count <= 0 {
             return []
         }
