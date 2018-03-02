@@ -31,6 +31,7 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         _web.scalesPageToFit = true;
 //        _web.scrollView.isScrollEnabled = false
         _web.delegate = self
+        _web.autoresizingMask = [.flexibleWidth,.flexibleHeight]
         self.view.addSubview(_web)
         return true
     }

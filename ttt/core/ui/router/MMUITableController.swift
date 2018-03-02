@@ -19,6 +19,7 @@ public class MMUITableController<T: MMCellModel>: MMUIController,UITableViewDele
         self.view = UIView(frame:UIScreen.main.bounds)
         _table = UITableView(frame:self.view.bounds,style:.plain)
         _table.delegate = self
+        _table.autoresizingMask = [.flexibleWidth,.flexibleHeight]
         self.view.addSubview(_table)
         return true
     }

@@ -22,6 +22,7 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
         _layout = MMCollectionViewLayout(loadLayoutConfig())
         _table = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
         _table.delegate = self
+        _table.autoresizingMask = [.flexibleWidth,.flexibleHeight]
         self.view.addSubview(_table)
         return true
     }

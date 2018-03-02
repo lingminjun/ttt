@@ -33,6 +33,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         _table.delegate = self
         _table.backgroundColor = UIColor.clear
         _table.alwaysBounceVertical = true
+        _table.autoresizingMask = [.flexibleWidth,.flexibleHeight]
         self.view.addSubview(_table)
         
         return true

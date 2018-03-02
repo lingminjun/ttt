@@ -315,6 +315,9 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             }
             let width = view.bounds.size.width
             let height = _config.insets.top + _config.insets.bottom + _bottoms[self.sectionOfMostHeight]
+            
+            // self.navigationController.navigationBar.isTranslucent
+            
             return CGSize(width:width,height:height)
         }
     }

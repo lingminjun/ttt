@@ -39,7 +39,9 @@ static NSString *const kCollectionViewHeaderReusableID = @"kCollectionViewHeader
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationController.navigationBar.translucent = NO;
+    if (self.navigationController.navigationBar.isTranslucent) {
+        self.navigationController.navigationBar.translucent = NO;
+    }
     self.view.backgroundColor = [UIColor whiteColor];
     
     
