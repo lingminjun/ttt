@@ -12,6 +12,11 @@ import Foundation
 
 public final class BriefRSA {
     
+    public static let PUB_KEY = "ZDY2YjcwZDY0ZjE3OGY3KzEwMDAx"//;ZDY2YjcwZDY0ZjE3OGY3KzEwMDAx
+    
+    //请妥善保存私钥，编译时请删除
+    public static let PRI_KEY = ""
+    
     //签名   var endMarker = NSData(bytes: [0xFF, 0xD9] as [UInt8], length: 2)
     public static func sign(key:String, data:Data) -> String {
         let hm = dataCRC32(data:data)//
@@ -29,7 +34,14 @@ public final class BriefRSA {
     public static func verify(key:String, sign:String, data:Data) -> Bool {
         let hm = dataCRC32(data: data)
         let keys = separate(key: key)
-        guard let ss = Data(base64Encoded: sign, options: Data.Base64DecodingOptions.ignoreUnknownCharacters) else {
+        let bc = 4 - sign.count % 4
+        var ssn = sign
+        if bc < 4 {
+            for _ in 0..<bc  {
+                ssn = ssn + "="
+            }
+        }
+        guard let ss = Data(base64Encoded: ssn, options: Data.Base64DecodingOptions.ignoreUnknownCharacters) else {
             return false
         }
         let s = BInt(bytes:[UInt8](ss))

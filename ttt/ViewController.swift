@@ -112,7 +112,7 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
             Navigator.shared.dopen("https://m.mymm.com/profilev2.html")
 //            Navigator.shared.dopen("https://mymm.com/p/77243897-6f77-44c0-b6de-3ac0d057c0ba?h=https://admin.mymm.com:443&_on_browser=1")
         } else if title == "百度" {
-            Navigator.shared.dopen("https://m.baidu.com?_on_browser=1")
+            Navigator.shared.dopen("https://www.baidu.com?_on_browser=1&__s=AUGg0JLk0H8=")
             
         } else if title == "瀑布" {
             Navigator.shared.dopen("https://m.mymm.com/xxx/collect.html")

@@ -11,6 +11,7 @@ import UIKit
 
 public let ROUTER_ON_BROWSER_KEY = "_on_browser"
 public let ROUTER_MODAL_STYLE = "__modal";
+public let ROUTER_HOST_SIGN = "__s";
 
 public protocol Authorize {
     func authorized() -> Bool//当前是否认证过
@@ -550,7 +551,7 @@ public final class Navigator: NSObject {
     }
     
     /// is valid url
-    open func isValid(url:String) -> Bool {
+    open func isValid(url:String, params:Dictionary<String,QValue>? = nil) -> Bool {
         guard let uri = URL(string:Urls.encoding(url: url)) else { return false }
         
         guard let host = uri.host else { return false }
@@ -578,6 +579,21 @@ public final class Navigator: NSObject {
                 if h == hst.value {
                     return true
                 }
+            }
+        }
+        
+        //自签名方式
+        var sign = ""
+        let qs = Urls.query(url: url, decord:false)
+        if let s = qs[ROUTER_HOST_SIGN]?.string {
+            sign = s
+        } else if let s = params?[ROUTER_HOST_SIGN]?.string {
+            sign = s
+        }
+        
+        if let data = h.data(using: String.Encoding.utf8) {
+            if !sign.isEmpty && BriefRSA.verify(key: BriefRSA.PUB_KEY, sign: sign, data: data) {
+                return true
             }
         }
         
