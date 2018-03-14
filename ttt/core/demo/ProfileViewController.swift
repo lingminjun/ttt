@@ -22,7 +22,7 @@ class ProfileViewController: MMUITableController<MMCellModel> {
     override func onViewDidLoad() {
         super.onViewDidLoad()
         
-        var profile = ssn_Arguments?["profile"]?.string
+        var profile = ssn_Arguments["profile"]?.string
         
         // Provisional request
         RPC.exec(task: { (idx, cmd, resp) -> Any in
