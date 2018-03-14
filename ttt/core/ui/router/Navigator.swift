@@ -13,6 +13,8 @@ public let ROUTER_ON_BROWSER_KEY = "_on_browser"
 public let ROUTER_MODAL_STYLE = "__modal";
 public let ROUTER_HOST_SIGN = "__s";
 
+public let LOAD_URL_KEY = "_load_url"
+
 public protocol Authorize {
     func authorized() -> Bool//当前是否认证过
     func howToAuthorize(url:String, query:Dictionary<String,QValue>) -> String//如何认证,返回认证的url
@@ -132,15 +134,24 @@ public final class Navigator: NSObject {
     
     /// do open url, no result
     open func dopen(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil) {
-        let isOpen = open(url,params:params,ext:ext,modal:modal,inner:false)
-        if !isOpen {
-            print("open the url:\(url) failed!")
+        if open(url,params:params,ext:ext,modal:modal,inner:false) { return }
+        
+        //仅仅是没有找到router，则统一路由到webview
+        if isValid(url: url, params: params) {
+            var q = Dictionary<String,QValue>()
+            if let params = params {
+                q = params
+            }
+            q[ROUTER_ON_BROWSER_KEY] = QValue("1")
+            if open(url,params:q,ext:ext,modal:modal,inner:false) { return }
         }
+        
+        print("open the url:\(url) failed!")
     }
     
     /// open url
     open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil, inner:Bool = false) -> Bool {
-        if !isValid(url:url) {
+        if !isValid(url:url, params:params) {
             return false
         }
         var cc: String = ""
@@ -222,6 +233,41 @@ public final class Navigator: NSObject {
         return true
     }
     
+    open func getWebRouterNode(url:String, query:Dictionary<String,QValue>? = nil, webController:String = "MMUIWebController") -> VCNode {
+        var q = Dictionary<String,QValue>()
+        if let query = query {
+            q = query
+        }
+        let rt = webRouterNode(url, query: &q, webController: webController)
+        return rt.node
+    }
+    fileprivate func webRouterNode(_ url:String, query: inout Dictionary<String,QValue>, webController:String = "MMUIWebController") -> RouterNode {
+        
+        let rt = RouterNode()
+        rt.id = "/app/browser.html"
+        rt.node = VCNode()
+        rt.node.controller = webController.isEmpty ? "MMUIWebController" : webController
+        var uurl = url
+        if let v = query[LOAD_URL_KEY]?.string {
+            uurl = v
+        }
+        rt.node.url = Urls.tidy(url: uurl, path: true)
+        rt.node.path = Urls.getURLFinderPath(url: uurl)
+        
+        //Complement parameters
+        var q = Urls.query(url: url);
+        for (k,v) in query {
+            if q[k] == nil && k != LOAD_URL_KEY  {
+                q[k] = v;
+            }
+        }
+        
+        query[LOAD_URL_KEY] = QValue(Urls.tidy(url: uurl, query: q))
+        query.removeValue(forKey: ROUTER_ON_BROWSER_KEY)
+        
+        return rt
+    }
+    
     /// generate VC
     open func getViewController(path:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
         if path.isEmpty {
@@ -236,7 +282,7 @@ public final class Navigator: NSObject {
         return genViewController(url, params: params, ext: ext, pending:&temp, container: &container)
     }
     fileprivate func genViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, checkAuth:Bool = false, pending: inout Bool, container: inout String) -> UIViewController? {
-        if !isValid(url:url) {
+        if !isValid(url:url, params:params) {
             return nil
         }
         
@@ -251,28 +297,7 @@ public final class Navigator: NSObject {
         var rt: RouterNode? = nil
         var hintParams = Dictionary<String,QValue>()
         if let onBrowser = query[ROUTER_ON_BROWSER_KEY], let b = onBrowser.bool, b {
-            rt = RouterNode()
-            rt?.id = "/app/browser.html"
-            rt?.node = VCNode()
-            rt?.node.controller = "MMUIWebController"
-            rt?.node.url = comple(path: "/app/browser.html")
-            var uurl = url
-            if let v = query[LOAD_URL_KEY]?.string {
-                uurl = v
-            }
-            
-            rt?.node.path = "/app/browser.html"
-            
-            //Complement parameters
-            var q = Urls.query(url: url);
-            for (k,v) in query {
-                if q[k] == nil && k != LOAD_URL_KEY  {
-                    q[k] = v;
-                }
-            }
-            
-            query[LOAD_URL_KEY] = QValue(Urls.tidy(url: uurl, query: q))
-            query.removeValue(forKey: ROUTER_ON_BROWSER_KEY)
+            rt = webRouterNode(url, query: &query)
         } else {
             rt = routerNode(url: url, hintParams: &hintParams)
         }
@@ -361,11 +386,12 @@ public final class Navigator: NSObject {
     }
     
     private static func reflectOCClass(name:String) -> Swift.AnyClass? {
-        guard let NameSpace = Bundle.main.infoDictionary?["CFBundleExecutable"] as? String else { return nil }
-        
+        guard var nameSpace = Bundle.main.infoDictionary?["CFBundleExecutable"] as? String else { return nil }
+        //命名空间，连字符“-”会被转换成下划线“_”
+        nameSpace = nameSpace.replacingOccurrences(of: "-", with: "_")
         var vcname = name
         if !name.contains(".") {
-            vcname = NameSpace + "." + name
+            vcname = nameSpace + "." + name
         }
         
         var clazz: Swift.AnyClass? = nil
@@ -584,8 +610,11 @@ public final class Navigator: NSObject {
         
         //自签名方式
         var sign = ""
-        let qs = Urls.query(url: url, decord:false)
+        let qs = Urls.query(url: url, decord:true)
+        let fs = Urls.fragment(url: url, decord: true)
         if let s = qs[ROUTER_HOST_SIGN]?.string {
+            sign = s
+        } else if let s = fs[ROUTER_HOST_SIGN]?.string {
             sign = s
         } else if let s = params?[ROUTER_HOST_SIGN]?.string {
             sign = s

@@ -9,8 +9,6 @@
 import Foundation
 import UIKit
 
-public let LOAD_URL_KEY = "_load_url"
-
 public class MMUIWebController: MMUIController,UIWebViewDelegate {
     
     public var webView: UIWebView { get {return _web} }
@@ -85,10 +83,16 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
             return true
         }
         
-        /// 判断
+        /// 继承特殊参数
+        var query = Dictionary<String,QValue>()
+        if let sign = self.ssn_Arguments[ROUTER_HOST_SIGN] {
+            query[ROUTER_HOST_SIGN] = sign
+        }
         
         /// 委托导航器打开
-        if Navigator.shared.open(url, inner:true) {
+        if Navigator.shared.open(url, params:query, inner:true) {
+            return false
+        } else if (!Navigator.shared.isValid(url: url, params: query)) {//不再加载
             return false
         }
         
@@ -97,7 +101,10 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         
         //新的页面打开，体验更好
         let webv = MMUIWebController()
+        webv._node = Navigator.shared.getWebRouterNode(url: url, query:query, webController:"MMUIWebController")
         webv._url = url
+        webv.ssn_Arguments = query
+        webv.onInit(params: query, ext: nil)
         nav.pushViewController(webv, animated: true)
         
         return false

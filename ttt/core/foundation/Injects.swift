@@ -120,7 +120,7 @@ final public class Injects {
                 MMTry.try({
                     obj.setValue(v, forKey: property)
                 }, catch: { (exception) in
-                    print("error:\(exception)")
+                    print("error:\(String(describing: exception))")
                 }, finally: nil)
             }
             
@@ -148,7 +148,7 @@ final public class Injects {
             MMTry.try({
                 obj.setValue(value, forKey: property)
             }, catch: { (exception) in
-                print("error:\(exception)")
+                print("error:\(String(describing: exception))")
                 print("\(type(of: obj)) the \(property) unable to set value [\(value)]")
                 obj.setValue(oldv, forKey: property) //Reduced value
             }, finally: nil)

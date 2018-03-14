@@ -10,6 +10,9 @@ import Foundation
 import UIKit
 
 @objc public protocol MMController {
+    //avoid not override the initialize
+    init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) // NS_DESIGNATED_INITIALIZER
+    
 //    func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>?)
     func onLoadView() -> Bool
     func onViewDidLoad() -> Void
@@ -20,7 +23,7 @@ import UIKit
     func onReceiveMemoryWarning()
 }
 
-@objc public protocol MMContainer : NSObjectProtocol{
+@objc public protocol MMContainer : NSObjectProtocol {
     func topController() -> MMController?
     func childrenControllers() -> [MMController]
     func volatileContainer() -> Bool
@@ -53,9 +56,9 @@ extension UIViewController: MMController {
     }
     
     //参数存储
-    public final var ssn_Arguments : Dictionary<String,QValue>? {
+    public final var ssn_Arguments : Dictionary<String,QValue> {
         get{
-            guard let result = objc_getAssociatedObject(self, &VC_PARAMS_PROPERTY) as? Dictionary<String,QValue> else {  return nil }
+            guard let result = objc_getAssociatedObject(self, &VC_PARAMS_PROPERTY) as? Dictionary<String,QValue> else {  return [:] }
             return result
         }
         set{

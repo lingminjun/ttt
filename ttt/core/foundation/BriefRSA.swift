@@ -12,7 +12,7 @@ import Foundation
 
 public final class BriefRSA {
     
-    public static let PUB_KEY = "ZDY2YjcwZDY0ZjE3OGY3KzEwMDAx"//;ZDY2YjcwZDY0ZjE3OGY3KzEwMDAx
+    public static let PUB_KEY = "MTcyNjcwNzZmZDYzYTUwZCsxMDAwMQ==";
     
     //请妥善保存私钥，编译时请删除
     public static let PRI_KEY = ""

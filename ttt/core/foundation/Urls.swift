@@ -286,6 +286,21 @@ public final class Urls {
         return tsurl
     }
     
+    public static func append(url:String, key:String, value:QValue) -> String {
+        return Urls.appends(url: url, querys: [key:value])
+    }
+    
+    public static func appends(url:String, querys: Dictionary<String,QValue>) -> String {
+        if querys.isEmpty {
+            return url
+        }
+        var q = Urls.query(url: url, decord: true)
+        for (key, value) in querys {
+            q[key] = value
+        }
+        return Urls.tidy(url: url,query: q)
+    }
+    
     /// tidy <scheme>://<host>:<port>/<path>;<params>?<query>#<fragment> , case sensitive path
     /// just uri:<scheme>://<host>:<port>/<path>;<params>
     /// *param: only is just url path

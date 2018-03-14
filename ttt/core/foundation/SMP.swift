@@ -259,12 +259,13 @@ public struct BInt:
         return bs
     }
 
+    /*
 	/// Returns the size of the BInt in bits.
-	public var size: Int
+	public var size: Int64
 	{
-		return 1 + (self.limbs.count * MemoryLayout<Limb>.size * 8)
+		return 1 + (Int64(self.limbs.count) * Int64(MemoryLayout<Limb>.size) * Int64(8))
 	}
-
+ 
 	/// Returns a formated human readable string that says how much space (in bytes, kilobytes, megabytes, or gigabytes) the BInt occupies.
 	public var sizeDescription: String
 	{
@@ -285,7 +286,7 @@ public struct BInt:
 		}
 		return String(format: "%.1f gb", Double(bits) / 8_000_000_000.0)
 	}
-
+     */
 	//
 	//
 	//	MARK: - Initializers
@@ -782,11 +783,11 @@ public struct BInt:
 		return lhs
 	}
 
-	static func +(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) + rhs }
-	static func +(lhs: BInt, rhs:  Int) -> BInt { return lhs + BInt(rhs) }
+//    static func +(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) + rhs }
+//    static func +(lhs: BInt, rhs:  Int) -> BInt { return lhs + BInt(rhs) }
 
-	static func +=(lhs: inout  Int, rhs: BInt) { lhs += (BInt(lhs) + rhs).toInt()! }
-	static func +=(lhs: inout BInt, rhs:  Int) { lhs +=  BInt(rhs)                 }
+//    static func +=(lhs: inout  Int, rhs: BInt) { lhs += (BInt(lhs) + rhs).toInt()! }
+//    static func +=(lhs: inout BInt, rhs:  Int) { lhs +=  BInt(rhs)                 }
 
 	//
 	//
@@ -828,13 +829,13 @@ public struct BInt:
 		return lhs + -rhs
 	}
 
-	static func -(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) - rhs }
-	static func -(lhs: BInt, rhs:  Int) -> BInt { return lhs - BInt(rhs) }
+//    static func -(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) - rhs }
+//    static func -(lhs: BInt, rhs:  Int) -> BInt { return lhs - BInt(rhs) }
 
 	// Required by protocol Numeric
 	public static func -=(lhs: inout BInt, rhs: BInt) { lhs += -rhs                        }
-	static func -=(lhs: inout  Int, rhs: BInt)  { lhs  = (BInt(lhs) - rhs).toInt()! }
-	static func -=(lhs: inout BInt, rhs:  Int)  { lhs -= BInt(rhs)                  }
+//    static func -=(lhs: inout  Int, rhs: BInt)  { lhs  = (BInt(lhs) - rhs).toInt()! }
+//    static func -=(lhs: inout BInt, rhs:  Int)  { lhs -= BInt(rhs)                  }
 
 	//
 	//
@@ -853,13 +854,13 @@ public struct BInt:
 		return BInt(sign: sign, limbs: lhs.limbs.multiplyingBy(rhs.limbs))
 	}
 
-	static func *(lhs: Int, rhs: BInt) -> BInt { return BInt(lhs) * rhs }
-	static func *(lhs: BInt, rhs: Int) -> BInt { return lhs * BInt(rhs) }
+//    static func *(lhs: Int, rhs: BInt) -> BInt { return BInt(lhs) * rhs }
+//    static func *(lhs: BInt, rhs: Int) -> BInt { return lhs * BInt(rhs) }
 
 	// Required by protocol SignedNumeric
 	public static func *=(lhs: inout BInt, rhs: BInt) { lhs = lhs * rhs                  }
-	static func *=(lhs: inout  Int, rhs: BInt) { lhs = (BInt(lhs) * rhs).toInt()! }
-	static func *=(lhs: inout BInt, rhs:  Int) { lhs = lhs * BInt(rhs)            }
+//    static func *=(lhs: inout  Int, rhs: BInt) { lhs = (BInt(lhs) * rhs).toInt()! }
+//    static func *=(lhs: inout BInt, rhs:  Int) { lhs = lhs * BInt(rhs)            }
 
 	//
 	//
@@ -871,11 +872,11 @@ public struct BInt:
 	//
 	//
 
-	static func **(lhs: BInt, rhs: Int) -> BInt
-	{
-		precondition(rhs >= 0, "BInts can't be exponentiated with exponents < 0")
-		return BInt(sign: lhs.sign && (rhs % 2 != 0), limbs: lhs.limbs.exponentiating(rhs))
-	}
+    fileprivate static func **(lhs: BInt, rhs: Int) -> BInt
+    {
+        precondition(rhs >= 0, "BInts can't be exponentiated with exponents < 0")
+        return BInt(sign: lhs.sign && (rhs % 2 != 0), limbs: lhs.limbs.exponentiating(rhs))
+    }
 
 	func factorial() -> BInt
 	{
@@ -909,11 +910,11 @@ public struct BInt:
 		return BInt(sign: sign, limbs: limbs)
 	}
 
-	static func /(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) / rhs }
-	static func /(lhs: BInt, rhs:  Int) -> BInt { return lhs / BInt(rhs) }
+//    static func /(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) / rhs }
+//    static func /(lhs: BInt, rhs:  Int) -> BInt { return lhs / BInt(rhs) }
 
 	public static func /=(lhs: inout BInt, rhs: BInt) { lhs = lhs / rhs       }
-	static func /=(lhs: inout BInt, rhs:  Int) { lhs = lhs / BInt(rhs) }
+//    static func /=(lhs: inout BInt, rhs:  Int) { lhs = lhs / BInt(rhs) }
 
 	//
 	//
@@ -933,11 +934,11 @@ public struct BInt:
 		return BInt(sign: sign, limbs: limbs)
 	}
 
-	static func %(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) % rhs  }
-	static func %(lhs: BInt, rhs:  Int) -> BInt { return lhs  % BInt(rhs) }
+//    static func %(lhs:  Int, rhs: BInt) -> BInt { return BInt(lhs) % rhs  }
+//    static func %(lhs: BInt, rhs:  Int) -> BInt { return lhs  % BInt(rhs) }
 
 	public static func %=(lhs: inout BInt, rhs: BInt)  { lhs = lhs % rhs       }
-	static func %=(lhs: inout BInt, rhs:  Int)  { lhs = lhs % BInt(rhs) }
+//    static func %=(lhs: inout BInt, rhs:  Int)  { lhs = lhs % BInt(rhs) }
 
 	//
 	//
@@ -1004,23 +1005,23 @@ public struct BInt:
 
 	}
 
-	static func <(lhs:  Int, rhs: BInt) -> Bool { return BInt(lhs) < rhs }
-	static func <(lhs: BInt, rhs:  Int) -> Bool { return lhs < BInt(rhs) }
+//    static func <(lhs:  Int, rhs: BInt) -> Bool { return BInt(lhs) < rhs }
+//    static func <(lhs: BInt, rhs:  Int) -> Bool { return lhs < BInt(rhs) }
 
 	// Required by protocol Comparable
 	public static func >(lhs: BInt, rhs: BInt) -> Bool { return rhs < lhs       }
-	static func >(lhs:  Int, rhs: BInt) -> Bool { return BInt(lhs) > rhs }
-	static func >(lhs: BInt, rhs:  Int) -> Bool { return lhs > BInt(rhs) }
+//    static func >(lhs:  Int, rhs: BInt) -> Bool { return BInt(lhs) > rhs }
+//    static func >(lhs: BInt, rhs:  Int) -> Bool { return lhs > BInt(rhs) }
 
 	// Required by protocol Comparable
 	public static func <=(lhs: BInt, rhs: BInt) -> Bool { return !(rhs < lhs)       }
-	static func <=(lhs:  Int, rhs: BInt) -> Bool { return !(rhs < BInt(lhs)) }
-	static func <=(lhs: BInt, rhs:  Int) -> Bool { return !(BInt(rhs) < lhs) }
+//    static func <=(lhs:  Int, rhs: BInt) -> Bool { return !(rhs < BInt(lhs)) }
+//    static func <=(lhs: BInt, rhs:  Int) -> Bool { return !(BInt(rhs) < lhs) }
 
 	// Required by protocol Comparable
 	public static func >=(lhs: BInt, rhs: BInt) -> Bool { return !(lhs < rhs)       }
-	static func >=(lhs:  Int, rhs: BInt) -> Bool { return !(BInt(lhs) < rhs) }
-	static func >=(lhs: BInt, rhs:  Int) -> Bool { return !(lhs < BInt(rhs)) }
+//    static func >=(lhs:  Int, rhs: BInt) -> Bool { return !(BInt(lhs) < rhs) }
+//    static func >=(lhs: BInt, rhs:  Int) -> Bool { return !(lhs < BInt(rhs)) }
 }
 //
 //
@@ -1075,10 +1076,10 @@ fileprivate extension String
 		{
 			if let digit = chars.index(of: char)
 			{
-				precondition(digit < from)
+				precondition(digit < BInt(from))
 
-				sum += digit * multiplier
-				multiplier *= from
+				sum += BInt(digit) * multiplier
+				multiplier *= BInt(from)
 			}
 			else
 			{
@@ -1088,7 +1089,7 @@ fileprivate extension String
 
 		repeat
 		{
-			res.insert(chars[(sum % toBase).toInt()!], at: res.startIndex)
+			res.insert(chars[(sum % BInt(toBase)).toInt()!], at: res.startIndex)
 			sum /= BInt(toBase)
 		}
 			while sum != 0
@@ -2189,7 +2190,7 @@ public class BIntMath
 		var i = 5
 		while (i * i) <= n
 		{
-			if ((n % i) == 0) || ((n % (i + 2)) == 0)
+			if ((n % BInt(i)) == 0) || ((n % BInt(i + 2)) == 0)
 			{
 				return false
 			}
@@ -2617,15 +2618,20 @@ public struct BDouble:
 	/**
 	 * Returns the size of the BDouble in bits.
      */
-	public var size: Int
+    
+    /*
+	public var size: Int64
 	{
-		return 1 + ((self.numerator.count + self.denominator.count) * MemoryLayout<Limb>.size * 8)
+		return 1 + (Int64(self.numerator.count + self.denominator.count) * Int64(MemoryLayout<Limb>.size) * Int64(8))
 	}
-
+     */
+    
 	/**
 	 * Returns a formated human readable string that says how much space
 	 * (in bytes, kilobytes, megabytes, or gigabytes) the BDouble occupies
 	*/
+    
+    /*
 	public var sizeDescription: String
 	{
 		// One bit for the sign, plus the size of the numerator and denominator.
@@ -2645,7 +2651,8 @@ public struct BDouble:
 		}
 		return String(format: "%.1f gb", Double(bits) / 8_000_000_000.0)
 	}
-
+    */
+    
 	public func rawData() -> (sign: Bool, numerator: [UInt64], denominator: [UInt64])
 	{
 		return (self.sign, self.numerator, self.denominator)
@@ -2742,15 +2749,15 @@ public struct BDouble:
 		)
 	}
 
-	public static func +(lhs: BDouble, rhs: Double) -> BDouble { return lhs + BDouble(rhs) }
-	public static func +(lhs: Double, rhs: BDouble) -> BDouble { return BDouble(lhs) + rhs }
+//    public static func +(lhs: BDouble, rhs: Double) -> BDouble { return lhs + BDouble(rhs) }
+//    public static func +(lhs: Double, rhs: BDouble) -> BDouble { return BDouble(lhs) + rhs }
 
 	public static func +=(lhs: inout BDouble, rhs: BDouble) {
 		let res = lhs + rhs
 		lhs = res
 	}
 
-	public static func +=(lhs: inout BDouble, rhs: Double) { lhs += BDouble(rhs) }
+//    public static func +=(lhs: inout BDouble, rhs: Double) { lhs += BDouble(rhs) }
 
 
 	//
@@ -2795,15 +2802,15 @@ public struct BDouble:
 	{
 		return lhs + -rhs
 	}
-	public static func -(lhs: BDouble, rhs: Double) -> BDouble { return lhs - BDouble(rhs) }
-	public static func -(lhs: Double, rhs: BDouble) -> BDouble { return BDouble(lhs) - rhs }
+//    public static func -(lhs: BDouble, rhs: Double) -> BDouble { return lhs - BDouble(rhs) }
+//    public static func -(lhs: Double, rhs: BDouble) -> BDouble { return BDouble(lhs) - rhs }
 
 	public static func -=(lhs: inout BDouble, rhs: BDouble) {
 		let res = lhs - rhs
 		lhs = res
 	}
 
-	public static func -=(lhs: inout BDouble, rhs: Double) { lhs -= BDouble(rhs) }
+//    public static func -=(lhs: inout BDouble, rhs: Double) { lhs -= BDouble(rhs) }
 
 	//
 	//
@@ -2826,15 +2833,15 @@ public struct BDouble:
 		if res.isZero() { res.sign = false }
 		return res
 	}
-	public static func *(lhs: BDouble, rhs: Double) -> BDouble { return lhs * BDouble(rhs) }
-	public static func *(lhs: Double, rhs: BDouble) -> BDouble { return BDouble(lhs) * rhs }
+//    public static func *(lhs: BDouble, rhs: Double) -> BDouble { return lhs * BDouble(rhs) }
+//    public static func *(lhs: Double, rhs: BDouble) -> BDouble { return BDouble(lhs) * rhs }
 
 	public static func *=(lhs: inout BDouble, rhs: BDouble) {
 		let res = lhs * rhs
 		lhs = res
 	}
 
-	public static func *=(lhs: inout BDouble, rhs: Double) { lhs *= BDouble(rhs) }
+//    public static func *=(lhs: inout BDouble, rhs: Double) { lhs *= BDouble(rhs) }
 
 	//
 	//
@@ -2847,23 +2854,23 @@ public struct BDouble:
 	//
 
 	// TODO: Exponentiation function that supports Double/BDouble in the exponent
-	public static func **(_ base : BDouble, _ exponent : Int) -> BDouble
-	{
-		if exponent == 0
-		{
-			return BDouble(1)
-		}
-		if exponent == 1
-		{
-			return base
-		}
-		if exponent < 0
-		{
-			return BDouble(1) / (base ** -exponent)
-		}
+    fileprivate static func **(_ base : BDouble, _ exponent : Int) -> BDouble
+    {
+        if exponent == 0
+        {
+            return BDouble(1)
+        }
+        if exponent == 1
+        {
+            return base
+        }
+        if exponent < 0
+        {
+            return BDouble(1) / (base ** -exponent)
+        }
 
-		return base * (base ** (exponent - 1))
-	}
+        return base * (base ** (exponent - 1))
+    }
 
 	//
 	//
@@ -2886,8 +2893,8 @@ public struct BDouble:
 		if res.isZero() { res.sign = false }
 		return res
 	}
-	public static func /(lhs: BDouble, rhs: Double) -> BDouble { return lhs / BDouble(rhs) }
-	public static func /(lhs: Double, rhs: BDouble) -> BDouble { return BDouble(lhs) / rhs }
+//    public static func /(lhs: BDouble, rhs: Double) -> BDouble { return lhs / BDouble(rhs) }
+//    public static func /(lhs: Double, rhs: BDouble) -> BDouble { return BDouble(lhs) / rhs }
 
 	//
 	//
@@ -2911,14 +2918,14 @@ public struct BDouble:
 		
 		if (lhs == rhs) { // shortcut, handles infinities
 			return true;
-		} else if diff <= epsilon {
+        } else if diff <= BDouble(epsilon) {
 			return true // shortcut
-		} else if (lhs == 0 || rhs == 0 || diff < Double.leastNormalMagnitude) {
+		} else if (lhs == 0 || rhs == 0 || diff < BDouble(Double.leastNormalMagnitude)) {
 			// lhs or rhs is zero or both are extremely close to it
 			// relative error is less meaningful here
-			return diff < (epsilon * Double.leastNormalMagnitude);
+			return diff < BDouble(epsilon * Double.leastNormalMagnitude)
 		} else { // use relative error
-			return diff / min((absLhs + absRhs), BDouble(Double.greatestFiniteMagnitude)) < epsilon;
+			return diff / min((absLhs + absRhs), BDouble(Double.greatestFiniteMagnitude)) < BDouble(epsilon)
 		}
 	}
 	
@@ -2930,15 +2937,15 @@ public struct BDouble:
 
 		return true
 	}
-	public static func ==(lhs: BDouble, rhs: Double) -> Bool { return lhs == BDouble(rhs) }
-	public static func ==(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) == rhs }
+//    public static func ==(lhs: BDouble, rhs: Double) -> Bool { return lhs == BDouble(rhs) }
+//    public static func ==(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) == rhs }
 
 	public static func !=(lhs: BDouble, rhs: BDouble) -> Bool
 	{
 		return !(lhs == rhs)
 	}
-	public static func !=(lhs: BDouble, rhs: Double) -> Bool { return lhs != BDouble(rhs) }
-	public static func !=(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) != rhs }
+//    public static func !=(lhs: BDouble, rhs: Double) -> Bool { return lhs != BDouble(rhs) }
+//    public static func !=(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) != rhs }
 
 	public static func <(lhs: BDouble, rhs: BDouble) -> Bool
 	{
@@ -2952,20 +2959,20 @@ public struct BDouble:
 
 		return ad.lessThan(bc)
 	}
-	public static func <(lhs: BDouble, rhs: Double) -> Bool { return lhs < BDouble(rhs) }
-	public static func <(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) < rhs }
+//    public static func <(lhs: BDouble, rhs: Double) -> Bool { return lhs < BDouble(rhs) }
+//    public static func <(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) < rhs }
 
 	public static func >(lhs: BDouble, rhs: BDouble) -> Bool { return rhs < lhs }
-	public static func >(lhs: BDouble, rhs: Double) -> Bool { return lhs > BDouble(rhs) }
-	public static func >(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) > rhs }
+//    public static func >(lhs: BDouble, rhs: Double) -> Bool { return lhs > BDouble(rhs) }
+//    public static func >(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) > rhs }
 
 	public static func <=(lhs: BDouble, rhs: BDouble) -> Bool { return !(rhs < lhs) }
-	public static func <=(lhs: BDouble, rhs: Double) -> Bool { return lhs <= BDouble(rhs) }
-	public static func <=(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) <= rhs }
+//    public static func <=(lhs: BDouble, rhs: Double) -> Bool { return lhs <= BDouble(rhs) }
+//    public static func <=(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) <= rhs }
 
 	public static func >=(lhs: BDouble, rhs: BDouble) -> Bool { return !(lhs < rhs) }
-	public static func >=(lhs: BDouble, rhs: Double) -> Bool { return lhs >= BDouble(rhs) }
-	public static func >=(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) >= rhs }
+//    public static func >=(lhs: BDouble, rhs: Double) -> Bool { return lhs >= BDouble(rhs) }
+//    public static func >=(lhs: Double, rhs: BDouble) -> Bool { return BDouble(lhs) >= rhs }
 }
 
 //

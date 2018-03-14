@@ -11,6 +11,9 @@ import UIKit
 let COLLECTION_HEADER_KIND = "Header"
 
 public struct MMLayoutConfig {
+    
+    var scrollDirection:UICollectionViewScrollDirection = .horizontal
+    
     var floating:Bool = false//存在某些cell飘浮，此选项开启，会造成性能损耗
     
     //默认UITable风格
