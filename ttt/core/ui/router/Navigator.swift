@@ -233,7 +233,7 @@ public final class Navigator: NSObject {
         return true
     }
     
-    open func getWebRouterNode(url:String, query:Dictionary<String,QValue>? = nil, webController:String = "MMUIWebController") -> VCNode {
+    open func getWebRouterNode(url:String, query:Dictionary<String,QValue>? = nil, webController:String = "MMWKWebController") -> VCNode {
         var q = Dictionary<String,QValue>()
         if let query = query {
             q = query
@@ -241,12 +241,12 @@ public final class Navigator: NSObject {
         let rt = webRouterNode(url, query: &q, webController: webController)
         return rt.node
     }
-    fileprivate func webRouterNode(_ url:String, query: inout Dictionary<String,QValue>, webController:String = "MMUIWebController") -> RouterNode {
+    fileprivate func webRouterNode(_ url:String, query: inout Dictionary<String,QValue>, webController:String = "MMWKWebController") -> RouterNode {
         
         let rt = RouterNode()
         rt.id = "/app/browser.html"
         rt.node = VCNode()
-        rt.node.controller = webController.isEmpty ? "MMUIWebController" : webController
+        rt.node.controller = webController.isEmpty ? "MMWKWebController" : webController
         var uurl = url
         if let v = query[LOAD_URL_KEY]?.string {
             uurl = v
