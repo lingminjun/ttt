@@ -12,11 +12,11 @@ let COLLECTION_HEADER_KIND = "Header"
 
 public struct MMLayoutConfig {
     
-    var scrollDirection:UICollectionViewScrollDirection = .horizontal
+    var scrollDirection:UICollectionViewScrollDirection = .vertical
     
     var floating:Bool = false//存在某些cell飘浮，此选项开启，会造成性能损耗
     
-    //默认UITable风格
+    //默认UITable风格，以下若属性命名均已vertical来命名，若设置horizontal时，则需要转换含义
     var columnCount:Int = 1
     var rowHeight:CGFloat = 44//固定行高(dp)，设置为0时，表示不固定行高；若设置大于零的有效值，则标识固定行高，不以委托返回高度计算
     var columnSpace:CGFloat = 1//(dp)
@@ -29,7 +29,7 @@ public struct MMLayoutConfig {
     //可以漂浮停靠在界面顶部
     @objc optional func collectionView(_ collectionView: UICollectionView, canFloatingCellAt indexPath: IndexPath) -> Bool
     
-    //cell的行高
+    //cell的行高,若scrollDirection == .horizontal则返回的是宽度
     @objc optional func collectionView(_ collectionView: UICollectionView, heightForCellAt indexPath: IndexPath) -> CGFloat
     
     //cell是否SpanSize，返回值小于等于零时默认为1
@@ -124,10 +124,12 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         let floating = _config.floating
         let rowHeight = _config.rowHeight
         let columnCount = _config.columnCount
-        let floatingWidth = view.bounds.size.width
-//        let lineWidth = view.bounds.size.width - (_config.insets.left + _config.insets.right)
-        let cellWidth = CGFloat(roundf(Float((view.bounds.size.width - (_config.insets.left + _config.insets.right) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
-        let diffWidth = view.bounds.size.width - (_config.insets.left + _config.insets.right) - _config.columnSpace * CGFloat(columnCount - 1) - cellWidth * CGFloat(columnCount)
+        let viewWidth = _config.scrollDirection == .vertical ? view.bounds.size.width : view.bounds.size.height
+        let viewWidthInsets = _config.scrollDirection == .vertical ? (_config.insets.left + _config.insets.right) : (_config.insets.top + _config.insets.bottom)
+        let floatingWidth = viewWidth
+
+        let cellWidth = CGFloat(roundf(Float((viewWidth - viewWidthInsets - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
+        let diffWidth = view.bounds.size.width - viewWidthInsets - _config.columnSpace * CGFloat(columnCount - 1) - cellWidth * CGFloat(columnCount)
         
         
         let sectionCount = view.numberOfSections
@@ -140,7 +142,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 let indexPath = IndexPath(row: row, section: section)
                 
                 //是否漂浮
-                var isFloating:Bool = _config.floating
+                var isFloating:Bool = _config.floating && _config.scrollDirection == .vertical //水平暂时不支持停靠
                 if let ds = ds, (floating && respondCanFloating) {
                     isFloating = ds.collectionView!(view, canFloatingCellAt: indexPath)
                 }
@@ -178,7 +180,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 _cellLayouts[indexPath] = attributes//记录下来，防止反复创建
                 
                 var suitableSetion = self.sectionOfLessHeight
-                var y = _bottoms[suitableSetion] //起始位置
+                var y = _bottoms[suitableSetion] //起始位置，水平对应x值
                 
                 //说明当前位置并不合适,换到新的一行开始处理
                 if isFloating || suitableSetion + spanSize > columnCount {
@@ -189,14 +191,14 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 
                 //起始行特别处理
                 if section == 0 && row == 0 && y == 0.0 && !isFloating {
-                    y = y + _config.insets.top
+                    y = y + (_config.scrollDirection == .vertical ? _config.insets.top : _config.insets.left)
                 }
                 
                 //x起始位和宽度
-                var x = _config.insets.left + (cellWidth + _config.columnSpace) * CGFloat(suitableSetion)
+                var x = (_config.scrollDirection == .vertical ? _config.insets.left : _config.insets.top) + (cellWidth + _config.columnSpace) * CGFloat(suitableSetion)
                 var width = cellWidth * CGFloat(spanSize) + _config.columnSpace * CGFloat(spanSize - 1)
                 //最后的宽度修正
-                if diffWidth != 0 && abs(view.bounds.size.width - (x + width)) < abs(diffWidth) + 0.1 {
+                if diffWidth != 0 && abs(viewWidth - (x + width)) < abs(diffWidth) + 0.1 {
                     width = width + diffWidth
                 }
                 
@@ -206,7 +208,11 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                     width = floatingWidth
                 }
                 
-                attributes.frame = CGRect(x:x, y:y, width:width, height:height)
+                if _config.scrollDirection == .vertical {
+                    attributes.frame = CGRect(x:x, y:y, width:width, height:height)
+                } else {
+                    attributes.frame = CGRect(x:y, y:x, width:height, height:width)
+                }
                 
                 //更新每列位置信息
                 for index in suitableSetion..<(suitableSetion + spanSize) {
@@ -308,7 +314,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     }
     
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
-        return _config.floating
+        return _config.floating && _config.scrollDirection == .vertical
     }
     
     override var collectionViewContentSize: CGSize {
@@ -316,8 +322,8 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             guard let view = self.collectionView else {
                 return CGSize.zero
             }
-            let width = view.bounds.size.width
-            let height = _config.insets.top + _config.insets.bottom + _bottoms[self.sectionOfMostHeight]
+            let width = _config.scrollDirection == .vertical ? view.bounds.size.width : (_config.insets.left + _config.insets.right + _bottoms[self.sectionOfMostHeight])
+            let height = _config.scrollDirection == .vertical ? (_config.insets.top + _config.insets.bottom + _bottoms[self.sectionOfMostHeight]) : view.bounds.size.height
             
             // self.navigationController.navigationBar.isTranslucent
             

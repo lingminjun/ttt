@@ -61,6 +61,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         sheet.addButton(withTitle: "瀑布流")
         sheet.addButton(withTitle: "瀑布流飘浮")
         sheet.addButton(withTitle: "重置数据")
+        sheet.addButton(withTitle: "横向滑动")
         sheet.show(in: self.view)
     }
     
@@ -75,7 +76,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         if title == "取消" {
             return
         }
-        
+        _config.scrollDirection = .vertical
         if title == "非固定行高" {
             _config.rowHeight = 0
             _config.columnCount = 1
@@ -96,6 +97,8 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
             _config.rowHeight = 0
             _config.columnCount = 2
             _config.floating = true
+        } else if title == "横向滑动" {
+            _config.scrollDirection = .horizontal
         }
         
         _layout.config = _config
