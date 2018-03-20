@@ -8,6 +8,12 @@
 
 import UIKit
 
+
+struct XStruct {
+    var a:Int = 1
+    var b:Int = 1
+}
+
 @UIApplicationMain
 public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize {
     
@@ -23,7 +29,20 @@ public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize {
 
     public var window: UIWindow?
 
-
+    //test materializeForSet:
+    var _ss:XStruct = XStruct()
+    var ss:XStruct {
+        get {
+            var x:XStruct = _ss
+            x.a = x.a + 1
+            return x
+        }
+        set {
+            _ss = newValue
+        }
+    }
+    
+    
     public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         window = UIWindow(frame:UIScreen.main.bounds)
@@ -36,6 +55,11 @@ public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize {
         Navigator.shared.open("https://m.mymm.com")
         Navigator.shared.setAuthorize(auth: self)
         window?.makeKeyAndVisible()
+        
+        self.ss.a = 2;
+        self.ss.b = 3;
+        
+        print("\(self.ss.a),\(self.ss.b)")
     
         return true
     }

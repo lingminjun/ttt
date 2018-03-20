@@ -12,17 +12,25 @@ class CltProfileViewController: MMUICollectionController<MMCellModel> {
     
     var profile:String = ""
     
+    init(_ str:String) {
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func loadFetchs() -> [MMFetch<MMCellModel>] {
         //使用默认的数据库
-        var list = [] as [MMCellModel]
-        var f = MMFetchList(list:list)
+        let list = [] as [MMCellModel]
+        let f = MMFetchList(list:list)
         return [f]
     }
     
     override func onViewDidLoad() {
         super.onViewDidLoad()
         
-        var profile = ssn_Arguments["profile"]?.string
+        let profile = ssn_Arguments["profile"]?.string
         
         // Provisional request
         RPC.exec(task: { (idx, cmd, resp) -> Any in

@@ -101,7 +101,11 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         
         //起始位计算
         _bottoms.removeAll()
-        for _ in 0..<_config.columnCount {
+        if _config.columnCount > 0 {
+            for _ in 0..<_config.columnCount {
+                _bottoms.append(0.0)
+            }
+        } else {
             _bottoms.append(0.0)
         }
         _cellLayouts.removeAll();
@@ -473,9 +477,11 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     fileprivate final var sectionOfLessHeight:Int {
         get {
             var minIndex:Int = 0
-            for index in 1..<_config.columnCount {
-                if _bottoms[index] < _bottoms[minIndex] {
-                    minIndex = index
+            if (_config.columnCount > 1) {
+                for index in 1..<_config.columnCount {
+                    if _bottoms[index] < _bottoms[minIndex] {
+                        minIndex = index
+                    }
                 }
             }
             return minIndex
@@ -485,9 +491,11 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     fileprivate final var sectionOfMostHeight:Int {
         get {
             var maxIndex:Int = 0
-            for index in 1..<_config.columnCount {
-                if _bottoms[index] > _bottoms[maxIndex] {
-                    maxIndex = index
+            if (_config.columnCount > 1) {
+                for index in 1..<_config.columnCount {
+                    if _bottoms[index] > _bottoms[maxIndex] {
+                        maxIndex = index
+                    }
                 }
             }
             return maxIndex

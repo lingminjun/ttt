@@ -39,6 +39,10 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         return true
     }
     
+    deinit {
+        print("delect SCollectionViewController")
+    }
+    
     override func onViewDidLoad() {
         
         _table.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "CELLID")
