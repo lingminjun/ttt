@@ -17,6 +17,6 @@
 + (void)try:(void (^)(void))try catch:(void (^)(NSException *))catch finally:(void (^)(void))finally;
 
 //安全的反射出view controller
-+ (UIViewController *)safeViewController:(NSString *)vcName;
+//+ (UIViewController *)safeViewController:(NSString *)vcName;
 
 @end

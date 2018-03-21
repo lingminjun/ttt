@@ -407,10 +407,10 @@ public final class Navigator: NSObject {
         return clazz
     }
     private static func reflectViewController(name:String) -> UIViewController? {
-        return MMTry.safeViewController(name)
-//        guard let clazz = reflectOCClass(name:name) else {return nil}
-//        let type = clazz as? UIViewController.Type
-//        return type?.init()
+//        return MMTry.safeViewController(name)
+        guard let clazz = reflectOCClass(name:name) else {return nil}
+        let type = clazz as? UIViewController.Type
+        return type?.init(nibName:nil,bundle:nil)
     }
     
     var _window : UIWindow = UIWindow()

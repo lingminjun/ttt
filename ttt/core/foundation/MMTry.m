@@ -14,10 +14,11 @@
 #import <objc/message.h>
 //#endif
 
+/*
 @protocol UIViewControllerSafeInit
  - (instancetype)initTheNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil;
 @end
-
+*/
 @implementation MMTry
 /**
  Provides try catch functionality for swift by wrapping around Objective-C
@@ -46,6 +47,7 @@
     return _SWIFT_MODULE_NAME;
 }
 
+/*
 + (UIViewController *)safeViewController:(NSString *)vcName {
     NSString *nameSpace = [self SWIFT_MODULE_NAME];
     
@@ -72,13 +74,14 @@
 //        if ([methods containsObject:@"initWithNibName:bundle:"]) {
 //            return [[clazz alloc] init];
 //        } else {
-            return [[clazz alloc] initWithNibName:nil bundle:nil];
-//            return [[clazz alloc] initTheNibName:nil bundle:nil];//发现仍然存在问题，进入SCollectionViewController时出现了卡死，不知道什么情况
+//            return [[clazz alloc] initWithNibName:nil bundle:nil];
+            return [[clazz alloc] initTheNibName:nil bundle:nil];//发现仍然存在问题，进入SCollectionViewController时出现了卡死，不知道什么情况
 //        }
     }  @catch (NSException *exception) {NSLog(@"%@",exception);}
     
     return nil;
 }
+ */
 
 /* 获取对象的所有方法 *//*
 +(NSArray *)getAllMethods:(Class)clazz {
@@ -104,7 +107,7 @@
 */
 @end
 
-
+/*
 @implementation UIViewController(SafeInit)
 
 + (void)initialize {
@@ -154,4 +157,5 @@
 }
 
 @end
+ */
 

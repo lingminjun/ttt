@@ -8,7 +8,15 @@
 
 import UIKit
 
-public class MMUIController : UIViewController {
+public class MMUIController : UIViewController,MMUIControllerInitProtocol {
+    
+    public override required init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
+        super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
     
     public func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>? = nil) {}
     /*

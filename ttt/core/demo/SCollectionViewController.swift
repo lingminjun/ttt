@@ -156,7 +156,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CELLID", for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CELLID", for: indexPath)
 //        if cell == nil {
 //            cell = UICollectionViewCell()
 //        }
@@ -178,7 +178,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == COLLECTION_HEADER_KIND {
-            var cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath)
+            let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath)
 //            if cell == nil {
 //                cell = UICollectionViewCell()
 //            }
@@ -189,7 +189,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
             return cell
         }
         
-        var cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header1", for: indexPath)
+        let cell = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header1", for: indexPath)
 //        if cell == nil {
 //            cell = UICollectionViewCell()
 //        }

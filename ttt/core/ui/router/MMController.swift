@@ -9,9 +9,13 @@
 import Foundation
 import UIKit
 
-@objc public protocol MMController {
+//VC初始化必须保留
+public protocol MMUIControllerInitProtocol {
     //avoid not override the initialize
-    init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) // NS_DESIGNATED_INITIALIZER
+    init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?)  // NS_DESIGNATED_INITIALIZER
+}
+
+@objc public protocol MMController {
     
 //    func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>?)
     func onLoadView() -> Bool
