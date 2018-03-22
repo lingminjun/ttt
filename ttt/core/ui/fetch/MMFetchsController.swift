@@ -15,10 +15,10 @@ import UIKit
     @objc optional func ssn_cell(_ cellID : String) -> UITableViewCell //适应于UITableView，尽量不采用反射方式
     func ssn_canEdit() -> Bool
     func ssn_canMove() -> Bool
-    func ssn_cellHeight() -> Float //UITableViewDelegate heightForRowAt or UICollectionViewLayout layoutAttributesForItemAtIndexPath
+    func ssn_cellHeight() -> CGFloat //UITableViewDelegate heightForRowAt or UICollectionViewLayout layoutAttributesForItemAtIndexPath
     func ssn_canFloating() -> Bool
     func ssn_isExclusiveLine() -> Bool
-    func ssn_cellGridSpanSize() -> UInt //占用列数
+    func ssn_cellGridSpanSize() -> Int //占用列数，小于等于零表示1
     
     @objc optional func ssn_cellClass(_ cellID : String, isFloating:Bool) -> Swift.AnyClass //返回cell class类型
     @objc optional func ssn_cellNib(_ cellID : String, isFloating:Bool) -> UINib //返回cell class类型

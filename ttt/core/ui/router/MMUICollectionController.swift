@@ -59,10 +59,39 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
         _table.delegate = nil
     }
     
-    // MARK:- UITableViewDelegate代理
+    // MARK:- UICollectionViewDelegate MMCollectionViewDelegate 代理
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("点击了\(indexPath.row) section:\(indexPath.section)")
         collectionView.deselectItem(at: indexPath, animated: false)
+    }
+    //可以漂浮停靠在界面顶部
+    func collectionView(_ collectionView: UICollectionView, canFloatingCellAt indexPath: IndexPath) -> Bool {
+        guard let m = _fetchs.object(at: indexPath) else {
+            return false
+        }
+        return m.ssn_canFloating()
+    }
+    
+    //cell的行高,若scrollDirection == .horizontal则返回的是宽度
+    public func collectionView(_ collectionView: UICollectionView, heightForCellAt indexPath: IndexPath) -> CGFloat {
+        if _layout.config.rowHeight > 0 {
+            return layout.config.rowHeight
+        }
+        guard let m = _fetchs.object(at: indexPath) else {
+            return 44
+        }
+        return m.ssn_cellHeight()
+    }
+    
+    //cell是否SpanSize，返回值小于等于零时默认为1
+    public func collectionView(_ collectionView: UICollectionView, spanSizeForCellAt indexPath: IndexPath) -> Int {
+        guard let m = _fetchs.object(at: indexPath) else {
+            return 1
+        }
+        if m.ssn_canFloating() || m.ssn_isExclusiveLine() {
+            return _layout.config.columnCount
+        }
+        return m.ssn_cellGridSpanSize()
     }
     
     /// MARK MMFetchsControllerDelegate

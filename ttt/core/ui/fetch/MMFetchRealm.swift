@@ -11,7 +11,7 @@ import RealmSwift
 import UIKit
 
 extension RealmSwift.Object : MMCellModel {
-    public func ssn_cellHeight() -> Float {
+    public func ssn_cellHeight() -> CGFloat {
         return 44.0
     }
     
@@ -23,7 +23,7 @@ extension RealmSwift.Object : MMCellModel {
         return false
     }
     
-    public func ssn_cellGridSpanSize() -> UInt {
+    public func ssn_cellGridSpanSize() -> Int {
         return 1
     }
     

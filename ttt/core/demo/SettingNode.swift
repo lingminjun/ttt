@@ -10,11 +10,11 @@ import Foundation
 import UIKit
 
 class SettingNode : NSObject,MMCellModel {
-    func ssn_cellGridSpanSize() -> UInt {
+    func ssn_cellGridSpanSize() -> Int {
         return 1
     }
     
-    func ssn_cellHeight() -> Float {
+    func ssn_cellHeight() -> CGFloat {
         return 44.0
     }
     
