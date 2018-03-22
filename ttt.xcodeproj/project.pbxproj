@@ -17,6 +17,8 @@
 		53822F392047D474009CDE66 /* MMUICollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F382047D474009CDE66 /* MMUICollectionController.swift */; };
 		53822F3B2047E766009CDE66 /* CltProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3A2047E766009CDE66 /* CltProfileViewController.swift */; };
 		53822F3D2047EAC2009CDE66 /* SettingV1Cell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53822F3C2047EAC2009CDE66 /* SettingV1Cell.swift */; };
+		538350EE2063A80C005DDA8A /* MMTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538350ED2063A80C005DDA8A /* MMTrack.swift */; };
+		538350F02063AC20005DDA8A /* HomePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538350EF2063AC20005DDA8A /* HomePageViewController.swift */; };
 		5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */; };
 		53888940204AD85600859ED6 /* BriefRSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5388893F204AD85600859ED6 /* BriefRSA.swift */; };
 		5388894A204F80CA00859ED6 /* SMP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53888949204F80CA00859ED6 /* SMP.swift */; };
@@ -67,6 +69,8 @@
 		53822F382047D474009CDE66 /* MMUICollectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMUICollectionController.swift; sourceTree = "<group>"; };
 		53822F3A2047E766009CDE66 /* CltProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CltProfileViewController.swift; sourceTree = "<group>"; };
 		53822F3C2047EAC2009CDE66 /* SettingV1Cell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingV1Cell.swift; sourceTree = "<group>"; };
+		538350ED2063A80C005DDA8A /* MMTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMTrack.swift; sourceTree = "<group>"; };
+		538350EF2063AC20005DDA8A /* HomePageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomePageViewController.swift; sourceTree = "<group>"; };
 		5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		5388893F204AD85600859ED6 /* BriefRSA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BriefRSA.swift; sourceTree = "<group>"; };
 		53888949204F80CA00859ED6 /* SMP.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMP.swift; sourceTree = "<group>"; };
@@ -134,6 +138,14 @@
 			path = layout;
 			sourceTree = "<group>";
 		};
+		538350EC2063A7C3005DDA8A /* track */ = {
+			isa = PBXGroup;
+			children = (
+				538350ED2063A80C005DDA8A /* MMTrack.swift */,
+			);
+			path = track;
+			sourceTree = "<group>";
+		};
 		538F9E91200A47AF006B3A28 /* fetch */ = {
 			isa = PBXGroup;
 			children = (
@@ -164,6 +176,7 @@
 		D958F781200868FC00E3F0C5 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				538350EC2063A7C3005DDA8A /* track */,
 				D9CCAD18200CBB1100C03276 /* foundation */,
 				D958F7832008690800E3F0C5 /* demo */,
 				D958F7822008690300E3F0C5 /* ui */,
@@ -184,6 +197,7 @@
 		D958F7832008690800E3F0C5 /* demo */ = {
 			isa = PBXGroup;
 			children = (
+				538350EF2063AC20005DDA8A /* HomePageViewController.swift */,
 				53822F3C2047EAC2009CDE66 /* SettingV1Cell.swift */,
 				53822F3A2047E766009CDE66 /* CltProfileViewController.swift */,
 				53822F2B20440CF6009CDE66 /* CollectionWaterfallLayout */,
@@ -415,6 +429,7 @@
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
 				53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
+				538350EE2063A80C005DDA8A /* MMTrack.swift in Sources */,
 				53822F3120450B89009CDE66 /* MMCollectionViewLayout.swift in Sources */,
 				D94140692016F1120050132B /* CycleStack.swift in Sources */,
 				D99152D7201836EE00FD8B92 /* ProfileViewController.swift in Sources */,
@@ -429,6 +444,7 @@
 				D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */,
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D94140652011DC8E0050132B /* MMUIWebController.swift in Sources */,
+				538350F02063AC20005DDA8A /* HomePageViewController.swift in Sources */,
 				53822F3B2047E766009CDE66 /* CltProfileViewController.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
 				53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */,

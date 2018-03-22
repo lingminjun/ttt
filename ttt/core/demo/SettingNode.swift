@@ -15,7 +15,7 @@ class SettingNode : NSObject,MMCellModel {
     }
     
     func ssn_cellHeight() -> CGFloat {
-        return 44.0
+        return cellHeight
     }
     
     func ssn_canFloating() -> Bool {
@@ -23,7 +23,7 @@ class SettingNode : NSObject,MMCellModel {
     }
     
     func ssn_isExclusiveLine() -> Bool {
-        return false
+        return isExclusiveLine
     }
     
     func ssn_cellID() -> String {
@@ -48,4 +48,6 @@ class SettingNode : NSObject,MMCellModel {
     
     public var title: String = ""
     public var subTitle: String = ""
+    public var isExclusiveLine: Bool = false
+    public var cellHeight:CGFloat = 44.0
 }

@@ -45,7 +45,7 @@
         description="COLLECT"/>
     <item url="https://m.mymm.com/yyy/collect.html"
         key=""
-        controller="SCollectionViewController"
+        controller="HomePageViewController"
         container=""
         description="COLLECT"/>
         

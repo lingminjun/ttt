@@ -51,6 +51,9 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
         _fetchs = MMFetchsController(fetchs: loadFetchs())
         _fetchs.delegate = self
         _table.dataSource = _fetchs
+        _table.performBatchUpdates({
+            //nothing
+        }, completion: nil)
         
     }
     
@@ -120,29 +123,38 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     }
     
     public func ssn_controllerDidChangeContent(_ controller: AnyObject) {
-        //一次更新掉
-        _table.performBatchUpdates({ [weak self] () in
-            guard let sself = self else {return}
-            for node in sself._ups {
-                switch node.type {
-                case .delete:
-                    sself._table.deleteItems(at: [node.indexPath])
-                case .insert:
-                    sself._table.insertItems(at: [node.indexPath])
-                case .update:
-                    sself._table.reloadItems(at: [node.indexPath])
-                default:
-                    if let newIndexPath = node.newIndexPath {
+        MMTry.try({
+            self._table.performBatchUpdates({ [weak self] () in
+                guard let sself = self else {return}
+                for node in sself._ups {
+                    switch node.type {
+                    case .delete:
                         sself._table.deleteItems(at: [node.indexPath])
-                        sself._table.insertItems(at: [newIndexPath])
+                    case .insert:
+                        sself._table.insertItems(at: [node.indexPath])
+                    case .update:
+                        sself._table.reloadItems(at: [node.indexPath])
+                    default:
+                        if let newIndexPath = node.newIndexPath {
+                            sself._table.deleteItems(at: [node.indexPath])
+                            sself._table.insertItems(at: [newIndexPath])
+                        }
                     }
                 }
-            }
-        }, completion: { [weak self] (b) in
-            guard let sself = self else {return}
-            sself._ups.removeAll()
-        })
+                }, completion: { [weak self] (b) in
+                    guard let sself = self else {return}
+                    sself._ups.removeAll()
+            })
+        }, catch: { (exception) in
+            print("error:\(String(describing: exception))")
+            self._table.performBatchUpdates({
+                //nothing
+            }, completion: nil)
+            self._ups.removeAll()
+        }, finally: nil)
     }
+    
+    
     
     private var _layout:MMCollectionViewLayout!
     private var _table : UICollectionView!
