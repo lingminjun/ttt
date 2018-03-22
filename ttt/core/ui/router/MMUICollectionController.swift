@@ -145,13 +145,7 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
                     guard let sself = self else {return}
                     sself._ups.removeAll()
             })
-        }, catch: { (exception) in
-            print("error:\(String(describing: exception))")
-            self._table.performBatchUpdates({
-                //nothing
-            }, completion: nil)
-            self._ups.removeAll()
-        }, finally: nil)
+        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
     }
     
     
