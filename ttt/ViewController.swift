@@ -34,14 +34,19 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     
     public override func onViewDidLoad() {
         super.onViewDidLoad()
+        table.delegate = self
         let sel = #selector(ViewController.rightAction)
         //title: String?, style: UIBarButtonItemStyle, target: Any?, action: Selector?
         let item = UIBarButtonItem(title: "选项", style: UIBarButtonItemStyle.plain, target: self, action: sel)
         self.navigationItem.rightBarButtonItem=item
         
-        
+//        table.delegate = self
 //        guard let v = Int("aaa") else { return }
 //        print("====\(v)")
+    }
+    
+    @objc public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print("\(scrollView)")
     }
     
     @objc func rightAction() -> Void {
