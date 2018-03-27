@@ -8,9 +8,10 @@
 
 import Foundation
 
-//1:移动端iOS；2:移动端Android；3：移动端H5(微商城)；4:移动端微信小程序(预留)；5:移动端支付宝小程序(预留)
-//6:PC浏览器(预留)；7:操作后台AC；8:操作后台MC；9:操作后台MNT
+//1:移动端iOS；2:移动端Android；3：移动端H5(微商城)；4:移动端微信小程序(预留)；5:移动端支付宝小程序(预留)；6:PC浏览器(预留)；7:操作后台AC；8:操作后台MC；9:操作后台MNT
 public let MYMM_APP_ID = 1
+
+public let REVEAL_DEPTH = 3
 
 //定义主体 Page
 @objc public protocol MMTrackPage {
@@ -20,7 +21,7 @@ public let MYMM_APP_ID = 1
     func track_title() -> String //页面名称
     
     //事件
-    func track_enter() -> Bool //进入事件，也是露出事件，返回true表示已处理，返回false，表示本身不处理
+    func track_enter() -> Void //进入事件，也是露出事件
 }
 
 //定义主体 Component
@@ -35,14 +36,14 @@ public let MYMM_APP_ID = 1
     
     //事件
     func track_reveal(depth:UInt) -> Void //露出事件
-    func track_action() -> Void //响应事件  （播放，暂停事件均为响应事件，仅仅带媒体数据）
+    func track_action(event:UIEvent) -> Void //响应事件  （播放，暂停事件均为响应事件，仅仅带媒体数据）
 }
 
 //定义事件：页面进入、元素露出、事件点击、视频自动播放(自动行为需要特别注意)
 public protocol MMTracker {
     func pageEnter(page:MMTrackPage) //页面进入
     func viewReveal(page:MMTrackPage,comp:MMTrackComponent) //露出
-    func viewAction(page:MMTrackPage,comp:MMTrackComponent) //响应
+    func viewAction(page:MMTrackPage,comp:MMTrackComponent,event:UIEvent) //响应
 }
 
 public final class MMTrack: MMTracker {
@@ -56,6 +57,14 @@ public final class MMTrack: MMTracker {
         if THE_TRACKER != nil {
             return
         }
+        
+        //初始化一些需要跟踪的事件
+        NSObject.swizzleMethod(target: UIViewController.self, #selector(UIViewController.viewDidAppear(_:)), #selector(UIViewController.track_viewDidAppear(_:)))
+        NSObject.swizzleMethod(target: UIScrollView.self, NSSelectorFromString("_notifyDidScroll"), #selector(UIScrollView.track_notifyDidScroll))
+        //NSObject.swizzleMethod(target: UIControl.self, #selector(UIControl.sendAction(_:to:for:)), #selector(UIControl.track_sendAction(_:to:for:)))
+        NSObject.swizzleMethod(target: UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)), #selector(UIApplication.track_sendAction(_:to:from:for:)))
+        
+        //初始化
         THE_TRACKER = MMTrack(tracker:tracker)
     }
     
@@ -74,8 +83,8 @@ public final class MMTrack: MMTracker {
         _tracker?.viewReveal(page: page, comp: comp)
     }
     
-    public func viewAction(page: MMTrackPage, comp: MMTrackComponent) {
-        _tracker?.viewAction(page: page, comp: comp)
+    public func viewAction(page: MMTrackPage, comp: MMTrackComponent,event:UIEvent) {
+        _tracker?.viewAction(page: page, comp: comp, event:event)
     }
 }
 
@@ -187,10 +196,26 @@ public extension NSObject {
             objc_setAssociatedObject(self, &VIEW_MEDIA_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
     }
+    
+    //方法替换
+    fileprivate static func swizzleMethod(target: NSObject.Type, _ left: Selector, _ right: Selector) {
+        
+        guard let originalMethod = class_getInstanceMethod(target, left), let swizzledMethod = class_getInstanceMethod(target, right) else {
+            return
+        }
+        
+        let didAddMethod = class_addMethod(target, left, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+        
+        if didAddMethod {
+            class_replaceMethod(target, right, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod))
+        } else {
+            method_exchangeImplementations(originalMethod, swizzledMethod);
+        }
+    }
 }
 
 // MARK:- UIViewController: MMTrackPage
-extension UIViewController:MMTrackPage {
+extension UIViewController: MMTrackPage {
     public func track_uri() -> String {
         return self.track_pageUri
     }
@@ -220,16 +245,8 @@ extension UIViewController:MMTrackPage {
     }
     
     // MARK:- Page页面进入
-    public func track_enter() -> Bool {
-        //默认只看vc
-        let vcs = self.childViewControllers
-        for vc in vcs {
-            if (vc.track_enter()) {
-                return true
-            }
-        }
+    public func track_enter() -> Void {
         MMTrack.tracker().pageEnter(page: self)
-        return true
     }
 }
 
@@ -302,6 +319,14 @@ extension UIView:MMTrackComponent {
     
     // MARK:- Component事件埋点
     public func track_reveal(depth:UInt) -> Void {
+        track_reveal(depth: depth, notscroll:false)
+    }
+    fileprivate final func track_reveal(depth:UInt, notscroll:Bool) -> Void {
+        
+        if notscroll && self is UIScrollView {
+            return
+        }
+        
         //在window上
         guard let win = self.window /*UIApplication.shared.delegate?.window as? UIWindow*/ else { return } //[[[UIApplication sharedApplication] delegate] window];
         let rect = self.convert(self.bounds, to: win)//[self convertRect: view1.bounds toView:window];
@@ -315,7 +340,11 @@ extension UIView:MMTrackComponent {
             //默认行为如下
             let vs = self.subviews
             for v in vs {
-                v.track_reveal(depth:depth - 1) //默认需要埋一篇
+                if notscroll && v is UIScrollView {
+                    continue
+                } else {
+                    v.track_reveal(depth:depth - 1) //默认需要埋一篇
+                }
             }
         }
         
@@ -327,12 +356,12 @@ extension UIView:MMTrackComponent {
         }
     }
     
-    public func track_action() {
+    public func track_action(event:UIEvent) {
         //响应埋点
         if let page = self as? MMTrackPage {
-            MMTrack.tracker().viewAction(page: page, comp: self)
+            MMTrack.tracker().viewAction(page: page, comp: self, event: event)
         } else if let vc = self.presentingPage() {
-            MMTrack.tracker().viewAction(page: vc, comp: self)
+            MMTrack.tracker().viewAction(page: vc, comp: self, event: event)
         }
     }
     
@@ -463,9 +492,9 @@ extension UIBarButtonItem:MMTrackComponent {
         //忽略
     }
     
-    public func track_action() {
+    public func track_action(event:UIEvent) {
         if let vc = self.presentingPage() {
-            MMTrack.tracker().viewAction(page: vc, comp: self)
+            MMTrack.tracker().viewAction(page: vc, comp: self, event: event)
         }
     }
 }
@@ -513,6 +542,23 @@ extension UISegmentedControl {
 }
 
 // MARK: - Reveal 事件重载
+extension UIScrollView {
+    //notice
+    @objc public func track_notifyDidScroll() -> Void {
+        // …then immediately cancel it
+        let sel = #selector(UIScrollView.didEndScrollingAnimation)
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: sel, object: nil)
+        
+        self.track_notifyDidScroll()
+        
+        perform(sel, with: nil, afterDelay: 0.1)
+    }
+    
+    @objc public func didEndScrollingAnimation() {
+        self.track_reveal(depth: 2)
+    }
+}
+
 extension UITableView {
     override public func track_reveal(depth:UInt) -> Void {
         self.tableHeaderView?.track_reveal(depth: 0)
@@ -523,9 +569,6 @@ extension UITableView {
             v.track_reveal(depth:depth) //默认需要埋一篇
         }
     }
-    
-    //滚动停止
-    
 }
 
 extension UICollectionView {
@@ -535,8 +578,54 @@ extension UICollectionView {
             v.track_reveal(depth:depth) //默认需要埋一篇
         }
     }
-    
-    //滚动停止
 }
 
 
+// MARK: - 针对UIKit中页面展现时机选取
+extension UIViewController {
+    @objc func track_viewDidAppear(_ animated: Bool) {
+        self.track_viewDidAppear(animated)
+        
+        //页面进入事件
+        self.track_enter()
+        
+        //非顶层view，不做埋点
+        if self is UINavigationController
+            || self is UITabBarController
+            || self is UIPageViewController {
+            return
+        }
+        
+        //scrollview本身会在didEndScrollingAnimation时上报，所以此处请过滤
+        if let v = self.view {
+            v.track_reveal(depth: 3, notscroll:true)
+        }
+    }
+}
+
+// MARK: - 针对UIKit中响应事件时机选取
+/* all the event will be dispatched UIApplication
+extension UIControl {
+    @objc func track_sendAction(_ action: Selector, to target: Any?, for event: UIEvent?) {
+        self.track_sendAction(action, to: target, for: event)
+        
+        if let event = event,let comp = target as? MMTrackComponent {
+            comp.track_action(event:event)
+        }
+    }
+}*/
+
+extension UIApplication {
+    @objc func track_sendAction(_ action: Selector, to target: Any?, from sender: Any?, for event: UIEvent?) -> Bool {
+        let rt = self.track_sendAction(action, to: target, from: sender, for: event)
+        
+        if rt {
+            if let event = event,let comp = sender as? MMTrackComponent {
+                comp.track_action(event:event)
+            }
+        }
+        
+        
+        return rt
+    }
+}

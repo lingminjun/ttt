@@ -800,7 +800,7 @@ extension UIViewController {
         router_swizzle_method(target: UIViewController.self, #selector(UIViewController.viewDidDisappear(_:)), #selector(UIViewController.router_viewDidDisappear(_:)))
     }
     
-    fileprivate class func router_swizzle_method(target: UIViewController.Type, _ left: Selector, _ right: Selector) {
+    fileprivate static func router_swizzle_method(target: UIViewController.Type, _ left: Selector, _ right: Selector) {
         
         guard let originalMethod = class_getInstanceMethod(target, left), let swizzledMethod = class_getInstanceMethod(target, right) else {
             return

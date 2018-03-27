@@ -46,7 +46,7 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     }
     
     @objc public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        print("\(scrollView)")
+//        print("\(scrollView)")
     }
     
     @objc func rightAction() -> Void {

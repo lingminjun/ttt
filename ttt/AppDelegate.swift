@@ -15,7 +15,19 @@ struct XStruct {
 }
 
 @UIApplicationMain
-public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize {
+public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize,MMTracker {
+    public func pageEnter(page: MMTrackPage) {
+        print("进入页面\(page)")
+    }
+    
+    public func viewReveal(page: MMTrackPage, comp: MMTrackComponent) {
+//        print("页面\(page)中元素\(comp)显示")
+    }
+    
+    public func viewAction(page: MMTrackPage, comp: MMTrackComponent, event: UIEvent) {
+        print("页面\(page)中元素\(comp)响应")
+    }
+    
     
     public var auth: Bool = false
     public func authorized() -> Bool {
@@ -55,6 +67,8 @@ public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize {
         Navigator.shared.open("https://m.mymm.com")
         Navigator.shared.setAuthorize(auth: self)
         window?.makeKeyAndVisible()
+        
+        MMTrack.setTracker(tracker: self)
         
         self.ss.a = 2;
         self.ss.b = 3;
