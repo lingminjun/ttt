@@ -78,6 +78,7 @@ public final class MMTrack: MMTracker {
         _tracker?.viewAction(page: page, comp: comp)
     }
 }
+
 private var THE_TRACKER:MMTracker? = nil
 
 
@@ -537,4 +538,5 @@ extension UICollectionView {
     
     //滚动停止
 }
+
 
