@@ -62,6 +62,7 @@ public final class MMTrack: MMTracker {
         NSObject.swizzleMethod(target: UIViewController.self, #selector(UIViewController.viewDidAppear(_:)), #selector(UIViewController.track_viewDidAppear(_:)))
         NSObject.swizzleMethod(target: UIScrollView.self, NSSelectorFromString("_notifyDidScroll"), #selector(UIScrollView.track_notifyDidScroll))
         //NSObject.swizzleMethod(target: UIControl.self, #selector(UIControl.sendAction(_:to:for:)), #selector(UIControl.track_sendAction(_:to:for:)))
+        NSObject.swizzleMethod(target: UIApplication.self, #selector(UIApplication.sendEvent(_:)), #selector(UIApplication.track_sendEvent(_:)))
         NSObject.swizzleMethod(target: UIApplication.self, #selector(UIApplication.sendAction(_:to:from:for:)), #selector(UIApplication.track_sendAction(_:to:from:for:)))
         
         //初始化
@@ -615,13 +616,36 @@ extension UIControl {
     }
 }*/
 
+
+private var dispatchEvent = false //表示处理过
 extension UIApplication {
+    
+    @objc func track_sendEvent(_ event: UIEvent) {
+        dispatchEvent = true
+        self.track_sendEvent(event)
+        
+        if dispatchEvent && (event.type == .touches || event.type == .presses) {
+            if let ts = event.allTouches,ts.count > 0 {
+                for tc in ts {
+                    if tc.type != .indirect && tc.phase == .ended {
+                        if let comp = tc.view {
+                            comp.track_action(event:event)
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        dispatchEvent = false
+    }
+    
     @objc func track_sendAction(_ action: Selector, to target: Any?, from sender: Any?, for event: UIEvent?) -> Bool {
         let rt = self.track_sendAction(action, to: target, from: sender, for: event)
         
-        if rt {
+        if rt && dispatchEvent {
             if let event = event,let comp = sender as? MMTrackComponent {
                 comp.track_action(event:event)
+                dispatchEvent = false
             }
         }
         
