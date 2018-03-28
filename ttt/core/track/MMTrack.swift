@@ -99,6 +99,7 @@ private var VIEW_PID_PROPERTY = 0
 private var VIEW_VID_PATH_PROPERTY = 0
 private var VIEW_VID_PROPERTY = 0
 private var VIEW_MEDIA_PROPERTY = 0
+private var VIEW_TAGS_PROPERTY = 0
 public extension NSObject {
     //元素描述
     public var track_consoleTitle : String? {
@@ -196,6 +197,27 @@ public extension NSObject {
         set {
             objc_setAssociatedObject(self, &VIEW_MEDIA_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
+    }
+    
+    //tags，方便一个对象关联其他数据
+    public func track_tag(_ key:String) -> Any? {
+        guard let dic = objc_getAssociatedObject(self, &VIEW_TAGS_PROPERTY) as? [String:Any] else {  return nil }
+        return dic[key]
+    }
+    public func track_setTag(_ key:String, tag:Any) {
+        let dic:[String:Any]!
+        if let dis = objc_getAssociatedObject(self, &VIEW_TAGS_PROPERTY) as? [String:Any] {
+            dic = dis
+        } else {
+            dic = [String:Any]()
+        }
+        dic[key] = tag
+        objc_setAssociatedObject(self, &VIEW_TAGS_PROPERTY, dic, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+    }
+    public func track_delTag(_ key:String) {
+        guard var dic = objc_getAssociatedObject(self, &VIEW_TAGS_PROPERTY) as? [String:Any] else {  return }
+        dic.removeValue(forKey: key)
+        objc_setAssociatedObject(self, &VIEW_TAGS_PROPERTY, dic, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
     }
     
     //方法替换
