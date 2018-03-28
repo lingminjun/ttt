@@ -25,7 +25,7 @@ public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize,MMTracker
     }
     
     public func viewAction(page: MMTrackPage, comp: MMTrackComponent, event: UIEvent) {
-        print("页面\(page)中元素\(comp)响应")
+        print("页面\(page.track_url())中\"\(comp.track_name())\"响应了==>\(comp)")
     }
     
     

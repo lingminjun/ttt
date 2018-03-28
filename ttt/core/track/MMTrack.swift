@@ -308,8 +308,44 @@ extension UIView:MMTrackComponent {
     
     //不同的对象主要
     public func track_name() -> String {
+        return track_name(child: true)
+    }
+    
+    @objc func track_name(child:Bool) -> String {
         if let t = self.track_consoleTitle, !t.isEmpty {
             return t
+        }
+        
+        // 支持一些特殊按钮，系统UIBarButtonItem中的几种，返回
+        if !child {
+            return ""
+        }
+        
+        return UIView.track_childrenName(view: self, depth: 3)
+    }
+    
+    private static func track_childrenName(view:UIView, depth:UInt) -> String {
+        if depth == 0 {
+            return ""
+        }
+        
+        //先取
+        let svs = view.subviews
+        for v in svs {
+            let str = v.track_name(child: false)
+            if !str.isEmpty {
+                return str
+            }
+        }
+        
+        //再递归
+        if depth > 1 {
+            for v in svs {
+                let str = UIView.track_childrenName(view: v, depth: depth - 1)
+                if !str.isEmpty {
+                    return str
+                }
+            }
         }
         return ""
     }
@@ -383,8 +419,8 @@ extension UIView:MMTrackComponent {
 
 // MARK: - 针对UIKit中的元素进行默认值处理
 extension UILabel {
-    override public func track_name() -> String {
-        let t = super.track_name()
+    @objc override func track_name(child:Bool) -> String {
+        let t = super.track_name(child:child)
         if !t.isEmpty {
             return t
         }
@@ -501,8 +537,8 @@ extension UIBarButtonItem:MMTrackComponent {
 }
 
 extension UIButton {
-    override public func track_name() -> String {
-        let t = super.track_name()
+     @objc override func track_name(child:Bool) -> String {
+        let t = super.track_name(child:child)
         if !t.isEmpty {
             return t
         }
@@ -517,8 +553,8 @@ extension UIButton {
 }
 
 extension UISearchBar {
-    override public func track_name() -> String {
-        let t = super.track_name()
+     @objc override func track_name(child:Bool) -> String {
+        let t = super.track_name(child:child)
         if !t.isEmpty {
             return t
         }
@@ -530,8 +566,8 @@ extension UISearchBar {
 }
 
 extension UISegmentedControl {
-    override public func track_name() -> String {
-        let t = super.track_name()
+     @objc override func track_name(child:Bool) -> String {
+        let t = super.track_name(child:child)
         if !t.isEmpty {
             return t
         }
@@ -617,35 +653,55 @@ extension UIControl {
 }*/
 
 
-private var dispatchEvent = false //表示处理过
+private var dispatchEvent = 0 //表示处理过
 extension UIApplication {
     
     @objc func track_sendEvent(_ event: UIEvent) {
-        dispatchEvent = true
+        dispatchEvent = dispatchEvent + 1
         self.track_sendEvent(event)
         
-        if dispatchEvent && (event.type == .touches || event.type == .presses) {
+        if dispatchEvent == 1 && (event.type != .motion && event.type != .remoteControl) {
             if let ts = event.allTouches,ts.count > 0 {
                 for tc in ts {
-                    if tc.type != .indirect && tc.phase == .ended {
+                    if tc.phase == .ended {
                         if let comp = tc.view {
-                            comp.track_action(event:event)
-                            break
+                            if #available(iOS 9.0, *) {
+                                if tc.type != .indirect {
+                                    comp.track_action(event:event)
+                                    break
+                                }
+                            } else {
+                                comp.track_action(event:event)
+                                break
+                            }
                         }
                     }
                 }
             }
         }
-        dispatchEvent = false
+        
+        dispatchEvent = dispatchEvent - 1
+        if dispatchEvent < 0 {
+            dispatchEvent = 0
+        }
     }
     
     @objc func track_sendAction(_ action: Selector, to target: Any?, from sender: Any?, for event: UIEvent?) -> Bool {
         let rt = self.track_sendAction(action, to: target, from: sender, for: event)
         
-        if rt && dispatchEvent {
+        if rt && dispatchEvent > 0 {
+            var compName = ""
+            if "\(action)" == "__backButtonAction:" {
+                compName = "返回"
+            }
             if let event = event,let comp = sender as? MMTrackComponent {
+                if !compName.isEmpty {
+                    if let obj = comp as? NSObject {
+                        obj.track_consoleTitle = compName
+                    }
+                }
                 comp.track_action(event:event)
-                dispatchEvent = false
+                dispatchEvent = dispatchEvent - 1
             }
         }
         
