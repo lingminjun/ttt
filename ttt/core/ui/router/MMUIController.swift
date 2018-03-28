@@ -105,7 +105,34 @@ public class MMUIController : UIViewController,MMUIControllerInitProtocol {
         }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         super.didReceiveMemoryWarning()
     }
+    
+    // MARK: - tracking
+    public override func track_url() -> String {
+        let uri = super.track_url()
+        if !uri.isEmpty {
+            return uri
+        }
         
+        //支持navigator自带uri的概念
+        return self._node.url
+    }
+    
+    public override func track_pid() -> String {
+        let id = super.track_pid()
+        if !id.isEmpty {
+            return id
+        }
+        
+        if !_node.param.isEmpty {
+            if let v = self.ssn_Arguments[_node.param]?.string {
+                return v
+            }
+        }
+        
+        return ""
+    }
+    
+    // MARK: - var
     private var _stack_flag = false
     var _node = VCNode()
     

@@ -63,6 +63,7 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate {
         if #available(iOS 9.0, *) {} else {
             req.setValue(UserDefaults.standard.string(forKey: "UserAgent"), forHTTPHeaderField: "User-Agent")
         }
+        req.setJWTHeader()
         _web.load(req)
     }
     

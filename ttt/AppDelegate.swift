@@ -17,7 +17,7 @@ struct XStruct {
 @UIApplicationMain
 public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize,MMTracker {
     public func pageEnter(page: MMTrackPage) {
-//        print("进入页面\(page)")
+        print("进入页面\(page.track_url())")
     }
     
     public func viewReveal(page: MMTrackPage, comp: MMTrackComponent) {

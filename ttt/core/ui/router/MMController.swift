@@ -49,6 +49,7 @@ extension UIViewController: MMController {
     public func onViewDidDisappear(_ animated: Bool) { }
     public func onReceiveMemoryWarning() {}
     
+    // 仅仅是path，因为忽略scheme\host
     @objc public final var ssn_uri : String {
         get{
             guard let result = objc_getAssociatedObject(self, &SSN_URI_PROPERTY) as? String else {  return "" }

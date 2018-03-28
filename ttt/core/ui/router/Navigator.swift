@@ -352,8 +352,18 @@ public final class Navigator: NSObject {
         MMTry.try({
             viewController = Navigator.reflectViewController(name:vc)
             viewController?.title = router.node.des
+            //初始化数据
             viewController?.ssn_uri = router.id
             viewController?.ssn_Arguments = query
+            
+            //埋点追踪需要设置的参数
+            viewController?.track_pageUrl = router.node.url
+            if !router.node.param.isEmpty {
+                if let v = query[router.node.param]?.string {
+                    viewController?.track_pageId = v
+                }
+            }
+            
         }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         if viewController == nil {
             return nil
@@ -465,7 +475,10 @@ public final class Navigator: NSObject {
         }
         
         let node = _routers[uri]
-        if (node != nil) {return node}
+        if (node != nil) {
+            node?.node.url = Urls.tidy(url: url)
+            return node
+        }
         
         ///开始兼容其他形式，如 detail/{_}.html 或者 detail/{_}/about.html 或者 detail/{_}/{_}.html
         
@@ -531,6 +544,7 @@ public final class Navigator: NSObject {
                     hintParams[nn.node.param] = QValue(values[0])
                 }
                 
+                nn.node.url = Urls.tidy(url: url)
                 return nn
             }
         }

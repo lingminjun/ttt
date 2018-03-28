@@ -16,7 +16,7 @@ public let REVEAL_DEPTH = 3
 //定义主体 Page
 @objc public protocol MMTrackPage {
     //属性
-    func track_uri() -> String //页面位置
+    func track_url() -> String //页面位置
     func track_pid() -> String //pageId,应该与uri一一对应，5.1版本，对没有pageId的页面，不进行埋点
     func track_title() -> String //页面名称
     
@@ -112,7 +112,7 @@ public extension NSObject {
     }
     
     //页面url
-    public var track_pageUri : String {
+    public var track_pageUrl : String {
         get{
             guard let result = objc_getAssociatedObject(self, &VIEW_URL_PROPERTY) as? String else {  return "" }
             return result
@@ -217,8 +217,8 @@ public extension NSObject {
 
 // MARK:- UIViewController: MMTrackPage
 extension UIViewController: MMTrackPage {
-    public func track_uri() -> String {
-        return self.track_pageUri
+    public func track_url() -> String {
+        return self.track_pageUrl
     }
     
     public func track_pid() -> String {
@@ -255,13 +255,13 @@ extension UIViewController: MMTrackPage {
 extension UIView:MMTrackComponent {
     
     public final func track_uri() -> String {
-        let uri = self.track_pageUri
+        let uri = self.track_pageUrl
         if !uri.isEmpty {
             return uri
         }
         
         if let vc = self.presentingPage() {
-            let vcUri = vc.track_uri()
+            let vcUri = vc.track_url()
             if !vcUri.isEmpty {
                 return vcUri
             }
@@ -433,13 +433,13 @@ extension UIBarButtonItem:MMTrackComponent {
     }
     
     public final func track_uri() -> String {
-        let uri = self.track_pageUri
+        let uri = self.track_pageUrl
         if !uri.isEmpty {
             return uri
         }
         
         if let vc = self.presentingPage() {
-            let vcUri = vc.track_uri()
+            let vcUri = vc.track_url()
             if !vcUri.isEmpty {
                 return vcUri
             }
