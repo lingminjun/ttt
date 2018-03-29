@@ -180,6 +180,7 @@
 		D958F781200868FC00E3F0C5 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				D9F5CA14206C7CDC00251D3F /* ext */,
 				538350EC2063A7C3005DDA8A /* track */,
 				D9CCAD18200CBB1100C03276 /* foundation */,
 				D958F7832008690800E3F0C5 /* demo */,
@@ -191,7 +192,6 @@
 		D958F7822008690300E3F0C5 /* ui */ = {
 			isa = PBXGroup;
 			children = (
-				D9F5CA14206C7CDC00251D3F /* ext */,
 				53822F2F20450B18009CDE66 /* layout */,
 				D9CCAD0F200C536300C03276 /* router */,
 				538F9E91200A47AF006B3A28 /* fetch */,
