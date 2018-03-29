@@ -128,11 +128,19 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
             Navigator.shared.dopen("https://m.mymm.com/p/111.html")
             
         } else if title == "二级" {
-            Navigator.shared.dopen("https://m.mymm.com/p/123/about")
-            
+            //Navigator.shared.dopen("https://m.mymm.com/p/123/about")
+            if flag % 2 == 0 {
+            self.showLoading()
+            } else {
+                self.stopLoading()
+            }
+            flag = flag + 1
         }
     }
 }
+
+var flag = 0
+
 
 /// test dataing
 extension ViewController {

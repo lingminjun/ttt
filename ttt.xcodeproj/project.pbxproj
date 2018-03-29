@@ -48,6 +48,8 @@
 		D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD16200C8F2700C03276 /* Urls.swift */; };
 		D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9CCAD19200CBB7900C03276 /* Injects.swift */; };
 		D9D2AA3C2018A738000B3681 /* Quantum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9D2AA3B2018A738000B3681 /* Quantum.swift */; };
+		D9F5CA16206C7D4900251D3F /* UIViewControllerLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9F5CA15206C7D4900251D3F /* UIViewControllerLoading.swift */; };
+		D9F5CA18206C9A1600251D3F /* NSObjectTagExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9F5CA17206C9A1600251D3F /* NSObjectTagExt.swift */; };
 		D9FDDBB42008672200A88631 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FDDBB32008672200A88631 /* AppDelegate.swift */; };
 		D9FDDBB62008672200A88631 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FDDBB52008672200A88631 /* ViewController.swift */; };
 		D9FDDBBB2008672200A88631 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9FDDBBA2008672200A88631 /* Assets.xcassets */; };
@@ -102,6 +104,8 @@
 		D9CCAD16200C8F2700C03276 /* Urls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Urls.swift; sourceTree = "<group>"; };
 		D9CCAD19200CBB7900C03276 /* Injects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Injects.swift; sourceTree = "<group>"; };
 		D9D2AA3B2018A738000B3681 /* Quantum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quantum.swift; sourceTree = "<group>"; };
+		D9F5CA15206C7D4900251D3F /* UIViewControllerLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerLoading.swift; sourceTree = "<group>"; };
+		D9F5CA17206C9A1600251D3F /* NSObjectTagExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSObjectTagExt.swift; sourceTree = "<group>"; };
 		D9FDDBB02008672200A88631 /* ttt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ttt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D9FDDBB32008672200A88631 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D9FDDBB52008672200A88631 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -187,6 +191,7 @@
 		D958F7822008690300E3F0C5 /* ui */ = {
 			isa = PBXGroup;
 			children = (
+				D9F5CA14206C7CDC00251D3F /* ext */,
 				53822F2F20450B18009CDE66 /* layout */,
 				D9CCAD0F200C536300C03276 /* router */,
 				538F9E91200A47AF006B3A28 /* fetch */,
@@ -251,6 +256,15 @@
 				5388893F204AD85600859ED6 /* BriefRSA.swift */,
 			);
 			path = foundation;
+			sourceTree = "<group>";
+		};
+		D9F5CA14206C7CDC00251D3F /* ext */ = {
+			isa = PBXGroup;
+			children = (
+				D9F5CA15206C7D4900251D3F /* UIViewControllerLoading.swift */,
+				D9F5CA17206C9A1600251D3F /* NSObjectTagExt.swift */,
+			);
+			path = ext;
 			sourceTree = "<group>";
 		};
 		D9FDDBA72008672200A88631 = {
@@ -430,6 +444,7 @@
 				53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
 				538350EE2063A80C005DDA8A /* MMTrack.swift in Sources */,
+				D9F5CA16206C7D4900251D3F /* UIViewControllerLoading.swift in Sources */,
 				53822F3120450B89009CDE66 /* MMCollectionViewLayout.swift in Sources */,
 				D94140692016F1120050132B /* CycleStack.swift in Sources */,
 				D99152D7201836EE00FD8B92 /* ProfileViewController.swift in Sources */,
@@ -451,6 +466,7 @@
 				53822F392047D474009CDE66 /* MMUICollectionController.swift in Sources */,
 				D941406B201721470050132B /* KeyCycleStack.swift in Sources */,
 				53822F3720467E16009CDE66 /* SCollectionViewController.swift in Sources */,
+				D9F5CA18206C9A1600251D3F /* NSObjectTagExt.swift in Sources */,
 				D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */,
 				5388894A204F80CA00859ED6 /* SMP.swift in Sources */,
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,

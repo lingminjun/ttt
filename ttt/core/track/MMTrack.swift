@@ -33,10 +33,12 @@ public let REVEAL_DEPTH = 3
     
     func track_mediaLink() -> String //事件所打的媒体数据
     
+    func track_page() -> MMTrackPage //所属页面
+    
     
     //事件
     func track_reveal(depth:UInt) -> Void //露出事件
-    func track_action(event:UIEvent) -> Void //响应事件  （播放，暂停事件均为响应事件，仅仅带媒体数据）
+    func track_action(page:MMTrackPage?, event:UIEvent) -> Void //响应事件（播放，暂停事件均为响应事件，仅仅带媒体数据）
 }
 
 //定义事件：页面进入、元素露出、事件点击、视频自动播放(自动行为需要特别注意)
@@ -99,7 +101,7 @@ private var VIEW_PID_PROPERTY = 0
 private var VIEW_VID_PATH_PROPERTY = 0
 private var VIEW_VID_PROPERTY = 0
 private var VIEW_MEDIA_PROPERTY = 0
-private var VIEW_TAGS_PROPERTY = 0
+
 public extension NSObject {
     //元素描述
     public var track_consoleTitle : String? {
@@ -199,27 +201,6 @@ public extension NSObject {
         }
     }
     
-    //tags，方便一个对象关联其他数据
-    public func track_tag(_ key:String) -> Any? {
-        guard let dic = objc_getAssociatedObject(self, &VIEW_TAGS_PROPERTY) as? [String:Any] else {  return nil }
-        return dic[key]
-    }
-    public func track_setTag(_ key:String, tag:Any) {
-        let dic:[String:Any]!
-        if let dis = objc_getAssociatedObject(self, &VIEW_TAGS_PROPERTY) as? [String:Any] {
-            dic = dis
-        } else {
-            dic = [String:Any]()
-        }
-        dic[key] = tag
-        objc_setAssociatedObject(self, &VIEW_TAGS_PROPERTY, dic, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-    }
-    public func track_delTag(_ key:String) {
-        guard var dic = objc_getAssociatedObject(self, &VIEW_TAGS_PROPERTY) as? [String:Any] else {  return }
-        dic.removeValue(forKey: key)
-        objc_setAssociatedObject(self, &VIEW_TAGS_PROPERTY, dic, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
-    }
-    
     //方法替换
     fileprivate static func swizzleMethod(target: NSObject.Type, _ left: Selector, _ right: Selector) {
         
@@ -271,10 +252,60 @@ extension UIViewController: MMTrackPage {
     public func track_enter() -> Void {
         MMTrack.tracker().pageEnter(page: self)
     }
+    
+    @objc public func track_topPage() -> UIViewController {
+        return self
+    }
+}
+
+extension UINavigationController {
+    @objc public override func track_topPage() -> UIViewController {
+        if let vc = self.topViewController {
+            return vc
+        }
+        return super.track_topPage()
+    }
+}
+
+extension UITabBarController {
+    @objc public override func track_topPage() -> UIViewController {
+        if let vc = self.selectedViewController {
+            return vc
+        }
+        return super.track_topPage()
+    }
+}
+
+extension UIPageViewController {
+    @objc public override func track_topPage() -> UIViewController {
+        guard let vs = self.viewControllers else {
+            return super.track_topPage()
+        }
+        guard let win = self.view.window else {
+            return super.track_topPage()
+        }
+        for v in vs {
+            let wc = v.view.convert(v.view.center, to:win)
+            if wc == win.center {
+                return v
+            }
+        }
+        return super.track_topPage()
+    }
 }
 
 // MARK:- UIView: MMTrackComponent
 extension UIView:MMTrackComponent {
+    
+    public func track_page() -> MMTrackPage {
+        if let page = self as? MMTrackPage {
+            return page
+        } else if let vc = self.presentingPage()?.track_topPage() {
+            return vc
+        }
+        return UIViewController()
+    }
+    
     
     public final func track_uri() -> String {
         let uri = self.track_pageUrl
@@ -410,16 +441,18 @@ extension UIView:MMTrackComponent {
         //露出埋点
         if let page = self as? MMTrackPage {
             MMTrack.tracker().viewReveal(page: page, comp: self)
-        } else if let vc = self.presentingPage() {
+        } else if let vc = self.presentingPage()?.track_topPage() {
             MMTrack.tracker().viewReveal(page: vc, comp: self)
         }
     }
     
-    public func track_action(event:UIEvent) {
+    public func track_action(page: MMTrackPage?, event: UIEvent) {
         //响应埋点
-        if let page = self as? MMTrackPage {
+        if let page = page {
             MMTrack.tracker().viewAction(page: page, comp: self, event: event)
-        } else if let vc = self.presentingPage() {
+        } else if let page = self as? MMTrackPage {
+            MMTrack.tracker().viewAction(page: page, comp: self, event: event)
+        } else if let vc = self.presentingPage()?.track_topPage() {
             MMTrack.tracker().viewAction(page: vc, comp: self, event: event)
         }
     }
@@ -454,6 +487,14 @@ extension UILabel {
 }
 
 extension UIBarButtonItem:MMTrackComponent {
+    
+    public func track_page() -> MMTrackPage {
+        if let vc = self.presentingPage()?.track_topPage() {
+            return vc
+        }
+        return UIViewController()
+    }
+    
     public func track_name() -> String {
         if let t = self.track_consoleTitle, !t.isEmpty {
             return t
@@ -551,8 +592,10 @@ extension UIBarButtonItem:MMTrackComponent {
         //忽略
     }
     
-    public func track_action(event:UIEvent) {
-        if let vc = self.presentingPage() {
+    public func track_action(page: MMTrackPage?, event: UIEvent) {
+        if let page = page {
+            MMTrack.tracker().viewAction(page: page, comp: self, event: event)
+        } else if let vc = self.presentingPage()?.track_topPage() {
             MMTrack.tracker().viewAction(page: vc, comp: self, event: event)
         }
     }
@@ -680,25 +723,39 @@ extension UIApplication {
     
     @objc func track_sendEvent(_ event: UIEvent) {
         dispatchEvent = dispatchEvent + 1
-        self.track_sendEvent(event)
         
-        if dispatchEvent == 1 && (event.type != .motion && event.type != .remoteControl) {
+        var page:MMTrackPage? = nil
+        var comp:MMTrackComponent? = nil
+        
+        if event.type != .motion && event.type != .remoteControl {
             if let ts = event.allTouches,ts.count > 0 {
                 for tc in ts {
                     if tc.phase == .ended {
-                        if let comp = tc.view {
+                        if let c = tc.view {
                             if #available(iOS 9.0, *) {
                                 if tc.type != .indirect {
-                                    comp.track_action(event:event)
+                                    comp = c
                                     break
                                 }
                             } else {
-                                comp.track_action(event:event)
+                                comp = c
                                 break
                             }
                         }
                     }
                 }
+                
+                if let comp = comp {
+                    page = comp.track_page()//必须提前取页面，方式事件是跳出页面
+                }
+            }
+        }
+
+        self.track_sendEvent(event)
+        
+        if dispatchEvent == 1 {
+            if let comp = comp {
+                comp.track_action(page:page, event:event)
             }
         }
         
@@ -709,6 +766,15 @@ extension UIApplication {
     }
     
     @objc func track_sendAction(_ action: Selector, to target: Any?, from sender: Any?, for event: UIEvent?) -> Bool {
+        
+        var page:MMTrackPage? = nil
+        var comp:MMTrackComponent? = nil
+        
+        if let c = sender as? MMTrackComponent {
+            page = c.track_page() //必须提前取页面，方式事件是跳出页面
+            comp = c
+        }
+        
         let rt = self.track_sendAction(action, to: target, from: sender, for: event)
         
         if rt && dispatchEvent > 0 {
@@ -716,13 +782,13 @@ extension UIApplication {
             if "\(action)" == "__backButtonAction:" {
                 compName = "返回"
             }
-            if let event = event,let comp = sender as? MMTrackComponent {
+            if let event = event,let comp = comp {
                 if !compName.isEmpty {
                     if let obj = comp as? NSObject {
                         obj.track_consoleTitle = compName
                     }
                 }
-                comp.track_action(event:event)
+                comp.track_action(page:page, event:event)
                 dispatchEvent = dispatchEvent - 1
             }
         }
