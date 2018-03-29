@@ -11,7 +11,7 @@ import UIKit
 import WebKit
 
 
-public class MMWKWebController: MMUIController,WKNavigationDelegate {
+public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate {
     
     public var webView: WKWebView { get {return _web} }
     public var launchUrl: String { get { return _url } }
@@ -44,6 +44,7 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate {
         _web = WKWebView(frame: self.view.bounds, configuration: configuration)
         _web.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         _web.navigationDelegate = self
+        _web.uiDelegate = self
         
         if #available(iOS 9.0, *) {//高于 iOS 9.0
             _web.customUserAgent = UserDefaults.standard.string(forKey: "UserAgent")
@@ -71,7 +72,7 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate {
         _web.navigationDelegate = nil
     }
     
-    // MARK WKNavigationDelegate
+    // MARK: - WKNavigationDelegate
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         let cred = URLCredential.init(trust: challenge.protectionSpace.serverTrust!)
         completionHandler(.useCredential, cred)
@@ -146,6 +147,45 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate {
         //
     }
     
+    // MARK: - WKUIDelegate
+    public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Swift.Void) {
+        let alert = UIAlertController(title: "提示", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "好", style: .default, handler: { (_) -> Void in
+            // We must call back js
+            completionHandler()
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
+    public func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (Bool) -> Swift.Void) {
+        let alert = UIAlertController(title: "提示", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "好", style: .default, handler: { (_) -> Void in
+            completionHandler(true)
+        }))
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: { (_) -> Void in
+            completionHandler(false)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    
+    public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping (String?) -> Swift.Void) {
+        let alert = UIAlertController(title: prompt, message: defaultText, preferredStyle: .alert)
+        
+        alert.addTextField { (textField: UITextField) -> Void in
+            textField.textColor = UIColor.red
+        }
+        alert.addAction(UIAlertAction(title: "好", style: .default, handler: { (_) -> Void in
+            completionHandler(alert.textFields![0].text!)
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    // MARK: 属性
     private var _web: WKWebView!
     private var _url = "" // load url
     private var _wload = false
