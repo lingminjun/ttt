@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 //1:移动端iOS；2:移动端Android；3：移动端H5(微商城)；4:移动端微信小程序(预留)；5:移动端支付宝小程序(预留)；6:PC浏览器(预留)；7:操作后台AC；8:操作后台MC；9:操作后台MNT
 public let MYMM_APP_ID = 1
