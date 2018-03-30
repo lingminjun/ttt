@@ -305,7 +305,7 @@ public final class Urls {
     /// just uri:<scheme>://<host>:<port>/<path>;<params>
     /// *param: only is just url path
     /// *param: sensitve is path case sensitve
-    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = false, scheme:String? = nil, host:String? = nil, query: Dictionary<String,QValue>? = nil) -> String {
+    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = true, scheme:String? = nil, host:String? = nil, query: Dictionary<String,QValue>? = nil) -> String {
         //decoding and encoding can compatibility more scene
         let surl = encoding(url: url)
         
