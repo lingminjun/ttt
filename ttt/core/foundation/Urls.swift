@@ -589,7 +589,7 @@ public final class Urls {
         
         if result {
             let lpath = uri.lastPathComponent
-            if lpath.length > 2 {
+            if lpath.count > 2 {
                 let begin = lpath.index(lpath.startIndex, offsetBy: 2)
                 let end = lpath.endIndex
                 appId = String(lpath[begin..<end])
