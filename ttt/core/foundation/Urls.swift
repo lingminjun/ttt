@@ -88,6 +88,34 @@ public struct QBundle :Collection {
         _map.removeAll(keepingCapacity:keepCapacity)
     }
     
+    public static func convert(dic:Dictionary<String,AnyObject>) -> QBundle {
+        var query = QBundle()
+        for (key,value) in dic {
+            if Injects.isBaseType(value) {
+                query[key] = QValue("\(value)")
+            } else if let entity = value as? MMJsonable {
+                query[key] = QValue("\(entity.ssn_jsonString())")
+            } else if let v = value as? QValue {
+                query[key] = v
+            }
+        }
+        return query
+    }
+    
+    public static func convert(query:QBundle) -> Dictionary<String,AnyObject> {
+        var dic = Dictionary<String,AnyObject>()
+        for (key,value) in query {
+            switch value {
+            case QValue.value(let v):
+                dic[key] = v as AnyObject
+                break
+            case QValue.array(let l):
+                dic[key] = l as AnyObject
+                break
+            }
+        }
+        return dic
+    }
 }
 
 /// query value defined
@@ -207,35 +235,6 @@ public enum QValue {
         default: break
         }
         return nil
-    }
-    
-    public static func convert(dic:Dictionary<String,AnyObject>) -> QBundle {
-        var query = QBundle()
-        for (key,value) in dic {
-            if Injects.isBaseType(value) {
-                query[key] = QValue("\(value)")
-            } else if let entity = value as? MMJsonable {
-                query[key] = QValue("\(entity.ssn_jsonString())")
-            } else if let v = value as? QValue {
-                query[key] = v
-            }
-        }
-        return query
-    }
-    
-    public static func convert(query:QBundle) -> Dictionary<String,AnyObject> {
-        var dic = Dictionary<String,AnyObject>()
-        for (key,value) in query {
-            switch value {
-            case QValue.value(let v):
-                dic[key] = v as AnyObject
-                break
-            case QValue.array(let l):
-                dic[key] = l as AnyObject
-                break
-            }
-        }
-        return dic
     }
 }
 
