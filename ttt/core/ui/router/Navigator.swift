@@ -149,6 +149,56 @@ public final class Navigator: NSObject {
         print("open the url:\(url) failed!")
     }
     
+    open func openItunes(_ url:String, params:Dictionary<String,QValue>? = nil) -> Bool {
+        var appId = ""
+        if !Urls.isItunesUrl(url: url, appId: &appId) {
+            return false
+        }
+        
+        if appId.isEmpty {
+            return false
+        }
+        
+        var canOpen = false
+        /*
+        if appId == Constants.AppID {
+            canOpen = true
+        } else { */
+            
+            //自签名方式
+            var sign = ""
+            let qs = Urls.query(url: url, decord:true)
+            let fs = Urls.fragment(url: url, decord: true)
+            if let s = qs[ROUTER_HOST_SIGN]?.string {
+                sign = s
+            } else if let s = fs[ROUTER_HOST_SIGN]?.string {
+                sign = s
+            } else if let s = params?[ROUTER_HOST_SIGN]?.string {
+                sign = s
+            }
+            
+            //验签名并打开
+            if let data = appId.data(using: String.Encoding.utf8) {
+                if !sign.isEmpty && BriefRSA.verify(key: BriefRSA.PUB_KEY, sign: sign, data: data) {
+                    canOpen = true
+                }
+            }
+        /*}*/
+        
+        if canOpen {
+            if let u = URL(string:url) {
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(u)
+                } else {
+                    UIApplication.shared.openURL(u)
+                }
+                return true
+            }
+        }
+            
+        return false
+    }
+    
     /// open url
     open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil, inner:Bool = false) -> Bool {
         if !isValid(url:url, params:params) {
@@ -168,6 +218,7 @@ public final class Navigator: NSObject {
             
             let u = URL(string:url)
             if u != nil {
+                return openItunes(url, params: params)
                 /*
                 let scms = Navigator.appURLSchemes()
                 let thescheme = u!.scheme
@@ -451,7 +502,11 @@ public final class Navigator: NSObject {
         var container = _window as MMContainer
         ctns.append(container)
         while let vc = container.topController() {
-            if let tvc = vc as? MMContainer {
+            /*
+            if let smc = vc as? SideMenuController, let tvc = smc.contentViewController as? MMContainer {
+                container = tvc
+                ctns.append(container)
+            } else */if let tvc = vc as? MMContainer {
                 container = tvc
                 ctns.append(container)
             } else {
@@ -603,6 +658,12 @@ public final class Navigator: NSObject {
         guard let scheme = uri.scheme else { return false }
         if scheme.isEmpty {
             return false
+        }
+        
+        //默认支持下itunes
+        var id = ""
+        if Urls.isItunesUrl(url: url, appId: &id) {
+            return true
         }
         
         if !_schemes.contains(scheme.lowercased()) {

@@ -549,4 +549,52 @@ public final class Urls {
         
         return ""
     }
+    
+    //是否为合法的itunes地址
+    public static func isItunesUrl(url:String, appId:inout String) -> Bool {
+        //**前缀**+itunes.apple.com/WebObjects/MZStore.woa/wa/viewSoftware?id=**AppId**
+        //**前缀**+itunes.apple.com/us/app/apple-store/id+**AppId**
+        //**前缀**+itunes.apple.com/us/app/id+**AppId**?mt=8
+        //**前缀**+itunes.apple.com/us/app/***sha-long-zhang-pai***/id1066602104?l=zh&ls=1&mt=8 (这个不常用，注 : 中间斜线文本是应用名拼音)
+        //**前缀**+itunes.apple.com/app/id+**AppId**
+       
+        guard let uri = URL(string:Urls.encoding(url: url)) else { return false }
+        
+        guard let host = uri.host?.lowercased() else { return false }
+        if host != "itunes.apple.com" {
+            return false
+        }
+        
+        guard let scheme = uri.scheme?.lowercased() else { return false }
+        if scheme != "http" && scheme != "https" && scheme != "itms-apps" {
+            return false
+        }
+        
+        let path = uri.path
+        var result = false
+        if path == "/WebObjects/MZStore.woa/wa/viewSoftware" {
+            if let str = uri.query, let id = Urls.query(query: str)["id"]?.string {
+                appId = id
+            }
+            return true
+        } else if path.starts(with: "/us/app/apple-store/id") {
+            result = true
+        } else if path.starts(with: "/us/app/id") {
+            result = true
+        }  else if path.starts(with: "/us/app/") {//不常见的方式，同样支持
+            result = true
+        } else if path.starts(with: "/app/id") {
+            result = true
+        }
+        
+        if result {
+            let lpath = uri.lastPathComponent
+            if lpath.length > 2 {
+                let begin = lpath.index(lpath.startIndex, offsetBy: 2)
+                let end = lpath.endIndex
+                appId = String(lpath[begin..<end])
+            }
+        }
+        return result
+    }
 }
