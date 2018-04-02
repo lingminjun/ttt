@@ -117,7 +117,7 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate
         }
         
         /// 继承特殊参数
-        var query = Dictionary<String,QValue>()
+        var query = QBundle()
         if let sign = self.ssn_Arguments[ROUTER_HOST_SIGN] {
             query[ROUTER_HOST_SIGN] = sign
         }
