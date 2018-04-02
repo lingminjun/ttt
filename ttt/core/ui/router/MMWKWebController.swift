@@ -17,7 +17,7 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate
     public var launchUrl: String { get { return _url } }
     public var currentUrl: String? { get { return _web.url?.absoluteString } }
     
-    public override func onInit(params: Dictionary<String, QValue>?, ext: Dictionary<String, Any>?) {
+    public override func onInit(params: QBundle?, ext: Dictionary<String, Any>?) {
         if let url = params?[LOAD_URL_KEY]?.string {
             _url = Urls.tidy(url: url)
         } else if let ext = ext, let v = ext[LOAD_URL_KEY], (v is String || v is Substring) {
