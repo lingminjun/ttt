@@ -17,7 +17,7 @@ public let LOAD_URL_KEY = "_load_url"
 
 public protocol Authorize {
     func authorized() -> Bool//当前是否认证过
-    func howToAuthorize(url:String, query:Dictionary<String,QValue>) -> String//如何认证,返回认证的url
+    func howToAuthorize(url:String, query:QBundle) -> String//如何认证,返回认证的url
 }
 
 /// Routing app all scene pages.
@@ -120,7 +120,7 @@ public final class Navigator: NSObject {
     }
     
     /// open url or open path
-    open func open(path:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = false) -> Bool {
+    open func open(path:String, params:QBundle? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = false) -> Bool {
         if path.isEmpty {
             return false
         }
@@ -133,12 +133,12 @@ public final class Navigator: NSObject {
     }
     
     /// do open url, no result
-    open func dopen(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil) {
+    open func dopen(_ url:String, params:QBundle? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil) {
         if open(url,params:params,ext:ext,modal:modal,inner:false) { return }
         
         //仅仅是没有找到router，则统一路由到webview
         if isValid(url: url, params: params) {
-            var q = Dictionary<String,QValue>()
+            var q = QBundle()
             if let params = params {
                 q = params
             }
@@ -149,7 +149,7 @@ public final class Navigator: NSObject {
         print("open the url:\(url) failed!")
     }
     
-    open func openItunes(_ url:String, params:Dictionary<String,QValue>? = nil) -> Bool {
+    open func openItunes(_ url:String, params:QBundle? = nil) -> Bool {
         var appId = ""
         if !Urls.isItunesUrl(url: url, appId: &appId) {
             return false
@@ -200,7 +200,7 @@ public final class Navigator: NSObject {
     }
     
     /// open url
-    open func open(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil, inner:Bool = false) -> Bool {
+    open func open(_ url:String, params:QBundle? = nil, ext:Dictionary<String,NSObject>? = nil, modal:Bool? = nil, inner:Bool = false) -> Bool {
         if !isValid(url:url, params:params) {
             return false
         }
@@ -284,15 +284,15 @@ public final class Navigator: NSObject {
         return true
     }
     
-    open func getWebRouterNode(url:String, query:Dictionary<String,QValue>? = nil, webController:String = "MMWKWebController") -> VCNode {
-        var q = Dictionary<String,QValue>()
+    open func getWebRouterNode(url:String, query:QBundle? = nil, webController:String = "MMWKWebController") -> VCNode {
+        var q = QBundle()
         if let query = query {
             q = query
         }
         let rt = webRouterNode(url, query: &q, webController: webController)
         return rt.node
     }
-    fileprivate func webRouterNode(_ url:String, query: inout Dictionary<String,QValue>, webController:String = "MMWKWebController") -> RouterNode {
+    fileprivate func webRouterNode(_ url:String, query: inout QBundle, webController:String = "MMWKWebController") -> RouterNode {
         
         let rt = RouterNode()
         rt.id = "/app/browser.html"
@@ -314,25 +314,25 @@ public final class Navigator: NSObject {
         }
         
         query[LOAD_URL_KEY] = QValue(Urls.tidy(url: uurl, query: q))
-        query.removeValue(forKey: ROUTER_ON_BROWSER_KEY)
+        let _ = query.removeValue(forKey: ROUTER_ON_BROWSER_KEY)
         
         return rt
     }
     
     /// generate VC
-    open func getViewController(path:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
+    open func getViewController(path:String, params:QBundle? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
         if path.isEmpty {
             return nil
         }
         let url = comple(path: path)
         return getViewController(url, params: params, ext: ext)
     }
-    open func getViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
+    open func getViewController(_ url:String, params:QBundle? = nil, ext:Dictionary<String,NSObject>? = nil) -> UIViewController? {
         var temp = false
         var container = ""
         return genViewController(url, params: params, ext: ext, pending:&temp, container: &container)
     }
-    fileprivate func genViewController(_ url:String, params:Dictionary<String,QValue>? = nil, ext:Dictionary<String,NSObject>? = nil, checkAuth:Bool = false, pending: inout Bool, container: inout String) -> UIViewController? {
+    fileprivate func genViewController(_ url:String, params:QBundle? = nil, ext:Dictionary<String,NSObject>? = nil, checkAuth:Bool = false, pending: inout Bool, container: inout String) -> UIViewController? {
         if !isValid(url:url, params:params) {
             return nil
         }
@@ -346,7 +346,7 @@ public final class Navigator: NSObject {
         }
         
         var rt: RouterNode? = nil
-        var hintParams = Dictionary<String,QValue>()
+        var hintParams = QBundle()
         if let onBrowser = query[ROUTER_ON_BROWSER_KEY], let b = onBrowser.bool, b {
             rt = webRouterNode(url, query: &query)
         } else {
@@ -518,12 +518,12 @@ public final class Navigator: NSObject {
     
     /// get router
     open func getRouter(url:String) -> VCNode? {
-        var temp = Dictionary<String,QValue>()
+        var temp = QBundle()
         return routerNode(url: url, hintParams: &temp)?.node
     }
     
     
-    fileprivate func routerNode(url:String, hintParams: inout Dictionary<String,QValue>) -> RouterNode? {
+    fileprivate func routerNode(url:String, hintParams: inout QBundle) -> RouterNode? {
         let uri = Urls.getURLFinderPath(url:url)
         if uri.isEmpty {
             return nil
@@ -647,7 +647,7 @@ public final class Navigator: NSObject {
     }
     
     /// is valid url
-    open func isValid(url:String, params:Dictionary<String,QValue>? = nil) -> Bool {
+    open func isValid(url:String, params:QBundle? = nil) -> Bool {
         guard let uri = URL(string:Urls.encoding(url: url)) else { return false }
         
         guard let host = uri.host else { return false }

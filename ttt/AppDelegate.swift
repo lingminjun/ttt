@@ -34,7 +34,7 @@ public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize,MMTracker
         return auth
     }
     
-    public func howToAuthorize(url: String, query: Dictionary<String, QValue>) -> String {
+    public func howToAuthorize(url: String, query: QBundle) -> String {
         return "https://m.mymm.com/user/login.html"
     }
     
