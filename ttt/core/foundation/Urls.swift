@@ -18,7 +18,7 @@ public struct QBundle :Collection {
     
     public subscript (_ i:QBundle.Index) -> Element { get{ return _map[i] } }
     public func index(after i: QBundle.Index) -> QBundle.Index {
-        return index(after:i)
+        return _map.index(after:i)
     }
     
     var _map:Dictionary<String,QValue>!
