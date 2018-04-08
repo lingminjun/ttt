@@ -16,6 +16,7 @@ import UIKit
     func ssn_canEdit() -> Bool
     func ssn_canMove() -> Bool
     func ssn_cellHeight() -> CGFloat //UITableViewDelegate heightForRowAt or UICollectionViewLayout layoutAttributesForItemAtIndexPath
+    func ssn_cellInsets() -> UIEdgeInsets //内边距，floating将忽略此致
     func ssn_canFloating() -> Bool
     func ssn_isExclusiveLine() -> Bool
     func ssn_cellGridSpanSize() -> Int //占用列数，小于等于零表示1

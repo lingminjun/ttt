@@ -10,6 +10,8 @@ import UIKit
 
 let COLLECTION_HEADER_KIND = "Header"
 
+let CELL_INSETS_TAG = "cell_content_insets"
+
 public struct MMLayoutConfig {
     
     var scrollDirection:UICollectionViewScrollDirection = .vertical
@@ -29,8 +31,11 @@ public struct MMLayoutConfig {
     //可以漂浮停靠在界面顶部
     @objc optional func collectionView(_ collectionView: UICollectionView, canFloatingCellAt indexPath: IndexPath) -> Bool
     
-    //cell的行高,若scrollDirection == .horizontal则返回的是宽度
+    //cell的行高,若scrollDirection == .horizontal则返回的是宽度，包含EdgeInsets.bottom+EdgeInsets.top的值
     @objc optional func collectionView(_ collectionView: UICollectionView, heightForCellAt indexPath: IndexPath) -> CGFloat
+    
+    //cell的内边距, floating cell不支持
+    @objc optional func collectionView(_ collectionView: UICollectionView, insetsForCellAt indexPath: IndexPath) -> UIEdgeInsets
     
     //cell是否SpanSize，返回值小于等于零时默认为1
     @objc optional func collectionView(_ collectionView: UICollectionView, spanSizeForCellAt indexPath: IndexPath) -> Int
@@ -117,11 +122,13 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         
         var respondCanFloating = false
         var respondHeightForCell = false
+        var respondInsetForCell = false
         var respondSpanSize = false
         let ds = self.delegate
         if let ds = ds {
             respondCanFloating = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:canFloatingCellAt:)))
             respondHeightForCell = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:heightForCellAt:)))
+            respondInsetForCell = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:insetsForCellAt:)))
             respondSpanSize = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:spanSizeForCellAt:)))
         }
         
@@ -159,6 +166,13 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 if let ds = ds, ( height <= 0 && respondHeightForCell ) {
                     height = ds.collectionView!(view, heightForCellAt: indexPath)
                 }
+                
+                //内边距
+                var insets = UIEdgeInsets.zero
+                if let ds = ds, !isFloating && respondInsetForCell {
+                    insets = ds.collectionView!(view, insetsForCellAt: indexPath)
+                }
+                
             
                 //占用各数
                 var spanSize = 1
@@ -180,6 +194,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                     attributes.zIndex = 1024
                 } else {
                     attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)//layoutAttributesForCellWithIndexPath
+                    attributes.ssn_setTag(CELL_INSETS_TAG, tag: insets)
                 }
                 _cellLayouts[indexPath] = attributes//记录下来，防止反复创建
                 
@@ -191,6 +206,13 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                     let mostSetion = self.sectionOfMostHeight
                     y = _bottoms[mostSetion] //起始位置
                     suitableSetion = 0 //new line
+                } else if spanSize > 1 {//这种情况需要观察占用列的最高值
+                    //取显示换位最长的
+                    for index in suitableSetion..<(suitableSetion + spanSize) {
+                        if y < _bottoms[index] {
+                            y = _bottoms[index]
+                        }
+                    }
                 }
                 
                 //起始行特别处理
@@ -212,10 +234,11 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                     width = floatingWidth
                 }
                 
+                //最终位置
                 if _config.scrollDirection == .vertical {
-                    attributes.frame = CGRect(x:x, y:y, width:width, height:height)
+                    attributes.frame = CGRect(x:x + insets.left, y:y + insets.top, width:width - (insets.left + insets.right), height:height - (insets.top + insets.bottom))
                 } else {
-                    attributes.frame = CGRect(x:y, y:x, width:height, height:width)
+                    attributes.frame = CGRect(x:y + insets.left, y:x + insets.top, width:height - (insets.left + insets.right), height:width - (insets.top + insets.bottom))
                 }
                 
                 //更新每列位置信息
@@ -239,9 +262,15 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         //遍历所有 Attributes 看看哪些符合 rect
         var list:[UICollectionViewLayoutAttributes] = []
         _cellLayouts.forEach { (key,value) in
+            var insets = UIEdgeInsets.zero
+            if let sets = value.ssn_tag(CELL_INSETS_TAG) as? UIEdgeInsets {
+                insets = sets
+            }
+            let frame = value.frame
+            let oframe = CGRect(x: frame.origin.x - insets.left, y: frame.origin.y - insets.top, width: frame.size.width + insets.left + insets.right, height: frame.size.height + insets.top + insets.bottom)
             
             //存在交集
-            if rect.intersects(value.frame) {
+            if rect.intersects(oframe) {
                 list.append(value)
                 
                 csets.insert(key)
@@ -346,10 +375,15 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             list.append(value)
         }
         
-        var frame = value.frame
+        let frame = value.frame
+        var insets = UIEdgeInsets.zero
+        if let sets = value.ssn_tag(CELL_INSETS_TAG) as? UIEdgeInsets {
+            insets = sets
+        }
+        var oframe = CGRect(x: frame.origin.x - insets.left, y: frame.origin.y - insets.top, width: frame.size.width + insets.left + insets.right, height: frame.size.height + insets.top + insets.bottom)
         
         let offsetY = originOffsetY + view.contentOffset.y + view.contentInset.top //基准线
-        if offsetY < frame.origin.y {
+        if offsetY < oframe.origin.y {
             return
         }
         
@@ -363,17 +397,17 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             }
         }
         
-        frame.origin.y = min(nextHeightTop - frame.size.height, offsetY)
+        oframe.origin.y = min(nextHeightTop - oframe.size.height, offsetY)
         
         //说明已经隐藏在停靠点内，不再需要修改布局，而是计算下一个header
-        if frame.origin.y + frame.size.height <= offsetY {
+        if oframe.origin.y + oframe.size.height <= offsetY {
             if let next = _headIndexs.index(of: indexPath) {
                 if next + 1 < _headIndexs.count {
                     setFloatingCellLayout(indexPath: _headIndexs[next + 1], hsets: hsets, list: &list)
                 }
             }
         } else {
-            value.frame = frame;
+            value.frame = CGRect(x: oframe.origin.x + insets.left, y: oframe.origin.y + insets.top, width: oframe.size.width - (insets.left + insets.right), height: oframe.size.height - (insets.top + insets.bottom))
         }
     }
     
@@ -382,10 +416,15 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             return
         }
         
-        var frame = attributes.frame
+        let frame = attributes.frame
+        var insets = UIEdgeInsets.zero
+        if let sets = attributes.ssn_tag(CELL_INSETS_TAG) as? UIEdgeInsets {
+            insets = sets
+        }
+        var oframe = CGRect(x: frame.origin.x - insets.left, y: frame.origin.y - insets.top, width: frame.size.width + insets.left + insets.right, height: frame.size.height + insets.top + insets.bottom)
         
         if indexPath.section == 0 && indexPath.row == 0 {
-            frame.origin.y = 0
+            oframe.origin.y = 0
         } else {
             var next:IndexPath? = IndexPath(row:indexPath.row + 1,section:indexPath.section)
             if !_cellLayouts.keys.contains(next!) {
@@ -398,11 +437,15 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             //重新布局下header
             if let next = next {
                 if let nextValue = _cellLayouts[next] {
-                    frame.origin.y = nextValue.frame.origin.y - _config.rowDefaultSpace - frame.height
+                    if let insets = nextValue.ssn_tag(CELL_INSETS_TAG) as? UIEdgeInsets {
+                        oframe.origin.y = nextValue.frame.origin.y + insets.top - _config.rowDefaultSpace - oframe.height
+                    } else {
+                        oframe.origin.y = nextValue.frame.origin.y - _config.rowDefaultSpace - oframe.height
+                    }
                 }
             }
         }
-        attributes.frame = frame
+        attributes.frame = CGRect(x: oframe.origin.x + insets.left, y: oframe.origin.y + insets.top, width: oframe.size.width - (insets.left + insets.right), height: oframe.size.height - (insets.top + insets.bottom))
     }
     
 //    weak var _cview:UICollectionView? = nil

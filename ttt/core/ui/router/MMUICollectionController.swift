@@ -86,6 +86,13 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
         return m.ssn_cellHeight()
     }
     
+    func collectionView(_ collectionView: UICollectionView, insetsForCellAt indexPath: IndexPath) -> UIEdgeInsets {
+        guard let m = _fetchs.object(at: indexPath) else {
+            return UIEdgeInsets.zero
+        }
+        return m.ssn_cellInsets()
+    }
+    
     //cell是否SpanSize，返回值小于等于零时默认为1
     public func collectionView(_ collectionView: UICollectionView, spanSizeForCellAt indexPath: IndexPath) -> Int {
         guard let m = _fetchs.object(at: indexPath) else {

@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 
 class SettingNode : NSObject,MMCellModel {
+    func ssn_cellInsets() -> UIEdgeInsets {
+        return UIEdgeInsets.zero
+    }
+    
     func ssn_cellGridSpanSize() -> Int {
         return 1
     }

@@ -11,6 +11,10 @@ import RealmSwift
 import UIKit
 
 extension RealmSwift.Object : MMCellModel {
+    public func ssn_cellInsets() -> UIEdgeInsets {
+        return UIEdgeInsets.zero
+    }
+    
     public func ssn_cellHeight() -> CGFloat {
         return 44.0
     }
