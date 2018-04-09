@@ -18,7 +18,7 @@ public class MMUIController : UIViewController,MMUIControllerInitProtocol {
         super.init(coder: aDecoder)
     }
     
-    public func onInit(params: Dictionary<String,QValue>?, ext:Dictionary<String,Any>? = nil) {}
+    public func onInit(params: QBundle?, ext:Dictionary<String,Any>? = nil) {}
     /*
     public func onLoadView() -> Bool { return false }
     public func onViewDidLoad() -> Void { }

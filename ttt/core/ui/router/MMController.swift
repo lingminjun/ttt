@@ -61,9 +61,13 @@ extension UIViewController: MMController {
     }
     
     //参数存储
-    public final var ssn_Arguments : Dictionary<String,QValue> {
+    public final var ssn_Arguments : QBundle {
         get{
-            guard let result = objc_getAssociatedObject(self, &VC_PARAMS_PROPERTY) as? Dictionary<String,QValue> else {  return [:] }
+            guard let result = objc_getAssociatedObject(self, &VC_PARAMS_PROPERTY) as? QBundle else {
+                let empty = QBundle()
+                objc_setAssociatedObject(self, &VC_PARAMS_PROPERTY, empty, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+                return empty
+            }
             return result
         }
         set{

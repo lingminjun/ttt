@@ -96,6 +96,8 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
         } else if title == "瀑布流" {
             _config.rowHeight = 0
             _config.columnCount = 2
+            _config.columnSpace = 10
+            _config.magicHorizontalEdge = 10
             _config.floating = false
         } else if title == "瀑布流飘浮" {
             _config.rowHeight = 0
@@ -153,6 +155,10 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
     
     func collectionView(_ collectionView: UICollectionView, heightForCellAt indexPath: IndexPath) -> CGFloat {
         return CGFloat(_datas[indexPath.section][indexPath.row])
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, supportMagicEdgeForCellAt indexPath: IndexPath) -> Bool {
+        return true
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

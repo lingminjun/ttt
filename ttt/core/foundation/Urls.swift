@@ -8,6 +8,116 @@
 
 import Foundation
 
+
+public struct QBundle :Collection {
+    
+    public typealias Index = Dictionary<String,QValue>.Index
+    public var startIndex:Index{ get{ return _map.startIndex } }
+    public var endIndex:Index{ get{ return _map.endIndex } }
+    public typealias Element = Dictionary<String,QValue>.Element
+    
+    public subscript (_ i:QBundle.Index) -> Element { get{ return _map[i] } }
+    public func index(after i: QBundle.Index) -> QBundle.Index {
+        return _map.index(after:i)
+    }
+    
+    var _map:Dictionary<String,QValue>!
+    public init() {
+        _map = Dictionary<String,QValue>()
+    }
+    public init(dictionary:[String:QValue]) {
+        _map = Dictionary<String,QValue>()
+        for (key,value) in dictionary {
+            _map[key] = value
+        }
+    }
+    public init(minimumCapacity: Int) {
+        _map = Dictionary(minimumCapacity: minimumCapacity)
+    }
+    public init<S>(uniqueKeysWithValues keysAndValues: S) where S : Sequence, S.Element == (String,QValue) {
+        _map = Dictionary(uniqueKeysWithValues: keysAndValues)
+    }
+    public init<S>(_ keysAndValues: S, uniquingKeysWith combine: (QValue, QValue) throws -> QValue) rethrows where S : Sequence, S.Element == (String,QValue) {
+        _map = try Dictionary(keysAndValues, uniquingKeysWith:combine)
+    }
+    
+    public subscript(key: String) -> QValue? {
+        get {
+            if let v = _map[key] {
+                return v
+            } else if let v = _map[key.lowercased()] {
+                return v
+            }
+            return nil
+        }
+        set {
+            _map[key] = newValue
+        }
+    }
+    
+
+    public var isEmpty: Bool { get{ return _map.isEmpty } }
+    
+    public var first: (key: String, value: QValue)? { get{ return _map.first } }
+    
+    public var count: Int { get{ return _map.count } }
+    
+    public var keys: Dictionary<String, QValue>.Keys { get{ return _map.keys } }
+
+    public var values: Dictionary<String, QValue>.Values { get{ return _map.values } }
+    
+    public mutating func merge(_ other: [String : QValue], uniquingKeysWith combine: (QValue, QValue) throws -> QValue) rethrows {
+        try _map.merge(other, uniquingKeysWith: combine)
+    }
+    
+    
+    public func merging(_ other: [String : QValue], uniquingKeysWith combine: (QValue, QValue) throws -> QValue) rethrows -> QBundle {
+        let rt = try _map.merging(other, uniquingKeysWith: combine)
+        return QBundle(dictionary:rt)
+    }
+    
+    public mutating func remove(at index: QBundle.Index) -> QBundle.Element {
+        return _map.remove(at: index)
+    }
+    
+    public mutating func removeValue(forKey key: String) -> QValue? {
+        return _map.removeValue(forKey: key)
+    }
+    
+    public mutating func removeAll(keepingCapacity keepCapacity: Bool = true) {
+        _map.removeAll(keepingCapacity:keepCapacity)
+    }
+    
+    public static func convert(dic:Dictionary<String,AnyObject>) -> QBundle {
+        var query = QBundle()
+        for (key,value) in dic {
+            if Injects.isBaseType(value) {
+                query[key] = QValue("\(value)")
+            } else if let entity = value as? MMJsonable {
+                query[key] = QValue("\(entity.ssn_jsonString())")
+            } else if let v = value as? QValue {
+                query[key] = v
+            }
+        }
+        return query
+    }
+    
+    public static func convert(query:QBundle) -> Dictionary<String,AnyObject> {
+        var dic = Dictionary<String,AnyObject>()
+        for (key,value) in query {
+            switch value {
+            case QValue.value(let v):
+                dic[key] = v as AnyObject
+                break
+            case QValue.array(let l):
+                dic[key] = l as AnyObject
+                break
+            }
+        }
+        return dic
+    }
+}
+
 /// query value defined
 public enum QValue {
     case value(String)
@@ -126,35 +236,6 @@ public enum QValue {
         }
         return nil
     }
-    
-    public static func convert(dic:Dictionary<String,AnyObject>) -> Dictionary<String,QValue> {
-        var query = Dictionary<String,QValue>()
-        for (key,value) in dic {
-            if Injects.isBaseType(value) {
-                query[key] = QValue("\(value)")
-            } else if let entity = value as? MMJsonable {
-                query[key] = QValue("\(entity.ssn_jsonString())")
-            } else if let v = value as? QValue {
-                query[key] = v
-            }
-        }
-        return query
-    }
-    
-    public static func convert(query:Dictionary<String,QValue>) -> Dictionary<String,AnyObject> {
-        var dic = Dictionary<String,AnyObject>()
-        for (key,value) in query {
-            switch value {
-            case QValue.value(let v):
-                dic[key] = v as AnyObject
-                break
-            case QValue.array(let l):
-                dic[key] = l as AnyObject
-                break
-            }
-        }
-        return dic
-    }
 }
 
 public final class Urls {
@@ -176,24 +257,24 @@ public final class Urls {
     }
     
     /// get url query dictionary
-    public static func query(url: String, decord: Bool = true) ->Dictionary<String,QValue> {
+    public static func query(url: String, decord: Bool = true) -> QBundle {
         let surl = encoding(url: url)
-        guard let u = URL(string:surl) else {return Dictionary<String,QValue>()}
-        guard let q = u.query else {return Dictionary<String,QValue>()}
+        guard let u = URL(string:surl) else {return QBundle()}
+        guard let q = u.query else {return QBundle()}
         return query(query:q, decord:decord)
     }
     
     /// get url fragment dictionary
-    public static func fragment(url: String, decord: Bool = true) ->Dictionary<String,QValue> {
+    public static func fragment(url: String, decord: Bool = true) -> QBundle {
         let surl = encoding(url: url)
-        guard let u = URL(string:surl) else {return Dictionary<String,QValue>()}
-        guard let f = u.fragment else {return Dictionary<String,QValue>()}
+        guard let u = URL(string:surl) else {return QBundle()}
+        guard let f = u.fragment else {return QBundle()}
         return query(query:f, decord:decord)
     }
     
     /// get query dictionary
-    public static func query(query: String, decord: Bool = true) ->Dictionary<String,QValue> {
-        var map = Dictionary<String,QValue>();
+    public static func query(query: String, decord: Bool = true) -> QBundle {
+        var map = QBundle();
         let strs = query.trimmingCharacters(in: CharacterSet(charactersIn: "?#!")).split(separator: "&")
         for str in strs {
             let ss = str.split(separator: "=")
@@ -238,7 +319,7 @@ public final class Urls {
     }
     
     /// get query string
-    public static func queryString(dic: Dictionary<String,QValue>, encode: Bool = true) ->String {
+    public static func queryString(dic: QBundle, encode: Bool = true) ->String {
         var result = ""
         let keys = dic.keys.sorted()
         for key in keys {
@@ -287,10 +368,21 @@ public final class Urls {
     }
     
     public static func append(url:String, key:String, value:QValue) -> String {
-        return Urls.appends(url: url, querys: [key:value])
+        return Urls.appends(url: url, dic: [key:value])
     }
     
-    public static func appends(url:String, querys: Dictionary<String,QValue>) -> String {
+    public static func appends(url:String, dic: Dictionary<String,QValue>) -> String {
+        if dic.isEmpty {
+            return url
+        }
+        var q = Urls.query(url: url, decord: true)
+        for (key, value) in dic {
+            q[key] = value
+        }
+        return Urls.tidy(url: url,query: q)
+    }
+    
+    public static func appends(url:String, querys: QBundle) -> String {
         if querys.isEmpty {
             return url
         }
@@ -305,7 +397,7 @@ public final class Urls {
     /// just uri:<scheme>://<host>:<port>/<path>;<params>
     /// *param: only is just url path
     /// *param: sensitve is path case sensitve
-    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = true, scheme:String? = nil, host:String? = nil, query: Dictionary<String,QValue>? = nil) -> String {
+    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = true, scheme:String? = nil, host:String? = nil, query: QBundle? = nil) -> String {
         //decoding and encoding can compatibility more scene
         let surl = encoding(url: url)
         
@@ -369,7 +461,7 @@ public final class Urls {
         }
         
         //query
-        var qry:Dictionary<String,QValue> = [:]
+        var qry:QBundle = QBundle()
         if let query = query {
             qry = query
         } else if let strqry = uri.query {
