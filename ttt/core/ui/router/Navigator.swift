@@ -562,9 +562,14 @@ public final class Navigator: NSObject {
         var strs = [Substring]()
         if let range = uri.range(of: "#") {
             let paths = String(uri[uri.startIndex..<range.lowerBound])
-            let fpaths = String(uri[range.lowerBound..<uri.endIndex])
+            let fpaths = String(uri[range.upperBound..<uri.endIndex])
             strs = paths.split(separator: "/")
-            strs.append(contentsOf: fpaths.split(separator: "/"))
+            
+            let tmp = fpaths.split(separator: "/")
+            if tmp.count > 0 {
+                strs.append(Substring("#")) //必须单独作为一个元素
+                strs.append(contentsOf: tmp)
+            }
         } else {
             strs = uri.split(separator: "/")
         }
