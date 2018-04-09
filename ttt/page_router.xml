@@ -5,6 +5,11 @@
         controller="ViewController"
         container=""
         description="启动页"/>
+    <item url="https://m.mymm.com#/product/{skuId}"
+        key=""
+        controller="DemoListController"
+        container=""
+        description="设置"/>
     <item url="https://m.mymm.com/setting.html"
         key=""
         controller="DemoListController"

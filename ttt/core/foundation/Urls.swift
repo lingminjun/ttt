@@ -322,6 +322,12 @@ public final class Urls {
     public static func queryString(dic: QBundle, encode: Bool = true) ->String {
         var result = ""
         let keys = dic.keys.sorted()
+        let valuse = dic.values
+        if valuse.count == 1 {
+            if let str = valuse.first?.string, str.isEmpty {
+                return keys[0]
+            }
+        }
         for key in keys {
             if let qvalue = dic[key] {
                 switch qvalue {
@@ -540,6 +546,7 @@ public final class Urls {
     
     /**
      * 获取url中除去host之后的path, 如果遇到 http://m.mymm.com/detail/{skuid}.html 类型，则匹配保留 detail/{_}.html
+     * web单页应用支持 http://m.mymm.com#/product/{skuId}
      * @param url
      * @return
      */
@@ -559,14 +566,46 @@ public final class Urls {
             return ""
         }
         
+        
+        // 支持单页应用 #/product/{skuId}
+        var fpaths = [Substring]()
+        if let fgmt = uri.fragment,fgmt.hasPrefix("/") && fgmt.count > 1 {
+            fpaths = fgmt.split(separator: "/")
+        }
+        
+        // 实际的path
         let paths = uri.pathComponents
-        if (paths.isEmpty) {//home page: https://m.mymm.com
+        if (paths.isEmpty && fpaths.isEmpty) {//home page: https://m.mymm.com
             return "/"
         }
         
+        var builder = buildPath(paths: paths)
+        
+        // 单页应用支持
+        if !fpaths.isEmpty {
+            builder.append("#/")
+        }
+        
+        builder.append(buildPath(paths: fpaths))
+        
+        if builder.isEmpty {
+            return "/"
+        }
+        
+        return builder
+    }
+    
+    private static func buildPath(paths:[Any]) -> String {
         var builder = String()
         var isFirst = true;
-        for p in paths {
+        for s in paths {
+            var p = ""
+            if let x = s as? String {
+                p = x
+            } else if let x = s as? Substring {
+                p = String(x)
+            }
+            
             if (p.isEmpty || p == "/" || p == "." || p == "..") {
                 continue
             }
@@ -588,35 +627,19 @@ public final class Urls {
             // 不区分大小写，不一定合理，兼容方案; Not case sensitive.
             builder.append(str.lowercased());
         }
-        
-        if builder.isEmpty {
-            return "/"
-        }
-        
         return builder
     }
     
-    // just support last component param key
-    public static func getURLPathParamKey(url: String) -> String  {
-        var surl = encoding(url: url)
-        surl = surl.replacingOccurrences(of: "{", with: "-")
-        surl = surl.replacingOccurrences(of: "}", with: "_")
-        guard let uri = URL(string:surl) else { return "" }
-        guard let host = uri.host else {
-            return ""
-        }
-        if host.isEmpty {
-            return ""
-        }
-        
-        let paths = uri.pathComponents
-        if (paths.isEmpty) {//home page: https://m.mymm.com
-            return ""
-        }
-        
-        //从后往前找
+    private static func getPathKey(paths:[Any]) -> String {
         var isLast = true
-        for var path in paths.reversed() {
+        for s in paths.reversed() {
+            var path = ""
+            if let x = s as? String {
+                path = x
+            } else if let x = s as? Substring {
+                path = String(x)
+            }
+            
             if (path.isEmpty || path == "/" || path == "." || path == "..") {
                 continue
             }
@@ -637,6 +660,46 @@ public final class Urls {
             let end = path.index(path.endIndex, offsetBy: -1)
             let range = begin ..< end
             return String(path[range])
+        }
+        
+        return ""
+    }
+    
+    // just support last component param key
+    public static func getURLPathParamKey(url: String) -> String  {
+        var surl = encoding(url: url)
+        surl = surl.replacingOccurrences(of: "{", with: "-")
+        surl = surl.replacingOccurrences(of: "}", with: "_")
+        guard let uri = URL(string:surl) else { return "" }
+        guard let host = uri.host else {
+            return ""
+        }
+        if host.isEmpty {
+            return ""
+        }
+        
+        // 支持单页应用 #/product/{skuId}
+        var fpaths = [Substring]()
+        if let fgmt = uri.fragment,fgmt.hasPrefix("/") && fgmt.count > 1 {
+            fpaths = fgmt.split(separator: "/")
+        }
+        
+        // 实际的path
+        let paths = uri.pathComponents
+        if (paths.isEmpty && fpaths.isEmpty) {//home page: https://m.mymm.com
+            return "/"
+        }
+        
+        // 从fragment中获取
+        var key = getPathKey(paths: fpaths)
+        if !key.isEmpty {
+            return key
+        }
+        
+        //从后往前找
+        key = getPathKey(paths: paths)
+        if !key.isEmpty {
+            return key
         }
         
         return ""

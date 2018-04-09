@@ -558,14 +558,17 @@ public final class Navigator: NSObject {
          detail/{_}/{_}/{_}/{_}------10
          */
         
-        var paths:String = uri
-        var ext:String = ""
-        if let range = uri.range(of: ".", options: .backwards) {
-            ext = String(uri[range.lowerBound..<uri.endIndex])
-            paths = String(uri[uri.startIndex..<range.lowerBound]);
+        //uri 支持单页情况可能如：detail#/detail/{skuId}
+        var strs = [Substring]()
+        if let range = uri.range(of: "#") {
+            let paths = String(uri[uri.startIndex..<range.lowerBound])
+            let fpaths = String(uri[range.lowerBound..<uri.endIndex])
+            strs = paths.split(separator: "/")
+            strs.append(contentsOf: fpaths.split(separator: "/"))
+        } else {
+            strs = uri.split(separator: "/")
         }
         
-        let strs = paths.split(separator: "/")
         var values = [] as [String];
         
         //需要查找的次数
@@ -582,15 +585,24 @@ public final class Navigator: NSObject {
                 
                 //开始拼接key
                 for j in 1..<strs.count {
+                    var sstr = String(strs[j])
+                    if sstr == "#" {//单页支持
+                        key = key + sstr
+                        continue
+                    }
+                    var ext:String = ""
+                    if let range = sstr.range(of: ".", options: .backwards) {
+                        ext = String(sstr[range.lowerBound..<sstr.endIndex])
+                        sstr = String(sstr[sstr.startIndex..<range.lowerBound])
+                    }
+                    
                     if (j >= start && j < start + len) {//替换位置
-                        key = key + "/{_}"
-                        values.append(String(strs[j]))
+                        key = key + "/{_}" + ext
+                        values.append(sstr)
                     } else {
-                        key = key + "/" + strs[j]
+                        key = key + "/" + sstr + ext
                     }
                 }
-                
-                key = key + ext
                 
                 //尝试取值
                 guard let nn = _routers[key] else { continue }
