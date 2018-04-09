@@ -58,8 +58,8 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     }
     
     deinit {
-        _table.dataSource = nil
-        _table.delegate = nil
+        _table?.dataSource = nil
+        _table?.delegate = nil
     }
     
     // MARK:- UICollectionViewDelegate MMCollectionViewDelegate 代理

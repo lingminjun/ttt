@@ -51,8 +51,8 @@ public class MMUITableController<T: MMCellModel>: MMUIController,UITableViewDele
     }
     
     deinit {
-        _table.dataSource = nil
-        _table.delegate = nil
+        _table?.dataSource = nil
+        _table?.delegate = nil
     }
     
     // MARK:- UITableViewDelegate代理

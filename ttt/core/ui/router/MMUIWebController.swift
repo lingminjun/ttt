@@ -43,7 +43,7 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
     }
     
     deinit {
-        _web.delegate = nil
+        _web?.delegate = nil
     }
     
     // MARK UIWebViewDelegate
