@@ -69,7 +69,8 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate
     }
     
     deinit {
-        _web.navigationDelegate = nil
+        _web?.navigationDelegate = nil
+        _web?.uiDelegate = nil
     }
     
     // MARK: - WKNavigationDelegate
