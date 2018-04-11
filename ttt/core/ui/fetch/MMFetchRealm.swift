@@ -11,6 +11,10 @@ import RealmSwift
 import UIKit
 
 extension RealmSwift.Object : MMCellModel {
+    public func ssn_groupID() -> String? {
+        return nil
+    }
+    
     public func ssn_cellInsets() -> UIEdgeInsets {
         return UIEdgeInsets.zero
     }

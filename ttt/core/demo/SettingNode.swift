@@ -10,6 +10,10 @@ import Foundation
 import UIKit
 
 class SettingNode : NSObject,MMCellModel {
+    func ssn_groupID() -> String? {
+        return nil
+    }
+    
     func ssn_cellInsets() -> UIEdgeInsets {
         return UIEdgeInsets.zero
     }

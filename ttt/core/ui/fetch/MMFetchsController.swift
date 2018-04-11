@@ -12,6 +12,7 @@ import UIKit
 /// Cell model is data obj
 @objc public protocol MMCellModel : NSObjectProtocol {
     func ssn_cellID() -> String
+    func ssn_groupID() -> String? //分组实现
     @objc optional func ssn_cell(_ cellID : String) -> UITableViewCell //适应于UITableView，尽量不采用反射方式
     func ssn_canEdit() -> Bool
     func ssn_canMove() -> Bool
@@ -192,6 +193,43 @@ public class MMFetch<T: MMCellModel> {
     public func indexOf(_ object: T) -> Int? {return 0}
     public func filter(_ predicate: NSPredicate) -> [T] {return []}
     
+    // support group
+    public func range(group:String,reversed:Bool = false) -> Range<Int>? {
+        var begin = 0
+        var end = 0
+        var find = false
+        if reversed {
+            for i in (0..<self.count()).reversed() {
+                if let m = self.get(i), let g = m.ssn_groupID(), g == group {
+                    if !find {
+                        end = i + 1
+                    }
+                    begin = i //往前移
+                    find = true
+                } else if find {
+                    break
+                }
+            }
+        } else {
+            for i in 0..<self.count() {
+                if let m = self.get(i), let g = m.ssn_groupID(), g == group {
+                    if !find {
+                        begin = i
+                    }
+                    end = i + 1 //往后移
+                    find = true
+                } else if find {
+                    break
+                }
+            }
+        }
+        
+        if !find {
+            return nil
+        }
+        
+        return begin..<end
+    }
 }
 
 /*
