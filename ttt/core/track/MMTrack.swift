@@ -222,11 +222,30 @@ public extension NSObject {
 // MARK:- UIViewController: MMTrackPage
 extension UIViewController: MMTrackPage {
     public func track_url() -> String {
-        return self.track_pageUrl
+        let uri = self.track_pageUrl
+        
+        if !uri.isEmpty {
+            return uri
+        }
+        
+        //支持navigator自带uri的概念
+        return self._node.url
     }
     
     public func track_pid() -> String {
-        return self.track_pageId
+        let id = self.track_pageId
+        
+        if !id.isEmpty {
+            return id
+        }
+        
+        if !_node.param.isEmpty {
+            if let v = self.ssn_Arguments[_node.param]?.string {
+                return v
+            }
+        }
+        
+        return ""
     }
     
     public func track_title() -> String {
@@ -341,6 +360,10 @@ extension UIView:MMTrackComponent {
     }
     
     public func track_vid() -> String {
+        return track_vid(superView:true)
+    }
+    
+    @objc func track_vid(superView:Bool) -> String {
         let vid = self.track_visitId
         if !vid.isEmpty {
             return vid
@@ -357,6 +380,34 @@ extension UIView:MMTrackComponent {
             return "\(pid).\(vpid)"
         }
         
+        // 支持一些特殊按钮，系统UIBarButtonItem中的几种，返回
+        if !superView {
+            return ""
+        }
+        
+        //往上找3层
+        return UIView.track_superName(view: self, depth: 3)
+    }
+    
+    private static func track_superName(view:UIView, depth:UInt) -> String {
+        if depth == 0 {
+            return ""
+        }
+        
+        //先取
+        guard let svs = view.superview else { return "" }
+        let str = svs.track_vid(superView: false)
+        if !str.isEmpty {
+            return str
+        }
+        
+        //再递归
+        if depth > 1 {
+            let str = UIView.track_superName(view: svs, depth: depth - 1)
+            if !str.isEmpty {
+                return str
+            }
+        }
         return ""
     }
     

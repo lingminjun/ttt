@@ -37,6 +37,7 @@ public protocol MMUIControllerInitProtocol {
 
 private var SSN_URI_PROPERTY = 0
 private var VC_PARAMS_PROPERTY = 0
+private var VC_NODE_PROPERTY = 0
 
 extension UIViewController: MMController {
     //The following is a safe life-cycle methods.
@@ -72,6 +73,22 @@ extension UIViewController: MMController {
         }
         set{
             objc_setAssociatedObject(self, &VC_PARAMS_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+    
+//    var _node = VCNode()
+    //参数存储
+    public final var _node : VCNode {
+        get{
+            guard let result = objc_getAssociatedObject(self, &VC_NODE_PROPERTY) as? VCNode else {
+                let empty = VCNode()
+                objc_setAssociatedObject(self, &VC_NODE_PROPERTY, empty, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+                return empty
+            }
+            return result
+        }
+        set{
+            objc_setAssociatedObject(self, &VC_NODE_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
     }
 }

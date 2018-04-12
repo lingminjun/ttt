@@ -160,10 +160,10 @@ public final class Navigator: NSObject {
         }
         
         var canOpen = false
-        /*
-        if appId == Constants.AppID {
+        
+        /*if appId == Constants.AppID {
             canOpen = true
-        } else { */
+        } else {*/
             
             //自签名方式
             var sign = ""
@@ -246,8 +246,8 @@ public final class Navigator: NSObject {
         var isModal = false
         if let modal = modal {
             isModal = modal
-        } else if let v = vc as? MMUIController {
-            if let value = v._node.modal {
+        } else {
+            if let value = vc._node.modal {
                 isModal = value
             }
         }
@@ -420,11 +420,13 @@ public final class Navigator: NSObject {
             return nil
         }
         
-        if let v = viewController as? MMUIController {
+        if let v = viewController {
             v._node = router.node
-            MMTry.try({
-                v.onInit(params: query, ext: ext)
-            }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+            if let v = viewController as? MMUIController {
+                MMTry.try({
+                    v.onInit(params: query, ext: ext)
+                }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+            }
         }
         
         return viewController
@@ -502,11 +504,10 @@ public final class Navigator: NSObject {
         var container = _window as MMContainer
         ctns.append(container)
         while let vc = container.topController() {
-            /*
-            if let smc = vc as? SideMenuController, let tvc = smc.contentViewController as? MMContainer {
+            /*if let smc = vc as? SideMenuController, let tvc = smc.contentViewController as? MMContainer {
                 container = tvc
                 ctns.append(container)
-            } else */if let tvc = vc as? MMContainer {
+            } else*/ if let tvc = vc as? MMContainer {
                 container = tvc
                 ctns.append(container)
             } else {
@@ -562,9 +563,14 @@ public final class Navigator: NSObject {
         var strs = [Substring]()
         if let range = uri.range(of: "#") {
             let paths = String(uri[uri.startIndex..<range.lowerBound])
-            let fpaths = String(uri[range.lowerBound..<uri.endIndex])
+            let fpaths = String(uri[range.upperBound..<uri.endIndex])
             strs = paths.split(separator: "/")
-            strs.append(contentsOf: fpaths.split(separator: "/"))
+            
+            let tmp = fpaths.split(separator: "/")
+            if tmp.count > 0 {
+                strs.append(Substring("#")) //必须单独作为一个元素
+                strs.append(contentsOf: tmp)
+            }
         } else {
             strs = uri.split(separator: "/")
         }
