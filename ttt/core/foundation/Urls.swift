@@ -399,6 +399,48 @@ public final class Urls {
         return Urls.tidy(url: url,query: q)
     }
     
+    public static func scheme(url:String) -> String {
+        //decoding and encoding can compatibility more scene
+        let surl = encoding(url: url)
+        
+        guard let uri = URL(string:surl) else { return "" }
+        
+        if let scheme = uri.scheme {
+            return scheme.lowercased()
+        }
+        
+        return ""
+    }
+    
+    public static func host(url:String) -> String {
+        //decoding and encoding can compatibility more scene
+        let surl = encoding(url: url)
+        
+        guard let uri = URL(string:surl) else { return "" }
+        
+        if let host = uri.host {
+            return host.lowercased()
+        }
+        
+        return ""
+    }
+    
+    // 取当前url的地址,即：scheme://host
+    public static func location(url:String) -> String {
+        //decoding and encoding can compatibility more scene
+        let surl = encoding(url: url)
+        
+        guard let uri = URL(string:surl) else { return "" }
+        
+        guard let host = uri.host else { return "" }
+        
+        if let scheme = uri.scheme {
+            return scheme.lowercased() + "://" + host.lowercased()
+        } else {
+            return "http://" + host.lowercased()
+        }
+    }
+    
     /// tidy <scheme>://<host>:<port>/<path>;<params>?<query>#<fragment> , case sensitive path
     /// just uri:<scheme>://<host>:<port>/<path>;<params>
     /// *param: only is just url path
@@ -630,7 +672,8 @@ public final class Urls {
         return builder
     }
     
-    private static func getPathKey(paths:[Any]) -> String {
+    private static func getPathKey(paths:[Any]) -> [String] {
+        var keys:[String] = []
         var isLast = true
         for s in paths.reversed() {
             var path = ""
@@ -659,23 +702,23 @@ public final class Urls {
             let begin = path.index(path.startIndex, offsetBy: 1)
             let end = path.index(path.endIndex, offsetBy: -1)
             let range = begin ..< end
-            return String(path[range])
+            keys.insert(String(path[range]), at: 0) //插入到前面
         }
         
-        return ""
+        return keys
     }
     
     // just support last component param key
-    public static func getURLPathParamKey(url: String) -> String  {
+    public static func getURLPathParamKey(url: String) -> [String]  {
         var surl = encoding(url: url)
         surl = surl.replacingOccurrences(of: "{", with: "-")
         surl = surl.replacingOccurrences(of: "}", with: "_")
-        guard let uri = URL(string:surl) else { return "" }
+        guard let uri = URL(string:surl) else { return [] }
         guard let host = uri.host else {
-            return ""
+            return []
         }
         if host.isEmpty {
-            return ""
+            return []
         }
         
         // 支持单页应用 #/product/{skuId}
@@ -687,22 +730,19 @@ public final class Urls {
         // 实际的path
         let paths = uri.pathComponents
         if (paths.isEmpty && fpaths.isEmpty) {//home page: https://m.mymm.com
-            return "/"
+            return []
         }
         
         // 从fragment中获取
-        var key = getPathKey(paths: fpaths)
-        if !key.isEmpty {
-            return key
-        }
+        var keys = getPathKey(paths: fpaths)
         
         //从后往前找
-        key = getPathKey(paths: paths)
-        if !key.isEmpty {
-            return key
+        let ks = getPathKey(paths: paths)
+        if !ks.isEmpty {
+            keys.insert(contentsOf: ks, at: 0)
         }
         
-        return ""
+        return keys
     }
     
     //是否为合法的itunes地址

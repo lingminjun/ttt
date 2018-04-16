@@ -358,8 +358,12 @@ public final class Navigator: NSObject {
         }
         
         // url hide value; simple:https://m.mymm.com/s/{skuId}.html
-        if !router.node.param.isEmpty && hintParams.keys.contains(router.node.param) {
-            query[router.node.param] = hintParams[router.node.param]
+        if !router.node.params.isEmpty {
+            for param in router.node.params {
+                if hintParams.keys.contains(param) {
+                    query[param] = hintParams[param]
+                }
+            }
         }
         
         // check auth
@@ -409,8 +413,8 @@ public final class Navigator: NSObject {
             
             //埋点追踪需要设置的参数
             viewController?.track_pageUrl = router.node.url
-            if !router.node.param.isEmpty {
-                if let v = query[router.node.param]?.string {
+            if !router.node.params.isEmpty {
+                if let v = query[router.node.params[0]]?.string {
                     viewController?.track_pageId = v
                 }
             }
@@ -507,7 +511,7 @@ public final class Navigator: NSObject {
             /*if let smc = vc as? SideMenuController, let tvc = smc.contentViewController as? MMContainer {
                 container = tvc
                 ctns.append(container)
-            } else*/ if let tvc = vc as? MMContainer {
+            } else */if let tvc = vc as? MMContainer {
                 container = tvc
                 ctns.append(container)
             } else {
@@ -613,8 +617,12 @@ public final class Navigator: NSObject {
                 //尝试取值
                 guard let nn = _routers[key] else { continue }
                 
-                if !nn.node.param.isEmpty && values.count > 0 {
-                    hintParams[nn.node.param] = QValue(values[0])
+                //取值要按照位置修改
+                if !nn.node.params.isEmpty && values.count > 0 {
+                    for pi in 0..<values.count {
+                        if pi > nn.node.params.count { break }
+                        hintParams[nn.node.params[pi]] = QValue(values[pi])
+                    }
                 }
                 
                 nn.node.url = Urls.tidy(url: url)
@@ -811,7 +819,7 @@ extension Navigator : XMLParserDelegate {
                 if attributeName == "url" {
                     _node.url = attributeValue
                     _node.path = Urls.getURLFinderPath(url: attributeValue, config: true)
-                    _node.param = Urls.getURLPathParamKey(url: attributeValue)
+                    _node.params = Urls.getURLPathParamKey(url: attributeValue)
                 } else if attributeName == "key" {
                     _node.key = attributeValue
                 } else if attributeName == "controller" {

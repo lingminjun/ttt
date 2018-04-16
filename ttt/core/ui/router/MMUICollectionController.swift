@@ -23,6 +23,7 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
         _table = UICollectionView(frame: self.view.bounds, collectionViewLayout: layout)
         _table.delegate = self
         _table.autoresizingMask = [.flexibleWidth,.flexibleHeight]
+        _table.backgroundColor = UIColor.white
         self.view.addSubview(_table)
         return true
     }

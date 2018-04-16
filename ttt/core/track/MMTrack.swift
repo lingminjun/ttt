@@ -239,8 +239,8 @@ extension UIViewController: MMTrackPage {
             return id
         }
         
-        if !_node.param.isEmpty {
-            if let v = self.ssn_Arguments[_node.param]?.string {
+        if !_node.params.isEmpty {
+            if let v = self.ssn_Arguments[_node.params[0]]?.string {
                 return v
             }
         }

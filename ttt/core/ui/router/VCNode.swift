@@ -18,7 +18,7 @@ public struct VCNode {
     public var key: String = "" //埋点需要的key---对应另一个配置
     public var des: String = "" //描述
     
-    public var param: String = "" //主键参数，针对url为 https://m.demo.com/detail/{skuid}.html这种
+    public var params: [String] = [] //主键参数，针对url为 https://m.demo.com/z/{pageId}/{chlId} 这种
     
     public var modal: Bool? = nil//null表示不强制限定打开方式
     public var auth: Bool = false
