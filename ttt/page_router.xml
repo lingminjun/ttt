@@ -10,6 +10,11 @@
         controller="DemoListController"
         container=""
         description="设置"/>
+    <item url="https://m.mymm.com/dk/tag/{tagName}"
+        key=""
+        controller="DemoListController"
+        container=""
+        description="设置"/>
     <item url="https://m.mymm.com/#/product/{skuId}"
         key=""
         controller="DemoListController"

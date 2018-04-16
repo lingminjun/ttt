@@ -608,7 +608,11 @@ public final class Navigator: NSObject {
                     
                     if (j >= start && j < start + len) {//替换位置
                         key = key + "/{_}" + ext
-                        values.append(sstr)
+                        if let en = sstr.removingPercentEncoding {
+                            values.append(en)
+                        } else {
+                            values.append(sstr)
+                        }
                     } else {
                         key = key + "/" + sstr + ext
                     }

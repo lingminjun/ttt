@@ -238,6 +238,24 @@ public enum QValue {
     }
 }
 
+extension URL {
+    public var encodedPathComponents: [String] {
+        get {
+            var eps = [] as [String]
+            let ps = self.pathComponents
+            for str in ps {
+                if let en = str.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) {
+                    eps.append(en)
+                } else {
+                    eps.append(str)
+                }
+            }
+            
+            return eps
+        }
+    }
+}
+
 public final class Urls {
     
     /// query url encode
@@ -368,6 +386,9 @@ public final class Urls {
     
     
     public static func encoding(url:String) -> String {
+        if let u = URL(string: url) {
+            return u.absoluteString
+        }
         guard let surl = url.removingPercentEncoding else { return url }
         guard let tsurl = surl.addingPercentEncoding(withAllowedCharacters: URL_ALLOWED_CHARS) else { return url }
         return tsurl
@@ -492,7 +513,7 @@ public final class Urls {
         }
         
         // path
-        let paths = uri.pathComponents
+        let paths = uri.encodedPathComponents
         for path in paths {
             if (path.isEmpty || path == "/" || path == "." || path == "..") {
                 continue
@@ -616,7 +637,7 @@ public final class Urls {
         }
         
         // 实际的path
-        let paths = uri.pathComponents
+        let paths = uri.encodedPathComponents //非encode，需要处理
         if (paths.isEmpty && fpaths.isEmpty) {//home page: https://m.mymm.com
             return "/"
         }
@@ -728,7 +749,7 @@ public final class Urls {
         }
         
         // 实际的path
-        let paths = uri.pathComponents
+        let paths = uri.encodedPathComponents
         if (paths.isEmpty && fpaths.isEmpty) {//home page: https://m.mymm.com
             return []
         }
