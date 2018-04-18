@@ -42,8 +42,16 @@ extension UIView {
 //        }
     }
     
-//    func prepareForReuse()
-    @objc func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject,atIndexPath indexPath: IndexPath) {}
+    /*
+        func prepareForReuse()
+        @Params tableView Presenting table
+        @Params model     Rendering by data
+        @Params atIndexPath
+        @Params reused    It is reuse scenario. The previous model(old model) is equal to the current model.
+                          This value depends on the isEquale method you implement.
+                          Value is true that maybe means updating the model
+    */
+    @objc func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject,atIndexPath indexPath: IndexPath, reused: Bool) {}
     
     fileprivate func ssn_set_cellModel(_ model:MMCellModel?) {
         objc_setAssociatedObject(self, &CELL_MODEL_PROPERTY, model, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
@@ -662,8 +670,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         // 3.设置cell数据
         MMTry.try({
+            let reused = model.isEqual(cell?.ssn_cellModel)
             cell?.ssn_set_cellModel(model) //提前设置model的值
-            cell?.ssn_onDisplay(view, model: model, atIndexPath: indexPath)
+            cell?.ssn_onDisplay(view, model: model, atIndexPath: indexPath, reused: reused)
         }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
         
         return cell!

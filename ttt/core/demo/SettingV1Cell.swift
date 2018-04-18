@@ -36,7 +36,7 @@ class SettingV1Cell: UICollectionViewCell {
         self.textLabel?.text = ""
     }
     
-    @objc override func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject,atIndexPath indexPath: IndexPath) {
+    @objc override func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject,atIndexPath indexPath: IndexPath, reused:Bool) {
         let node: SettingNode = model as! SettingNode
         self.textLabel?.text = node.title
 //        self.detailTextLabel?.text = node.subTitle
