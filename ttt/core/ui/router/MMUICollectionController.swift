@@ -64,6 +64,12 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     }
     
     // MARK:- UICollectionViewDelegate MMCollectionViewDelegate 代理
+    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    }
+    
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print("点击了\(indexPath.row) section:\(indexPath.section)")
         collectionView.deselectItem(at: indexPath, animated: false)
@@ -161,4 +167,10 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     private var _layout:MMCollectionViewLayout!
     private var _table : UICollectionView!
     private var _fetchs : MMFetchsController<T>!
+    /*lazy var noConnectionView:NoConnectionView = {
+        let ViewSize = CGSize(width: self.view.width, height: 198)
+        let noConnectionView = NoConnectionView(frame:CGRect(x:0, y: (self.view.height - ViewSize.height) / 2.5, width: ViewSize.width, height: ViewSize.height))
+        noConnectionView.isHidden = true
+        return noConnectionView
+    }()*/
 }

@@ -228,4 +228,33 @@ extension UIViewController {
         
         presenting?.dismiss(animated: true, completion: nil)
     }
+    
+    public func ssn_presentingNavigationController() -> UINavigationController? {
+        if let nav = self.navigationController {
+            return nav
+        }
+        var responder = self.next
+        while responder != nil {
+            if let _ = responder as? UIWindow {
+                return nil
+            } else if let nav = responder as? UINavigationController {
+                return nav
+            } else if let vc = responder as? UIViewController,let nav = vc.navigationController {
+                return nav
+            }
+            responder = responder?.next
+        }
+        return nil
+    }
+    
+    public func ssn_home() {
+        
+        let nav = self.ssn_presentingNavigationController()
+        if let nv = nav, let presenting = nv.presentingViewController {
+            presenting.dismiss(animated: true, completion: nil)
+        } else if let nv = nav {
+            nv.popToRootViewController(animated: true)
+        }
+        
+    }
 }

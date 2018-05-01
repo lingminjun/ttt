@@ -86,7 +86,21 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate
     @objc func shareButtonTapped() {
         let shareViewController = ShareViewController()
         
-        /*
+        var url = _url
+        if let u = self.currentUrl {
+            url = u
+        }
+        
+        let model = CMSPageModel()
+        model.link = url
+        if let t = self.title {
+            model.title = t
+        } else {
+            model.title = self.getShareDescription()
+        }
+        model.description = self.getShareDescription()
+        model.coverImage = self.getShareIcon()
+        
         shareViewController.didUserSelectedHandler = { [weak self] (data) in
             if let strongSelf = self {
                 let myRole: UserRole = UserRole(userKey: Context.getUserKey())
@@ -100,11 +114,8 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate
                     viewController: strongSelf,
                     completion: { (ack) in
                         if let convKey = ack.data {
+                            let chatModel = ChatModel(text: url)
                             let viewController = UserChatViewController(convKey: convKey)
-                            let magazineCoverModel = MagazineCoverModel()
-                            magazineCoverModel.magazineCover = strongSelf.magazineCover
-                            let chatModel = ChatModel(model: magazineCoverModel)
-                            chatModel.messageContentType = .SharePage
                             viewController.forwardChatModel = chatModel
                             strongSelf.navigationController?.pushViewController(viewController, animated: true)
                         } else {
@@ -113,15 +124,11 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate
                 })
             }
         }
+        
         shareViewController.didSelectSNSHandler = { method in
-            if let magazineCover = self.magazineCover {
-                ShareManager.sharedManager.shareContentPage(magazineCover, method: method)
-                sender.recordAction(.Tap, sourceRef: "Share", sourceType: .Button, targetRef: magazineCover.contentPageKey, targetType: .ContentPage)
-            } else {
-                ErrorLogManager.sharedManager.recordNonFatalError(withException: .NullPointer)
-            }
+            //页面分享先套用cms模板，实际是Page模板
+            ShareManager.sharedManager.shareCMSContentPage(model, method: method)
         }
-         */
         
         self.present(shareViewController, animated: false, completion: nil)
     }
@@ -138,26 +145,38 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate
     }
    
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        
+        let allow = {
+            if navigationAction.request.allHTTPHeaderFields?["Authorization"] != nil {
+                decisionHandler(WKNavigationActionPolicy.allow)
+            } else {
+                decisionHandler(WKNavigationActionPolicy.cancel)
+                var request = navigationAction.request
+                request.setJWTHeader()
+                webView.load(request)
+            }
+        }
+        
         guard let url = navigationAction.request.url?.absoluteString else {
-            decisionHandler(WKNavigationActionPolicy.allow)
+            allow()
             return
         }
         
         if url.isEmpty || url == "about:blank" {
-            decisionHandler(WKNavigationActionPolicy.allow)
+            allow()
             return
         }
         
         switch navigationAction.navigationType {
         case .linkActivated:
             if checkGotoOtherWebController(url: url) {
-                decisionHandler(WKNavigationActionPolicy.allow)
+                allow()
             } else {
                 decisionHandler(WKNavigationActionPolicy.cancel)
             }
             break
         default:
-            decisionHandler(WKNavigationActionPolicy.allow)
+            allow()
             break
         }
     }

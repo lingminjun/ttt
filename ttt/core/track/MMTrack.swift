@@ -371,13 +371,11 @@ extension UIView:MMTrackComponent {
         
         //自行组装
         let vpid = self.track_visitPathId
-        if vpid.isEmpty {
-            return ""
-        }
-        
-        let pid = self.track_pid()
         if !vpid.isEmpty {
-            return "\(pid).\(vpid)"
+            let pid = self.track_pid()
+            if !pid.isEmpty {
+                return "\(pid).\(vpid)"
+            }
         }
         
         // 支持一些特殊按钮，系统UIBarButtonItem中的几种，返回
@@ -628,7 +626,7 @@ extension UIBarButtonItem:MMTrackComponent {
         }
         
         let pid = self.track_pid()
-        if !vpid.isEmpty {
+        if !pid.isEmpty {
             return "\(pid).\(vpid)"
         }
         
@@ -655,16 +653,32 @@ extension UIBarButtonItem:MMTrackComponent {
 
 extension UIButton {
      @objc override func track_name(child:Bool) -> String {
+        if let t = self.track_consoleTitle, !t.isEmpty {
+            return t
+        }
+        
+        var state = self.state
+        if self.isSelected {
+            state = .selected
+        }
+        
+        if let str = self.image(for: state)?.track_consoleTitle, !str.isEmpty {
+            return str
+        }
+        
+        if let str = self.title(for: state), !str.isEmpty {
+            return str
+        }
+        
+        if let str = self.titleLabel?.text, !str.isEmpty {
+            return str
+        }
+        
         let t = super.track_name(child:child)
         if !t.isEmpty {
             return t
         }
-        if let str = self.title(for: self.state), !str.isEmpty {
-            return str
-        }
-        if let str = self.titleLabel?.text, !str.isEmpty {
-            return str
-        }
+        
         return ""
     }
 }

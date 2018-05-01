@@ -527,6 +527,7 @@ public final class Navigator: NSObject {
         return routerNode(url: url, hintParams: &temp)?.node
     }
     
+    let legal_exts = [".html",".htm",".xhtml",".asp",".aspx",".php",".jsp",".shtml",".shtm",".do"]
     
     fileprivate func routerNode(url:String, hintParams: inout QBundle) -> RouterNode? {
         let uri = Urls.getURLFinderPath(url:url)
@@ -603,7 +604,11 @@ public final class Navigator: NSObject {
                     var ext:String = ""
                     if let range = sstr.range(of: ".", options: .backwards) {
                         ext = String(sstr[range.lowerBound..<sstr.endIndex])
-                        sstr = String(sstr[sstr.startIndex..<range.lowerBound])
+                        if !legal_exts.contains(ext) {
+                            ext = ""
+                        } else {
+                            sstr = String(sstr[sstr.startIndex..<range.lowerBound])
+                        }
                     }
                     
                     if (j >= start && j < start + len) {//替换位置

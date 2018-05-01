@@ -658,7 +658,7 @@ public final class Urls {
         return builder
     }
     
-    private static func buildPath(paths:[Any]) -> String {
+    private static func buildPath(paths:[Any],case sensitve:Bool = true) -> String {
         var builder = String()
         var isFirst = true;
         for s in paths {
@@ -688,7 +688,11 @@ public final class Urls {
             }
             
             // 不区分大小写，不一定合理，兼容方案; Not case sensitive.
-            builder.append(str.lowercased());
+            if sensitve {
+                builder.append(str)
+            } else {
+                builder.append(str.lowercased())
+            }
         }
         return builder
     }
