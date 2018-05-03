@@ -10,7 +10,16 @@ import Foundation
 import RealmSwift
 
 ///http://www.ganji.com/dog/
-public final class Dog : RealmSwift.Object,MMJsonable,Decodable {
+public final class Dog : RealmSwift.Object,MMJsonable,Decodable,FlyModel {
+    public var data_unique_id: String {
+        get { return breed }
+    }
+    
+    public var data_sync_flag: Int64 {
+        get { return flag }
+        set { flag = newValue }
+    }
+    
     public func ssn_jsonString() -> String {
         return "{\"breed\":\"\(breed)\",\"name\":\"\(name)\",\"brains\":\"\(brains)\",\"loyalty\":\"\(loyalty)\"}"
     }
@@ -26,6 +35,7 @@ public final class Dog : RealmSwift.Object,MMJsonable,Decodable {
     @objc public dynamic var name: String = ""
     @objc public dynamic var brains: Int = 80 // MAX = 120
     @objc public dynamic var loyalty: Int = 80
+    @objc public dynamic var flag: Int64 = 0
     
     //https://www.jianshu.com/p/fef63f4cf6b4
     @objc override static open func primaryKey() -> String? { return "breed" }

@@ -102,9 +102,10 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         }
         else {
             let dog = self.fetchs.object(at: indexPath)
-            self.fetchs.update(at: indexPath, {
-                dog?.brains += 1;
-            })
+//            self.fetchs.update(at: indexPath, {
+//                dog?.brains += 1;
+//            })
+            Navigator.shared.dopen("https://m.mymm.com/dog/detail/\(dog!.breed).html")
         }
     }
     

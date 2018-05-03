@@ -30,6 +30,11 @@
         controller="DemoRealmController"
         container=""
         description="狗狗列表"/>
+    <item url="https://m.mymm.com/dog/detail/{breed}.html"
+        key=""
+        controller="DetailViewController"
+        container=""
+        description="详情"/>
     <item url="https://m.mymm.com/web.html"
         key=""
         controller="MMUIWebController"

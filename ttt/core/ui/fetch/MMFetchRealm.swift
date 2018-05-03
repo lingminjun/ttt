@@ -104,6 +104,11 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
         }
     }
     
+    deinit {
+        _notice?.invalidate()
+        _notice = nil
+    }
+    
     /// 
     override public func count() -> Int { return _list.count }
     override public func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return Array(_list)}

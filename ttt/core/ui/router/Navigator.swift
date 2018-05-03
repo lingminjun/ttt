@@ -23,9 +23,16 @@ public protocol Authorize {
 /// Routing app all scene pages.
 public final class Navigator: NSObject {
     
+    public var TIMES:Int { get { return _times } }
+    
     // private
     private override init() {
         super.init()
+        
+        let defaults = UserDefaults.standard
+        _times = defaults.integer(forKey: ".app.start.times") + 1
+        defaults.set(_times, forKey: ".app.start.times")
+        
         loadConfig()
         UIViewController.router_hook()
         
@@ -772,6 +779,7 @@ public final class Navigator: NSObject {
     var _waiting:Bool = false
     var _authUri = ""
     var _pendingUrl = ""//pending task that  will be open after authored
+    var _times = 0
     
     //
     private var _node: VCNode = VCNode()

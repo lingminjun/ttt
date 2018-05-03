@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5326877B20983A3A0004F1DF /* Flyweight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5326877A20983A3A0004F1DF /* Flyweight.swift */; };
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
+		5355BF81209ABA9C00C7CAC0 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */; };
+		5355BF83209ABFC300C7CAC0 /* DogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5355BF82209ABFC300C7CAC0 /* DogManager.swift */; };
 		53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2220440CD5009CDE66 /* WFHeaderView.m */; };
 		53822F2920440CD5009CDE66 /* WFHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 53822F2520440CD5009CDE66 /* WFHeaderView.xib */; };
 		53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2620440CD5009CDE66 /* CollectViewController.m */; };
@@ -58,7 +61,10 @@
 /* Begin PBXFileReference section */
 		358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.release.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.release.xcconfig"; sourceTree = "<group>"; };
 		35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ttt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5326877A20983A3A0004F1DF /* Flyweight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flyweight.swift; sourceTree = "<group>"; };
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
+		5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		5355BF82209ABFC300C7CAC0 /* DogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogManager.swift; sourceTree = "<group>"; };
 		53822F2220440CD5009CDE66 /* WFHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFHeaderView.m; sourceTree = "<group>"; };
 		53822F2320440CD5009CDE66 /* CollectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectViewController.h; sourceTree = "<group>"; };
 		53822F2420440CD5009CDE66 /* WFHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WFHeaderView.h; sourceTree = "<group>"; };
@@ -220,6 +226,8 @@
 				D99152D6201836EE00FD8B92 /* ProfileViewController.swift */,
 				5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */,
 				53822F3620467E16009CDE66 /* SCollectionViewController.swift */,
+				5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */,
+				5355BF82209ABFC300C7CAC0 /* DogManager.swift */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -254,6 +262,7 @@
 				D941406A201721470050132B /* KeyCycleStack.swift */,
 				D9D2AA3B2018A738000B3681 /* Quantum.swift */,
 				5388893F204AD85600859ED6 /* BriefRSA.swift */,
+				5326877A20983A3A0004F1DF /* Flyweight.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -441,6 +450,7 @@
 				D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */,
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
+				5355BF81209ABA9C00C7CAC0 /* DetailViewController.swift in Sources */,
 				53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
 				538350EE2063A80C005DDA8A /* MMTrack.swift in Sources */,
@@ -448,8 +458,10 @@
 				53822F3120450B89009CDE66 /* MMCollectionViewLayout.swift in Sources */,
 				D94140692016F1120050132B /* CycleStack.swift in Sources */,
 				D99152D7201836EE00FD8B92 /* ProfileViewController.swift in Sources */,
+				5326877B20983A3A0004F1DF /* Flyweight.swift in Sources */,
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
 				53888940204AD85600859ED6 /* BriefRSA.swift in Sources */,
+				5355BF83209ABFC300C7CAC0 /* DogManager.swift in Sources */,
 				D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */,
 				D94140672016D6420050132B /* RigidCache.swift in Sources */,
 				53822F3D2047EAC2009CDE66 /* SettingV1Cell.swift in Sources */,
