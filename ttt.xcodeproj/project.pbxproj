@@ -30,6 +30,7 @@
 		538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */; };
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
 		538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8F200A2DDE006B3A28 /* SettingNode.swift */; };
+		53B133A3209F2ED900B2A3FD /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B133A2209F2ED900B2A3FD /* LRUCache.swift */; };
 		A466CFF86FB13BD221AC4E61 /* Pods_ttt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */; };
 		D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9414050200F3E3F0050132B /* MMJsonable.swift */; };
 		D941405C20107C610050132B /* MMTry.m in Sources */ = {isa = PBXBuildFile; fileRef = D941405B20107C610050132B /* MMTry.m */; };
@@ -89,6 +90,7 @@
 		538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRealmController.swift; sourceTree = "<group>"; };
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		538F9E8F200A2DDE006B3A28 /* SettingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNode.swift; sourceTree = "<group>"; };
+		53B133A2209F2ED900B2A3FD /* LRUCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRUCache.swift; sourceTree = "<group>"; };
 		91BE48983675DDBC97B96407 /* Pods-ttt.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.debug.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.debug.xcconfig"; sourceTree = "<group>"; };
 		D9414050200F3E3F0050132B /* MMJsonable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMJsonable.swift; sourceTree = "<group>"; };
 		D941405A20107C610050132B /* MMTry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMTry.h; sourceTree = "<group>"; };
@@ -268,6 +270,7 @@
 				5388893F204AD85600859ED6 /* BriefRSA.swift */,
 				5326877A20983A3A0004F1DF /* Flyweight.swift */,
 				5374F93F209C42E60036225E /* DataStore.swift */,
+				53B133A2209F2ED900B2A3FD /* LRUCache.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -445,6 +448,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53B133A3209F2ED900B2A3FD /* LRUCache.swift in Sources */,
 				5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */,
 				D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */,
 				538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */,

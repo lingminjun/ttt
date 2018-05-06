@@ -21,7 +21,7 @@ class DogManager  {
         
         let TIMES = UserDefaults.standard.integer(forKey: ".app.start.times")
 //        _list = realm.objects(Dog.self)
-        fly = Flyweight<Dog>(capacity: 100, storeScope:"dog", flag: Int64(TIMES))
+        fly = Flyweight<Dog>(capacity: 3, storeScope:"dog", flag: Int64(TIMES))
     }
     
 }

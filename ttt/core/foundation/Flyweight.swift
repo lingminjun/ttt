@@ -8,13 +8,44 @@
 
 import Foundation
 
-public class Flyweight<Value: FlyModel> : Notice {
+/**
+ * Data model protocol
+ */
+public protocol FlyModel:Codable {
+    var data_unique_id:String {get}
+    var data_sync_flag:Int64 {get set}
+}
+
+/**
+ * Data update notice
+ */
+public protocol Notice {
+    func on_data_update(dataId:String, model: FlyModel?, isDeleted: Bool)
+}
+
+/**
+ * Persistence
+ */
+public protocol Persistence {
+    func persistent_queryData(dataId: String) -> FlyModel?
+    func persistent_saveData(dataId: String, model: FlyModel)
+    func persistent_removeData(dataId: String)
     
-    private typealias Node = CacheNode<String, Value>
+    func persistent_set_notice(notice: Notice)
+}
+
+/**
+ * Remote accessor
+ */
+public protocol RemoteAccessor {
+    func remote_get(dataId:String) -> FlyModel
+}
+
+
+public class Flyweight<Value: FlyModel> : Notice {
 
     init(capacity: Int, psstn: Persistence? = nil, remote: RemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
-        self.capacity = capacity
-        self.storage = Dictionary<String, Value>(minimumCapacity: capacity)
+        self._cache = LRUCache<String, Value>(maxCapacity: capacity)
         self.remote = remote
         self.flag = flag
         if psstn != nil {
@@ -24,54 +55,15 @@ public class Flyweight<Value: FlyModel> : Notice {
     }
     
     init(capacity: Int, storeScope: String, storeDomain: String = "", remote: RemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
-        self.capacity = capacity
-        self.storage = Dictionary<String, Value>(minimumCapacity: capacity)
+        self._cache = LRUCache<String, Value>(maxCapacity: capacity)
         self.remote = remote
         self.flag = flag
         self.storeDomain = storeDomain
         self.storeScope = storeScope
     }
     
-    private func getCache(key: String) -> Value? {
-        if let node = findNode(key) {
-            // Move the node to the front of the list
-            moveNodeToFront(node)
-        }
-        
-        return storage[key]
-    }
-    
-    private func setCache(key: String, value newValue: Value?) {
-        storage[key] = newValue
-        
-        if let value = newValue {
-            // Value was provided. Find the corresponding node, update its value, and move
-            // it to the front of the list. If it's not found, create it at the front.
-            if let node = findNode(key) {
-                node.value = value
-                moveNodeToFront(node)
-            } else {
-                let newNode = Node(key: key, value: value)
-                addNodeToFront(newNode)
-                
-                // Truncate from the tail
-                if count > capacity {
-                    for _ in capacity..<count {
-                        storage[tail!.key] = nil
-                        tail = tail?.previous
-                    }
-                }
-            }
-        } else {
-            // Value was removed. Find the corresponding node and remove it as well.
-            if let node = findNode(key) {
-                removeNode(node)
-            }
-        }
-    }
-    
     public var count: Int {
-        return storage.count
+        return _cache.count
     }
     
     /**
@@ -145,9 +137,7 @@ public class Flyweight<Value: FlyModel> : Notice {
      * 清除所有内存对象
      */
     public func restore() {
-        storage.removeAll()
-        head = nil
-        tail = nil
+        _cache.removeAll()
         _store = nil
     }
     
@@ -159,6 +149,8 @@ public class Flyweight<Value: FlyModel> : Notice {
         _store = nil
     }
     
+    
+    // MARK: - private
     private func dataClone(model:Value) -> Value {
         guard let data = try? JSONEncoder().encode(model) else {
             return model
@@ -185,7 +177,10 @@ public class Flyweight<Value: FlyModel> : Notice {
     }
     
     private func loadModel(_ dataId:String, notices:[Notice]) {
-        var obj:Value? = self.getCache(key: dataId)
+        var obj:Value? = nil
+        synchronized {
+            obj = _cache[dataId]
+        }
         let nocache = obj == nil
         
         if (obj == nil && psstn != nil) {
@@ -213,7 +208,9 @@ public class Flyweight<Value: FlyModel> : Notice {
 //        }
         
         if nocache && obj != nil {
-            self.setCache(key: dataId, value: obj)
+            synchronized {
+                _cache[dataId] = obj
+            }
         }
         
         if let model = obj {
@@ -225,8 +222,9 @@ public class Flyweight<Value: FlyModel> : Notice {
             obj = remote?.remote_get(dataId:dataId) as? Value
             if (obj != nil) {
                 obj?.data_sync_flag = flag
-                self.setCache(key: dataId, value: obj)
-                
+                synchronized {
+                    _cache[dataId] = obj
+                }
                 let lss = getObserver(dataId)
                 notice(dataId,model:obj!,notices:lss);//第二次更新
             }
@@ -236,14 +234,15 @@ public class Flyweight<Value: FlyModel> : Notice {
         clean();
     }
     
-    func updateModel(_ model:Value, notices:[Notice], persistent:Bool) {
+    private func updateModel(_ model:Value, notices:[Notice], persistent:Bool) {
         let dataId = model.data_unique_id
         if  dataId.isEmpty {
             return
         }
         
-        setCache(key: dataId, value: model)
-        
+        synchronized {
+            _cache[dataId] = model
+        }
         
         if persistent && psstn != nil {
             psstn?.persistent_saveData(dataId: dataId,model: model)
@@ -254,10 +253,10 @@ public class Flyweight<Value: FlyModel> : Notice {
         notice(dataId,model:model,notices:notices)
     }
     
-    func removeModel(_ dataId:String, notices:[Notice]) {
-        let obj = getCache(key: dataId)
-        if obj != nil {
-            setCache(key: dataId, value: nil)
+    private func removeModel(_ dataId:String, notices:[Notice]) {
+        var obj:Value? = nil
+        synchronized {
+            obj = _cache.removeValue(forKey: dataId)
         }
         
         if psstn != nil {
@@ -269,7 +268,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         notice(dataId,model:obj,isDeleted:true,notices:notices);
     }
     
-    func notice(_ dataId:String, model:Value?, isDeleted: Bool = false, notices: [Notice]) {
+    private func notice(_ dataId:String, model:Value?, isDeleted: Bool = false, notices: [Notice]) {
         if notices.isEmpty {
             return
         }
@@ -292,11 +291,11 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
     }
     
-    func monitorPersistent() {
+    private func monitorPersistent() {
         psstn?.persistent_set_notice(notice: self)
     }
     
-    func lookOverListeners(dataId:String, model: Value?, isDeleted:Bool) {
+    private func lookOverListeners(dataId:String, model: Value?, isDeleted:Bool) {
         let listeners = getObserver(dataId)
         if (isDeleted) {
             removeModel(dataId,notices:listeners);
@@ -309,11 +308,11 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
     }
     
-    func isMainThread() -> Bool {
+    private func isMainThread() -> Bool {
         return Thread.isMainThread
     }
     
-    func clearObserver(code:String) {//synchronized
+    private func clearObserver(code:String) {//synchronized
         self.synchronized {
             guard let dataId = map[code] else {
                 return
@@ -337,12 +336,17 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
     }
     
-    func addObserver(_ dataId: String, notice: Notice) {//synchronized
+    private func addObserver(_ dataId: String, notice: Notice) {//synchronized
         let code = String(format: "%p", notice as! CVarArg)
         
-        //已经添加过了
+        
         self.synchronized {
-            let key = map[code]
+            var key = map[code]
+            if let k = key, k != dataId {//已经添加过了,但是不是注册的同一个dataId
+                clearObserver(code: code)
+                key = nil
+            }
+            
             if key == nil {
                 map[code] = dataId
                 let observer = WeakObserver(notice as AnyObject, dataId:dataId, code:code)
@@ -359,7 +363,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
     }
     
-    func getObserver(_ dataId:String) -> [Notice] {//synchronized
+    private func getObserver(_ dataId:String) -> [Notice] {//synchronized
         var listeners:[Notice] = []
         
         self.synchronized {
@@ -379,74 +383,23 @@ public class Flyweight<Value: FlyModel> : Notice {
         return listeners
     }
     
+    private class WeakObserver {
+        weak var obj: AnyObject? = nil
+        var dataId:String = ""
+        var code:String = ""
+        init(_ obj: AnyObject, dataId:String, code:String) {
+            self.obj = obj
+            self.dataId = dataId
+            self.code = code
+        }
+    }
     
-    
-    
-    // MARK: - private
     private func synchronized(_ body: () throws -> Void) rethrows {
         objc_sync_enter(self)
         defer { objc_sync_exit(self) }
         return try body()
     }
     
-    private func addNodeToFront(_ node: Node) {
-        if let headNode = head {
-            head = node
-            node.next = headNode
-            headNode.previous = node
-        } else {
-            head = node
-            tail = node
-        }
-    }
-    
-    private func moveNodeToFront(_ node: Node) {
-        // Link the previous node to the next
-        removeNode(node)
-        
-        // Then prepend this node at the front of the list
-        node.next = head
-        head = node
-    }
-    
-    private func findNode(_ key: String) -> Node? {
-        var node = head
-        var found = false
-        
-        while node != nil {
-            if node?.key == key {
-                found = true
-                break
-            } else {
-                node = node?.next
-            }
-        }
-        
-        if !found {
-            node = nil
-        }
-        
-        return node
-    }
-    
-    private func removeNode(_ node: Node) {
-        // Remove the given node by linking the previous node to the next
-        let previous = node.previous
-        let next = node.next
-        
-        previous?.next = next
-        next?.previous = previous
-        
-        // Update the tail, if necessary
-        if tail?.key == node.key {
-            tail = previous
-        }
-    }
-    
-    private var capacity: Int
-    private var storage: Dictionary<String, Value>
-    private var head: Node?
-    private var tail: Node?
     
     private var storeDomain = ""
     private var storeScope = ""
@@ -465,7 +418,11 @@ public class Flyweight<Value: FlyModel> : Notice {
             return _store
         }
     }
+    
+    
     private var _store:DataStore?
+    private var _cache:LRUCache<String,Value>!
+    
     private var psstn: Persistence?
     private var remote: RemoteAccessor?
     
@@ -476,55 +433,4 @@ public class Flyweight<Value: FlyModel> : Notice {
     private var map: Dictionary<String, String> = [:]//
 }
 
-public protocol FlyModel:Codable {
-    var data_unique_id:String {get}
-    var data_sync_flag:Int64 {get set}
-}
 
-/**
- * Data update notice
- */
-public protocol Notice {
-    func on_data_update(dataId:String, model: FlyModel?, isDeleted: Bool)
-}
-
-/**
- * Persistence
- */
-public protocol Persistence {
-    func persistent_queryData(dataId: String) -> FlyModel?
-    func persistent_saveData(dataId: String, model: FlyModel)
-    func persistent_removeData(dataId: String)
-    
-    func persistent_set_notice(notice: Notice)
-}
-
-/**
- * Remote accessor
- */
-public protocol RemoteAccessor {
-    func remote_get(dataId:String) -> FlyModel
-}
-
-private class CacheNode<String: Hashable, Value> {
-    let key: String
-    var value: Value
-    var previous: CacheNode?
-    var next: CacheNode?
-    
-    init(key: String, value: Value) {
-        self.key = key
-        self.value = value
-    }
-}
-
-private class WeakObserver {
-    weak var obj: AnyObject? = nil
-    var dataId:String = ""
-    var code:String = ""
-    init(_ obj: AnyObject, dataId:String, code:String) {
-        self.obj = obj
-        self.dataId = dataId
-        self.code = code
-    }
-}
