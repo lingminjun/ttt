@@ -10,7 +10,7 @@ import Foundation
 import RealmSwift
 
 ///http://www.ganji.com/dog/
-public final class Dog : RealmSwift.Object,MMJsonable,Decodable,FlyModel {
+public final class Dog : RealmSwift.Object,MMJsonable,Codable,FlyModel {
     public var data_unique_id: String {
         get { return breed }
     }
@@ -21,6 +21,10 @@ public final class Dog : RealmSwift.Object,MMJsonable,Decodable,FlyModel {
     }
     
     public func ssn_jsonString() -> String {
+        let js = JSONEncoder()
+        if let data = try? js.encode(self),let str = String(data: data, encoding: String.Encoding.utf8) {
+            return str
+        }
         return "{\"breed\":\"\(breed)\",\"name\":\"\(name)\",\"brains\":\"\(brains)\",\"loyalty\":\"\(loyalty)\"}"
     }
     

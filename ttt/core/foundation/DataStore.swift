@@ -11,6 +11,7 @@ import Foundation
 let SSNDataStoreDir = "ssndatastore"
 
 let SSNDataStoreNotification = "SSN.DataStore.Notification"
+let SSNDataStoreNotificationOperationKey = "SSN.DataStore.Notification.Operation.Key"
 
 /**
  *  目录类型
@@ -109,6 +110,64 @@ class DataStore : Equatable {
         print("DataStore[\(_scope)] deinit ")
     }
     
+    ////// 对象支持
+    func model<T>(forKey key:String, type: T.Type) -> T? where T : Decodable {
+        guard let data = data(forKey: key) else {
+            return nil
+        }
+        let decoder = JSONDecoder()
+        guard let model = try? decoder.decode(type, from: data) else {
+            return nil
+        }
+        return model
+    }
+    
+    func accessModel<T>(forKey key:String, type: T.Type) -> T? where T : Decodable  {
+        guard let data = accessData(forKey: key) else {
+            return nil
+        }
+        let decoder = JSONDecoder()
+        guard let model = try? decoder.decode(type, from: data) else {
+            return nil
+        }
+        return model
+    }
+    
+    func model<T>(forKey key:String, isExpired: inout Bool, type: T.Type) -> T? where T : Decodable {
+        guard let data = data(forKey: key, isExpired: &isExpired) else {
+            return nil
+        }
+        let decoder = JSONDecoder()
+        guard let model = try? decoder.decode(type, from: data) else {
+            return nil
+        }
+        return model
+    }
+    
+    func accessModel<T>(forKey key:String, isExpired: inout Bool, type: T.Type) -> T? where T : Decodable {
+        guard let data = accessData(forKey: key, isExpired: &isExpired) else {
+            return nil
+        }
+        let decoder = JSONDecoder()
+        guard let model = try? decoder.decode(type, from: data) else {
+            return nil
+        }
+        return model
+    }
+    
+    func store<T>(model:T, forKey key:String, expire:Int64 = 0) where T : Encodable {
+        let encoder = JSONEncoder()
+        guard let data = try? encoder.encode(model) else {
+            return
+        }
+        store(data: data, forKey: key, expire: expire)
+    }
+    
+    func removeModel(forKey key:String) {
+        removeData(forKey: key)
+    }
+    
+    ////// 对字符串支持
     func string(forKey key:String) -> String {
         if let data = data(forKey: key), let str = String(data: data, encoding: String.Encoding.utf8) {
             return str
@@ -252,7 +311,9 @@ class DataStore : Equatable {
         pthread_mutex_unlock(lock)
         
         // 发起通知
-        NotificationCenter.default.post(name: NSNotification.Name(_scope + "." + SSNDataStoreNotification), object: key)
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: NSNotification.Name(self._scope + "." + SSNDataStoreNotification), object: key)
+        }
     }
     
     /**
@@ -268,6 +329,12 @@ class DataStore : Equatable {
         pthread_mutex_lock(lock)
         removeFile(forKey:key)
         pthread_mutex_unlock(lock)
+        
+        // 发起通知
+        DispatchQueue.main.async {
+            let info = ["operation":"delete"]
+            NotificationCenter.default.post(name: NSNotification.Name(self._scope + "." + SSNDataStoreNotification), object: key, userInfo:info)
+        }
     }
     
     

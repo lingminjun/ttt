@@ -10,7 +10,7 @@ import Foundation
 import RealmSwift
 
 class DetailViewController: MMUITableController<MMCellModel>,Notice {
-    func on_data_update(model: FlyModel, isDeleted: Bool) {
+    func on_data_update(dataId: String, model: FlyModel?, isDeleted: Bool) {
         if let dog = model as? Dog {
             self.dog = dog
             self.title = dog.breed + "(\(dog.brains))"
@@ -49,6 +49,7 @@ class DetailViewController: MMUITableController<MMCellModel>,Notice {
             try realm.write {
                 dog.brains = dog.brains + 1
 //                realm.add(dog, update: true);//(newObjects)
+                DogManager.shared.fly.save(dog)
             }
         } catch {
             print("error:\(error)")

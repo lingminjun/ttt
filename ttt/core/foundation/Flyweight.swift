@@ -11,35 +11,25 @@ import Foundation
 public class Flyweight<Value: FlyModel> : Notice {
     
     private typealias Node = CacheNode<String, Value>
-    
-    private var capacity: Int
-    private var storage: Dictionary<String, Value>
-    private var head: Node?
-    private var tail: Node?
-    
-    private var psstn: Persistence?
-    private var remote: RemoteAccessor?
-    
-    private var flag: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
-    
-    //容器
-    private var obs: Dictionary<String, [WeakObserver]> = [:]//所有注册者
-    private var map: Dictionary<String, String> = [:]//
-    
-    //监听对象释放
-//    private ReferenceQueue<Listener> _gc = new ReferenceQueue<Listener>();
-//    private Thread _mainThread = Looper.getMainLooper().getThread();
-    
 
     init(capacity: Int, psstn: Persistence? = nil, remote: RemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
         self.capacity = capacity
         self.storage = Dictionary<String, Value>(minimumCapacity: capacity)
-        self.psstn = psstn
         self.remote = remote
         self.flag = flag
         if psstn != nil {
+            self.psstn = psstn
             monitorPersistent()
         }
+    }
+    
+    init(capacity: Int, storeScope: String, storeDomain: String = "", remote: RemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
+        self.capacity = capacity
+        self.storage = Dictionary<String, Value>(minimumCapacity: capacity)
+        self.remote = remote
+        self.flag = flag
+        self.storeDomain = storeDomain
+        self.storeScope = storeScope
     }
     
     private func getCache(key: String) -> Value? {
@@ -126,7 +116,7 @@ public class Flyweight<Value: FlyModel> : Notice {
     }
     
     
-    public func save( _ model: inout Value, latest: Bool = true) {
+    public func save( _ model: Value, latest: Bool = true) {
         
         let dataId = model.data_unique_id
         
@@ -134,12 +124,13 @@ public class Flyweight<Value: FlyModel> : Notice {
             return;
         }
         
+        var m = dataClone(model:model)
         if (latest) {
-            model.data_sync_flag = flag
+            m.data_sync_flag = flag
         }
         
         let listeners = getObserver(dataId)
-        updateModel(model,notices:listeners,persistent:latest)
+        updateModel(m,notices:listeners,persistent:latest)
     }
     
     public func remove(_ dataId:String) {
@@ -157,6 +148,25 @@ public class Flyweight<Value: FlyModel> : Notice {
         storage.removeAll()
         head = nil
         tail = nil
+        _store = nil
+    }
+    
+    /**
+     清除所有内存对象
+    */
+    public func switchStoreDomain(_ domain: String) {
+        self.storeDomain = domain
+        _store = nil
+    }
+    
+    private func dataClone(model:Value) -> Value {
+        guard let data = try? JSONEncoder().encode(model) else {
+            return model
+        }
+        guard let m = try? JSONDecoder().decode(Value.self, from: data) else {
+            return model
+        }
+        return m
     }
     
     /**
@@ -180,6 +190,11 @@ public class Flyweight<Value: FlyModel> : Notice {
         
         if (obj == nil && psstn != nil) {
             obj = psstn?.persistent_queryData(dataId: dataId) as? Value
+            if let model = obj {
+                obj = dataClone(model: model)
+            }
+        } else if (obj == nil && store != nil) {
+            obj = store?.model(forKey: dataId, type: Value.self)
         }
         
         //本地获取数据后，仍然可能需要从远程获取数据
@@ -202,7 +217,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
         
         if let model = obj {
-            notice(model,notices:notices)
+            notice(dataId,model:model,notices:notices)
         }
         
         if (needSync && remote != nil) {
@@ -213,7 +228,7 @@ public class Flyweight<Value: FlyModel> : Notice {
                 self.setCache(key: dataId, value: obj)
                 
                 let lss = getObserver(dataId)
-                notice(obj!,notices:lss);//第二次更新
+                notice(dataId,model:obj!,notices:lss);//第二次更新
             }
         }
         
@@ -232,45 +247,48 @@ public class Flyweight<Value: FlyModel> : Notice {
         
         if persistent && psstn != nil {
             psstn?.persistent_saveData(dataId: dataId,model: model)
+        } else if persistent && store != nil {
+            store?.store(model: model, forKey: dataId)
         }
         
-        notice(model,notices:notices)
+        notice(dataId,model:model,notices:notices)
     }
     
     func removeModel(_ dataId:String, notices:[Notice]) {
-        guard let obj = getCache(key: dataId) else {
-            return
+        let obj = getCache(key: dataId)
+        if obj != nil {
+            setCache(key: dataId, value: nil)
         }
-        setCache(key: dataId, value: nil)
-
         
         if psstn != nil {
             psstn?.persistent_removeData(dataId: dataId)
+        } else if store != nil {
+            store?.removeModel(forKey: dataId)
         }
         
-        notice(obj,isDeleted:true,notices:notices);
+        notice(dataId,model:obj,isDeleted:true,notices:notices);
     }
     
-    func notice(_ model:Value, isDeleted: Bool = false, notices: [Notice]) {
+    func notice(_ dataId:String, model:Value?, isDeleted: Bool = false, notices: [Notice]) {
         if notices.isEmpty {
             return
         }
         if (isMainThread()) {
             for notice in notices {
-                notice.on_data_update(model: model, isDeleted: isDeleted)
+                notice.on_data_update(dataId:dataId, model: model, isDeleted: isDeleted)
             }
         } else {
             DispatchQueue.main.async {
                 for notice in notices {
-                    notice.on_data_update(model: model, isDeleted: isDeleted)
+                    notice.on_data_update(dataId:dataId, model: model, isDeleted: isDeleted)
                 }
             }
         }
     }
     
-    public func on_data_update(model: FlyModel, isDeleted: Bool) {
+    public func on_data_update(dataId:String, model: FlyModel?, isDeleted: Bool) {
         if let m = model as? Value {
-            lookOverListeners(model: m, isDeleted: isDeleted)
+            lookOverListeners(dataId:dataId ,model: m, isDeleted: isDeleted)
         }
     }
     
@@ -278,13 +296,16 @@ public class Flyweight<Value: FlyModel> : Notice {
         psstn?.persistent_set_notice(notice: self)
     }
     
-    func lookOverListeners(model:Value, isDeleted:Bool) {
-        let dataId = model.data_unique_id
+    func lookOverListeners(dataId:String, model: Value?, isDeleted:Bool) {
         let listeners = getObserver(dataId)
         if (isDeleted) {
             removeModel(dataId,notices:listeners);
+        } else if let model = model {
+            updateModel(model, notices:listeners, persistent:false)
+        } else if let model = psstn?.persistent_queryData(dataId: dataId) as? Value {
+            updateModel(model, notices:listeners, persistent:false)
         } else {
-            updateModel(model, notices:listeners,persistent:false)
+            print("注意，persistent update必须将实例传入，否则可能出现读取误差")
         }
     }
     
@@ -421,9 +442,41 @@ public class Flyweight<Value: FlyModel> : Notice {
             tail = previous
         }
     }
+    
+    private var capacity: Int
+    private var storage: Dictionary<String, Value>
+    private var head: Node?
+    private var tail: Node?
+    
+    private var storeDomain = ""
+    private var storeScope = ""
+    private var store:DataStore? {
+        get {
+            
+            if _store != nil {
+                return _store
+            }
+            if !storeDomain.isEmpty && !storeScope.isEmpty {
+                _store = DataStore.documentsStore(withScope: storeDomain+"/"+storeScope)
+            } else if !storeScope.isEmpty {
+                _store = DataStore.documentsStore(withScope: "flyweight/"+storeScope)
+            }
+            
+            return _store
+        }
+    }
+    private var _store:DataStore?
+    private var psstn: Persistence?
+    private var remote: RemoteAccessor?
+    
+    private var flag: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
+    
+    //容器
+    private var obs: Dictionary<String, [WeakObserver]> = [:]//所有注册者
+    private var map: Dictionary<String, String> = [:]//
 }
 
-public protocol FlyModel {
+public protocol FlyModel:Codable {
     var data_unique_id:String {get}
     var data_sync_flag:Int64 {get set}
 }
@@ -432,7 +485,7 @@ public protocol FlyModel {
  * Data update notice
  */
 public protocol Notice {
-    func on_data_update(model: FlyModel, isDeleted: Bool)
+    func on_data_update(dataId:String, model: FlyModel?, isDeleted: Bool)
 }
 
 /**
