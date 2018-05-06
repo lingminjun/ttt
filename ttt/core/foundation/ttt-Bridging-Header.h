@@ -10,6 +10,7 @@
 //#define ttt_Bridging_Header_h
 
 #import "MMTry.h"
+#import <CommonCrypto/CommonCrypto.h>
 
 //#endif /* ttt_Bridging_Header_h */
 

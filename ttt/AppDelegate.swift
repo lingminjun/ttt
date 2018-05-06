@@ -91,8 +91,31 @@ public class AppDelegate: UIResponder, UIApplicationDelegate,Authorize,MMTracker
         self.ss.b = 3;
         
         print("\(self.ss.a),\(self.ss.b)")
+        
+        let store = DataStore.documentsStore(withScope: "lmj")
+        let str = store.string(forKey: "随便测试一个数据")
+        if !str.isEmpty {
+            print("=========\(str)")
+        } else {
+            store.store(string: "找一篇文章存储下来，看看有没有问题", forKey: "随便测试一个数据", expire: 30*1000)
+        }
     
+//        let store1 = DataStore.documentsStore(withScope: "lmj1")
+//        testStore()
         return true
+    }
+    
+    func testStore() {
+        for i in 0..<100 {
+            DispatchQueue.global().async {
+                let store = DataStore.documentsStore(withScope: "lmj")
+                store.store(string: "\(i)", forKey: "key\(i)", expire: 1000)
+                let key = arc4random()%100;
+                var expired = false
+                let rt = store.accessString(forKey: "key\(key)", isExpired:&expired)
+                print("====> \(rt) \(expired) \(key)")
+            }
+        }
     }
     
     public func applicationWillResignActive(_ application: UIApplication) {

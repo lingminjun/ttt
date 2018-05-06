@@ -9,15 +9,17 @@
 import Foundation
 
 public final class KeyCycleStack<K: Hashable,T: AnyObject> {
-    private var _keys:[K?]!
-    private var _stack:Dictionary<K,T>!
+    private var _keys:[K?] = []
+    private var _stack:Dictionary<K,T> = Dictionary()
     private var _idx:Int = 0
     private var MAX_SIZE:Int = 10
     
     public init(_ size:Int) {
         MAX_SIZE = size < 0 ? 10 : size
-        _keys = [K]()
-        _stack = Dictionary()
+        //初始化大小
+        for _ in 0..<MAX_SIZE {
+            _keys.append(nil)
+        }
     }
     
     /**

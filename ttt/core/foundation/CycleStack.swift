@@ -9,13 +9,16 @@
 import Foundation
 
 public final class CycleStack<T: Equatable> {
-    private var _stack:[T?]!
+    private var _stack:[T?] = []
     private var _idx: Int = 0
     private var MAX_SIZE:Int = 10
     
     public init(_ size:Int) {
         MAX_SIZE = size < 0 ? 10 : size
-        _stack = [T]()
+        //初始化大小
+        for _ in 0..<MAX_SIZE {
+            _stack.append(nil)
+        }
     }
     
     /**

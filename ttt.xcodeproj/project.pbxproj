@@ -11,6 +11,8 @@
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
 		5355BF81209ABA9C00C7CAC0 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */; };
 		5355BF83209ABFC300C7CAC0 /* DogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5355BF82209ABFC300C7CAC0 /* DogManager.swift */; };
+		5374F940209C42E60036225E /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5374F93F209C42E60036225E /* DataStore.swift */; };
+		5374F942209C54530036225E /* StringExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5374F941209C54530036225E /* StringExt.swift */; };
 		53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2220440CD5009CDE66 /* WFHeaderView.m */; };
 		53822F2920440CD5009CDE66 /* WFHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 53822F2520440CD5009CDE66 /* WFHeaderView.xib */; };
 		53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2620440CD5009CDE66 /* CollectViewController.m */; };
@@ -65,6 +67,8 @@
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
 		5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		5355BF82209ABFC300C7CAC0 /* DogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogManager.swift; sourceTree = "<group>"; };
+		5374F93F209C42E60036225E /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
+		5374F941209C54530036225E /* StringExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExt.swift; sourceTree = "<group>"; };
 		53822F2220440CD5009CDE66 /* WFHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFHeaderView.m; sourceTree = "<group>"; };
 		53822F2320440CD5009CDE66 /* CollectViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectViewController.h; sourceTree = "<group>"; };
 		53822F2420440CD5009CDE66 /* WFHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WFHeaderView.h; sourceTree = "<group>"; };
@@ -263,6 +267,7 @@
 				D9D2AA3B2018A738000B3681 /* Quantum.swift */,
 				5388893F204AD85600859ED6 /* BriefRSA.swift */,
 				5326877A20983A3A0004F1DF /* Flyweight.swift */,
+				5374F93F209C42E60036225E /* DataStore.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -272,6 +277,7 @@
 			children = (
 				D9F5CA15206C7D4900251D3F /* UIViewControllerLoading.swift */,
 				D9F5CA17206C9A1600251D3F /* NSObjectTagExt.swift */,
+				5374F941209C54530036225E /* StringExt.swift */,
 			);
 			path = ext;
 			sourceTree = "<group>";
@@ -471,6 +477,7 @@
 				D9CCAD17200C8F2700C03276 /* Urls.swift in Sources */,
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D94140652011DC8E0050132B /* MMUIWebController.swift in Sources */,
+				5374F942209C54530036225E /* StringExt.swift in Sources */,
 				538350F02063AC20005DDA8A /* HomePageViewController.swift in Sources */,
 				53822F3B2047E766009CDE66 /* CltProfileViewController.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
@@ -482,6 +489,7 @@
 				D9414051200F3E3F0050132B /* MMJsonable.swift in Sources */,
 				5388894A204F80CA00859ED6 /* SMP.swift in Sources */,
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,
+				5374F940209C42E60036225E /* DataStore.swift in Sources */,
 				D9917D2C2008AF73003682AD /* DogCell.swift in Sources */,
 				D9FDDBB42008672200A88631 /* AppDelegate.swift in Sources */,
 			);

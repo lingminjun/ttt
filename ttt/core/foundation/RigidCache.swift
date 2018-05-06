@@ -8,16 +8,15 @@
 
 import Foundation
 
-
-public class RigidCache<T: NSObject> {
+public class RigidCache<T: Equatable> {
     
-    class WeakBox<T: AnyObject> {
-        private weak var _obj:T?
+    private class WeakBox<T> {
+        private weak var _obj:AnyObject?
         init(_ obj:T) {
-            _obj = obj
+            _obj = (obj as AnyObject)
         }
         func get() -> T? {
-            return _obj
+            return _obj as? T
         }
     }
     
