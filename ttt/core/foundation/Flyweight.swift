@@ -246,7 +246,7 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
     }
     
     private func removeModel(_ dataId:String, notices:[FlyNotice]) {
-        var obj:Value? = _cache.removeValue(forKey: dataId)
+        let obj:Value? = _cache.removeValue(forKey: dataId)
         
         if psstn != nil {
             psstn?.persistent_removeData(dataId: dataId)
