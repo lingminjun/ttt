@@ -19,32 +19,32 @@ public protocol FlyModel:Codable {
 /**
  * Data update notice
  */
-public protocol Notice {
+public protocol FlyNotice {
     func on_data_update(dataId:String, model: FlyModel?, isDeleted: Bool)
 }
 
 /**
  * Persistence
  */
-public protocol Persistence {
+public protocol FlyPersistence {
     func persistent_queryData(dataId: String) -> FlyModel?
     func persistent_saveData(dataId: String, model: FlyModel)
     func persistent_removeData(dataId: String)
     
-    func persistent_set_notice(notice: Notice)
+    func persistent_set_notice(notice: FlyNotice)
 }
 
 /**
  * Remote accessor
  */
-public protocol RemoteAccessor {
+public protocol FlyRemoteAccessor {
     func remote_get(dataId:String) -> FlyModel?
 }
 
 
-public class Flyweight<Value: FlyModel> : Notice {
+public class Flyweight<Value: FlyModel> : FlyNotice {
 
-    init(capacity: Int, psstn: Persistence? = nil, remote: RemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
+    init(capacity: Int, psstn: FlyPersistence? = nil, remote: FlyRemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
         self._cache = LRUCache<String, Value>(maxCapacity: capacity)
         self.remote = remote
         self.flag = flag
@@ -54,7 +54,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
     }
     
-    init(capacity: Int, storeScope: String, storeDomain: String = "", remote: RemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
+    init(capacity: Int, storeScope: String, storeDomain: String = "", remote: FlyRemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
         self._cache = LRUCache<String, Value>(maxCapacity: capacity)
         self.remote = remote
         self.flag = flag
@@ -70,7 +70,7 @@ public class Flyweight<Value: FlyModel> : Notice {
      * Data and notice binding
      * @param notice Caution! weak reference
      */
-    public func bind(_ model: Value, notice: Notice) {
+    public func bind(_ model: Value, notice: FlyNotice) {
         bind(model.data_unique_id, notice: notice);
     }
     
@@ -81,12 +81,12 @@ public class Flyweight<Value: FlyModel> : Notice {
      * @param notice
      * @return model instance
      */
-    public func bind(_ dataId:String, notice: Notice) {
+    public func bind(_ dataId:String, notice: FlyNotice) {
         
         addObserver(dataId,notice:notice)
         
         //收绑定必定调用notice方法
-        var listeners:[Notice] = []
+        var listeners:[FlyNotice] = []
         listeners.append(notice)
         if (isMainThread()) {
             DispatchQueue.global().async {
@@ -102,7 +102,7 @@ public class Flyweight<Value: FlyModel> : Notice {
      * 解除绑定
      * @param notice
      */
-    public func unbind(_ notice:Notice) {
+    public func unbind(_ notice:FlyNotice) {
         let code = String(format: "%p", notice as! CVarArg)
         clearObserver(code:code)
     }
@@ -177,7 +177,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
     }
     
-    private func loadModel(_ dataId:String, notices:[Notice]) {
+    private func loadModel(_ dataId:String, notices:[FlyNotice]) {
         var obj:Value? = _cache[dataId]
         let nocache = obj == nil
         
@@ -228,7 +228,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         clean();
     }
     
-    private func updateModel(_ model:Value, notices:[Notice], persistent:Bool) {
+    private func updateModel(_ model:Value, notices:[FlyNotice], persistent:Bool) {
         let dataId = model.data_unique_id
         if  dataId.isEmpty {
             return
@@ -245,7 +245,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         notice(dataId,model:model,notices:notices)
     }
     
-    private func removeModel(_ dataId:String, notices:[Notice]) {
+    private func removeModel(_ dataId:String, notices:[FlyNotice]) {
         var obj:Value? = _cache.removeValue(forKey: dataId)
         
         if psstn != nil {
@@ -257,7 +257,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         notice(dataId,model:obj,isDeleted:true,notices:notices);
     }
     
-    private func notice(_ dataId:String, model:Value?, isDeleted: Bool = false, notices: [Notice]) {
+    private func notice(_ dataId:String, model:Value?, isDeleted: Bool = false, notices: [FlyNotice]) {
         if notices.isEmpty {
             return
         }
@@ -328,7 +328,7 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
     }
     
-    private func addObserver(_ dataId: String, notice: Notice) {//synchronized
+    private func addObserver(_ dataId: String, notice: FlyNotice) {//synchronized
         let code = String(format: "%p", notice as! CVarArg)
         
 //        print("准备添加 \(dataId) \(code)" )
@@ -368,8 +368,8 @@ public class Flyweight<Value: FlyModel> : Notice {
         }
     }
     
-    private func getObserver(_ dataId:String) -> [Notice] {//synchronized
-        var listeners:[Notice] = []
+    private func getObserver(_ dataId:String) -> [FlyNotice] {//synchronized
+        var listeners:[FlyNotice] = []
         
         self.synchronized {
             guard let observers = obs[dataId] else {
@@ -377,7 +377,7 @@ public class Flyweight<Value: FlyModel> : Notice {
             }
             
             for observer in observers {
-                if let obj = observer.obj as? Notice {
+                if let obj = observer.obj as? FlyNotice {
                     listeners.append(obj)
                 } else {
                     clearObserver(code: observer.code)
@@ -428,8 +428,8 @@ public class Flyweight<Value: FlyModel> : Notice {
     private var _store:DataStore?
     private var _cache:LRUCache<String,Value>!
     
-    private var psstn: Persistence?
-    private var remote: RemoteAccessor?
+    private var psstn: FlyPersistence?
+    private var remote: FlyRemoteAccessor?
     
     private var flag: Int64 = Int64(Date().timeIntervalSince1970 * 1000)
     

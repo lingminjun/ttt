@@ -9,7 +9,7 @@
 import Foundation
 import RealmSwift
 
-class DetailViewController: MMUITableController<MMCellModel>,Notice {
+class DetailViewController: MMUITableController<MMCellModel>,FlyNotice {
     func on_data_update(dataId: String, model: FlyModel?, isDeleted: Bool) {
         if let dog = model as? Dog {
             self.dog = dog
