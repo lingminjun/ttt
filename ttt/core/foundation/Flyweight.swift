@@ -146,7 +146,8 @@ public class Flyweight<Value: FlyModel> : Notice {
     */
     public func switchStoreDomain(_ domain: String) {
         self.storeDomain = domain
-        _store = nil
+        self._store = nil
+        self._cache.removeAll()
     }
     
     
