@@ -38,7 +38,7 @@ public protocol Persistence {
  * Remote accessor
  */
 public protocol RemoteAccessor {
-    func remote_get(dataId:String) -> FlyModel
+    func remote_get(dataId:String) -> FlyModel?
 }
 
 
