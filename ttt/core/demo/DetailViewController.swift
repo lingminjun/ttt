@@ -18,6 +18,11 @@ class DetailViewController: MMUITableController<MMCellModel>,FlyNotice {
     }
     
     
+    deinit {
+        DogManager.shared.fly.unbind(self)
+        print("释放页面\(self)")
+    }
+    
     var dog:Dog!
     
     //

@@ -19,7 +19,7 @@ public protocol FlyModel:Codable {
 /**
  * Data update notice
  */
-public protocol FlyNotice {
+public protocol FlyNotice:AnyObject {
     func on_data_update(dataId:String, model: FlyModel?, isDeleted: Bool)
 }
 
@@ -103,7 +103,7 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
      * @param notice
      */
     public func unbind(_ notice:FlyNotice) {
-        let code = String(format: "%p", notice as! CVarArg)
+        let code = getNoticeCode(notice: notice)
         clearObserver(code:code)
     }
     
@@ -328,8 +328,22 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
         }
     }
     
+    private func getNoticeCode(notice: FlyNotice) -> String {
+        /// 方案一： 测试中 发现作用在<引用类型>的对象上能确保正确性
+        let point = Unmanaged<AnyObject>.passUnretained(notice as AnyObject).toOpaque()
+        let hashValue = point.hashValue // 这个就是唯一的，可以作比较
+        
+        /// 方案二：测试中 发现作用在<值类型>的对象上能确保正确性
+//        let hashValue2 = withUnsafePointer(to: &notice) { (point) -> Int in
+//            /// 闭包的实现有多种，可根据自己需求修改
+//            return point.hashValue
+//        }
+        
+        return "\(hashValue)"
+    }
+    
     private func addObserver(_ dataId: String, notice: FlyNotice) {//synchronized
-        let code = String(format: "%p", notice as! CVarArg)
+        let code = getNoticeCode(notice: notice)
         
 //        print("准备添加 \(dataId) \(code)" )
         self.synchronized {
