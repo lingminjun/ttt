@@ -9,7 +9,7 @@
 import Foundation
 
 /**
- @brief LRUCache: Least Recently Used Cache. Thread unsafe
+ @brief LRUCache: Least Recently Used Cache. Thread safe
  */
 public struct LRUCache<Key, Value> where Key : Hashable {
     
@@ -24,32 +24,42 @@ public struct LRUCache<Key, Value> where Key : Hashable {
     
     public subscript(key: Key) -> Value? {
         mutating get {
-            let value = _holder[key]
-            if value != nil {
-                forthNode(key: key)
+            var value:Value? = nil
+            synchronized {
+                value = _holder[key]
+                if value != nil {
+                    forthNode(key: key)
+                }
             }
             return value
         }
         set {
-            let value = _holder[key]
-            if value != nil {
-                forthNode(key: key)
-            } else {
-                pushNode(node: Node<Key>(key))
-                if _holder.count == _maxCapacity {
-                    if let tail = spillNode() {
-                        _holder.removeValue(forKey: tail.key)
+            synchronized {
+                let value = _holder[key]
+                if value != nil {
+                    forthNode(key: key)
+                } else {
+                    pushNode(node: Node<Key>(key))
+                    if _holder.count == _maxCapacity {
+                        if let tail = spillNode() {
+                            _holder.removeValue(forKey: tail.key)
+                        }
                     }
                 }
+                _holder[key] = newValue
             }
-            _holder[key] = newValue
         }
     }
     
     /// The number of key-value pairs in the LRUCache.
     ///
     /// - Complexity: O(1).
-    public var count: Int { get { return _holder.count } }
+    public var count: Int { get {
+        var c = 0
+        synchronized { c = _holder.count }
+        return c
+        }
+    }
     
     /// The max capacity of key-value pairs in the LRUCache.
     ///
@@ -64,7 +74,12 @@ public struct LRUCache<Key, Value> where Key : Hashable {
     ///     var frequencies: [String: Int] = [:]
     ///     print(frequencies.isEmpty)
     ///     // Prints "true"
-    public var isEmpty: Bool { get { return _holder.isEmpty } }
+    public var isEmpty: Bool { get {
+        var empty = true
+        synchronized { empty = _holder.isEmpty }
+        return empty
+        }
+    }
     
     /// Removes the given key and its associated value from the LRUCache.
     ///
@@ -72,21 +87,33 @@ public struct LRUCache<Key, Value> where Key : Hashable {
     /// associated value. On removal, this method invalidates all indices with
     /// respect to the LRUCache.
     public mutating func removeValue(forKey key: Key) -> Value? {
-        let value = _holder.removeValue(forKey: key)
-        if value != nil {
-            removeNode(key: key)
+        var value:Value? = nil
+        synchronized {
+            value = _holder.removeValue(forKey: key)
+            if value != nil {
+                removeNode(key: key)
+            }
         }
         return value
     }
     
     /// Removes all key-value pairs from the LRUCache.
     public mutating func removeAll() {
-        _holder.removeAll(keepingCapacity: true)
-        _head = nil
+        synchronized {
+            _holder.removeAll(keepingCapacity: true)
+            _head = nil
+        }
     }
     
     /// A collection containing just the keys of the LRUCache.
-    public var keys: Dictionary<Key, Value>.Keys { get { return _holder.keys } }
+    public var keys: Dictionary<Key, Value>.Keys { get {
+        var ks: Dictionary<Key, Value>.Keys = [:].keys
+        synchronized {
+            ks = _holder.keys
+        }
+        return ks
+        }
+    }
     
     
     private class Node<Key> where Key : Hashable {
@@ -187,6 +214,12 @@ public struct LRUCache<Key, Value> where Key : Hashable {
         }
         
         return nil
+    }
+    
+    private func synchronized(_ body: () throws -> Void) rethrows {
+        objc_sync_enter(self)
+        defer { objc_sync_exit(self) }
+        return try body()
     }
     
     private var _holder:Dictionary<Key, Value> = Dictionary<Key, Value>()

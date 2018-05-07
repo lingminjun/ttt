@@ -177,10 +177,7 @@ public class Flyweight<Value: FlyModel> : Notice {
     }
     
     private func loadModel(_ dataId:String, notices:[Notice]) {
-        var obj:Value? = nil
-        synchronized {
-            obj = _cache[dataId]
-        }
+        var obj:Value? = _cache[dataId]
         let nocache = obj == nil
         
         if (obj == nil && psstn != nil) {
@@ -208,9 +205,7 @@ public class Flyweight<Value: FlyModel> : Notice {
 //        }
         
         if nocache && obj != nil {
-            synchronized {
-                _cache[dataId] = obj
-            }
+            _cache[dataId] = obj
         }
         
         if let model = obj {
@@ -222,9 +217,7 @@ public class Flyweight<Value: FlyModel> : Notice {
             obj = remote?.remote_get(dataId:dataId) as? Value
             if (obj != nil) {
                 obj?.data_sync_flag = flag
-                synchronized {
-                    _cache[dataId] = obj
-                }
+                _cache[dataId] = obj
                 let lss = getObserver(dataId)
                 notice(dataId,model:obj!,notices:lss);//第二次更新
             }
@@ -240,9 +233,7 @@ public class Flyweight<Value: FlyModel> : Notice {
             return
         }
         
-        synchronized {
-            _cache[dataId] = model
-        }
+        _cache[dataId] = model
         
         if persistent && psstn != nil {
             psstn?.persistent_saveData(dataId: dataId,model: model)
@@ -254,10 +245,7 @@ public class Flyweight<Value: FlyModel> : Notice {
     }
     
     private func removeModel(_ dataId:String, notices:[Notice]) {
-        var obj:Value? = nil
-        synchronized {
-            obj = _cache.removeValue(forKey: dataId)
-        }
+        var obj:Value? = _cache.removeValue(forKey: dataId)
         
         if psstn != nil {
             psstn?.persistent_removeData(dataId: dataId)
@@ -324,6 +312,7 @@ public class Flyweight<Value: FlyModel> : Notice {
                     let observer = observers[idx]
                     if (observer.code == code) {
                         observers.remove(at: idx)
+//                        print(">>> remove \(dataId) \(code)")
                         break
                     }
                 }
@@ -331,6 +320,8 @@ public class Flyweight<Value: FlyModel> : Notice {
                 //全部移除
                 if (observers.count == 0) {
                     obs.removeValue(forKey:dataId)
+                } else {//重置数据源
+                    obs[dataId] = observers
                 }
             }
         }
@@ -339,11 +330,12 @@ public class Flyweight<Value: FlyModel> : Notice {
     private func addObserver(_ dataId: String, notice: Notice) {//synchronized
         let code = String(format: "%p", notice as! CVarArg)
         
-        
+//        print("准备添加 \(dataId) \(code)" )
         self.synchronized {
             var key = map[code]
             if let k = key, k != dataId {//已经添加过了,但是不是注册的同一个dataId
-                clearObserver(code: code)
+//                print("反复添加 code:\(code)" )
+                clearObserver(code: code) //
                 key = nil
             }
             
@@ -358,6 +350,18 @@ public class Flyweight<Value: FlyModel> : Notice {
                 if var tobs = observers {
                     tobs.append(observer)
                     obs[dataId] = tobs
+//                    print("添加 \(dataId) \(code)" )
+                }
+            } else {//找到原来对象，并重置notice
+                if let observers = obs[dataId] {
+                    for ob in observers {
+                        if ob.code == code {
+                            ob.dataId = dataId
+                            ob.obj = notice as AnyObject
+//                            print("重置 \(dataId) \(code)" )
+                            break
+                        }
+                    }
                 }
             }
         }
