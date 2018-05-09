@@ -281,7 +281,7 @@ extension UIViewController: MMTrackPage {
 extension UINavigationController {
     @objc public override func track_topPage() -> UIViewController {
         if let vc = self.topViewController {
-            return vc
+            return vc.track_topPage()
         }
         return super.track_topPage()
     }
@@ -290,7 +290,7 @@ extension UINavigationController {
 extension UITabBarController {
     @objc public override func track_topPage() -> UIViewController {
         if let vc = self.selectedViewController {
-            return vc
+            return vc.track_topPage()
         }
         return super.track_topPage()
     }
@@ -306,8 +306,9 @@ extension UIPageViewController {
         }
         for v in vs {
             let wc = v.view.convert(v.view.center, to:win)
-            if wc == win.center {
-                return v
+            //使用y值判断
+            if wc.y == win.center.y {
+                return v.track_topPage()
             }
         }
         return super.track_topPage()
