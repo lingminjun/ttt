@@ -28,6 +28,7 @@ import UIKit
 }
 
 private var CELL_MODEL_PROPERTY = 0
+private var CELL_FETCHS_PROPERTY = 0
 
 /// UITableViewCell display support or UICollectionReusableView display support
 extension UIView {
@@ -55,6 +56,18 @@ extension UIView {
     
     fileprivate func ssn_set_cellModel(_ model:MMCellModel?) {
         objc_setAssociatedObject(self, &CELL_MODEL_PROPERTY, model, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+    }
+    
+    // fetchs. be careful fetchs is MMFetchsController
+    var ssn_fetchs : AnyObject? {
+        get{
+            guard let result = objc_getAssociatedObject(self, &CELL_FETCHS_PROPERTY) else {  return nil }
+            return result as AnyObject
+        }
+    }
+    
+    fileprivate func ssn_weak_set_fetchs(_ fetchs:AnyObject?) {
+        objc_setAssociatedObject(self, &CELL_FETCHS_PROPERTY, fetchs, objc_AssociationPolicy.OBJC_ASSOCIATION_ASSIGN)
     }
 }
 
@@ -378,6 +391,10 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
     }
     
+    deinit {
+        print("释放fetchs")
+    }
+    
     /// The number of Fetchs in the controller.
     public func count() -> Int {
         return _fetchs.count
@@ -595,6 +612,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             } else {
                 cell = UICollectionViewCell()
             }
+            cell?.ssn_weak_set_fetchs(self as AnyObject)
             return cell!
         }
         
@@ -605,6 +623,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         // 1.创建cell,此时cell是可选类型
         if let table = table {
             cell = table.dequeueReusableCell(withIdentifier:cellID)
+            cell?.ssn_weak_set_fetchs(self as AnyObject)
         }
         
         // 2.判断cell是否为nil
@@ -656,6 +675,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                     }
                 }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
             }
+            cell?.ssn_weak_set_fetchs(self as AnyObject)
         }
         
         if cell == nil {
@@ -666,6 +686,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             } else {
                 cell = UICollectionViewCell()
             }
+            cell?.ssn_weak_set_fetchs(self as AnyObject)
         }
         
         // 3.设置cell数据

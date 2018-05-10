@@ -18,5 +18,10 @@ class DogCell: UITableViewCell {
         let dog: Dog = model as! Dog
         self.textLabel?.text = dog.breed
         self.detailTextLabel?.text = "智力：\(dog.brains)"
+        
+        if let fetchs = self.ssn_fetchs as? MMFetchsController<Dog> {
+            //
+            print("fetchs")
+        }
     }
 }

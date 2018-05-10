@@ -13,6 +13,10 @@ import RealmSwift
 // tableView的基本
 class DemoListController: MMUITableController<SettingNode> {
     
+    deinit {
+        print("释放 DemoListController")
+    }
+    
     override func loadFetchs() -> [MMFetch<SettingNode>] {
         //使用默认的数据库
         var f = MMFetchList(list:initDataList())
