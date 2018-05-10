@@ -391,9 +391,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
     }
     
-    deinit {
-        print("释放fetchs")
-    }
+//    deinit {
+//        print("释放fetchs")
+//    }
     
     /// The number of Fetchs in the controller.
     public func count() -> Int {
