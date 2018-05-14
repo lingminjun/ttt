@@ -254,6 +254,30 @@ extension URL {
             return eps
         }
     }
+    
+    public var encodedFragmentPathComponents: [String] {
+        get {
+            
+            var eps = [] as [String]
+            if let fgmt = self.fragment,fgmt.hasPrefix("/") && fgmt.count > 1 {
+                
+                //单页应用存在非标准的query参数 如：#/product/3918744?from=singlemessage
+                let ss = fgmt.split(separator: "?")
+                let fp = ss.count > 1 ? String(ss[0]) : fgmt
+                
+                let fs = fp.split(separator: "/")
+                for sub in fs {
+                    if let en = String(sub).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) {
+                        eps.append(en)
+                    } else {
+                        eps.append(String(sub))
+                    }
+                }
+            }
+            
+            return eps
+         }
+    }
 }
 
 public final class Urls {
@@ -631,10 +655,7 @@ public final class Urls {
         
         
         // 支持单页应用 #/product/{skuId}
-        var fpaths = [Substring]()
-        if let fgmt = uri.fragment,fgmt.hasPrefix("/") && fgmt.count > 1 {
-            fpaths = fgmt.split(separator: "/")
-        }
+        let fpaths = uri.encodedFragmentPathComponents
         
         // 实际的path
         let paths = uri.encodedPathComponents //非encode，需要处理
@@ -747,10 +768,7 @@ public final class Urls {
         }
         
         // 支持单页应用 #/product/{skuId}
-        var fpaths = [Substring]()
-        if let fgmt = uri.fragment,fgmt.hasPrefix("/") && fgmt.count > 1 {
-            fpaths = fgmt.split(separator: "/")
-        }
+        let fpaths = uri.encodedFragmentPathComponents
         
         // 实际的path
         let paths = uri.encodedPathComponents
