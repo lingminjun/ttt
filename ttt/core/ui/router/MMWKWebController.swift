@@ -168,7 +168,7 @@ public class MMWKWebController: MMUIController,WKNavigationDelegate,WKUIDelegate
         }
         
         switch navigationAction.navigationType {
-        case .linkActivated:
+        case .linkActivated, .other:
             if checkGotoOtherWebController(url: url) {
                 allow()
             } else {
