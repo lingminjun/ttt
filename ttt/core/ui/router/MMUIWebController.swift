@@ -69,7 +69,7 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         
         print("should load \(url)")
         switch navigationType {
-        case .linkClicked, .other:
+        case .linkClicked:
             return checkGotoOtherWebController(url: url)
 //        case .other:
 //            return checkGotoOtherWebController(url: url!)
