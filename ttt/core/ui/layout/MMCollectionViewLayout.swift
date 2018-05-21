@@ -494,6 +494,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
 //                _setedOffsetY = true
                 return view.adjustedContentInset.top
             } else { //低于 iOS 11.0
+                /*
                 guard let superview = view.superview else {
                     return _offsetY
                 }
@@ -523,12 +524,12 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                     if !UIApplication.shared.isStatusBarHidden && !vc.prefersStatusBarHidden {
                         _offsetY = _offsetY + UIApplication.shared.statusBarFrame.height
                     }
-                    
+
                     if let nv = vc.navigationController, !nv.isNavigationBarHidden {
                         _offsetY = _offsetY + nv.navigationBar.frame.size.height
                     }
                 }
-                
+                */
                 return _offsetY
                 
             }

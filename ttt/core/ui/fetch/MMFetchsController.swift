@@ -622,7 +622,11 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         // 1.创建cell,此时cell是可选类型
         if let table = table {
-            cell = table.dequeueReusableCell(withIdentifier:cellID)
+            if isFloating {
+                cell = table.dequeueReusableHeaderFooterView(withIdentifier:cellID)
+            } else {
+                cell = table.dequeueReusableCell(withIdentifier:cellID)
+            }
             cell?.ssn_weak_set_fetchs(self as AnyObject)
         }
         

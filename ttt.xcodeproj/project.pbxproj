@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5326877B20983A3A0004F1DF /* Flyweight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5326877A20983A3A0004F1DF /* Flyweight.swift */; };
+		532F4C9720B29DAA00B1DBCB /* DemoCollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */; };
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
 		5355BF81209ABA9C00C7CAC0 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */; };
 		5355BF83209ABFC300C7CAC0 /* DogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5355BF82209ABFC300C7CAC0 /* DogManager.swift */; };
@@ -65,6 +66,7 @@
 		358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.release.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.release.xcconfig"; sourceTree = "<group>"; };
 		35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ttt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5326877A20983A3A0004F1DF /* Flyweight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flyweight.swift; sourceTree = "<group>"; };
+		532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoCollectionController.swift; sourceTree = "<group>"; };
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
 		5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		5355BF82209ABFC300C7CAC0 /* DogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogManager.swift; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				53822F3620467E16009CDE66 /* SCollectionViewController.swift */,
 				5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */,
 				5355BF82209ABFC300C7CAC0 /* DogManager.swift */,
+				532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -495,6 +498,7 @@
 				D9FDDBB62008672200A88631 /* ViewController.swift in Sources */,
 				5374F940209C42E60036225E /* DataStore.swift in Sources */,
 				D9917D2C2008AF73003682AD /* DogCell.swift in Sources */,
+				532F4C9720B29DAA00B1DBCB /* DemoCollectionController.swift in Sources */,
 				D9FDDBB42008672200A88631 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
