@@ -638,19 +638,33 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                     MMTry.try({
                         let nib = model.ssn_cellNib!(cellID,isFloating: isFloating)
                         if table != nil {
-                            table?.register(nib, forCellReuseIdentifier: cellID)
+                            if isFloating {//只做header
+                                table?.register(nib, forHeaderFooterViewReuseIdentifier: cellID)
+                            } else {
+                                table?.register(nib, forCellReuseIdentifier: cellID)
+                            }
                         } else {
-                            collection?.register(nib, forCellWithReuseIdentifier: cellID)
+                            if isFloating {
+                                collection?.register(nib, forSupplementaryViewOfKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID)
+                            } else {
+                                collection?.register(nib, forCellWithReuseIdentifier: cellID)
+                            }
                         }
                     }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
                 }
                 MMTry.try({
                     if table != nil {
-                        cell = table?.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
-                    } else if isFloating {
-                        cell = collection?.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
+                        if isFloating {//只做header
+                            cell = table?.dequeueReusableHeaderFooterView(withIdentifier: cellID)
+                        } else {
+                            cell = table?.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
+                        }
                     } else {
-                        cell = collection?.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                        if isFloating {
+                            cell = collection?.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
+                        } else {
+                            cell = collection?.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                        }
                     }
                 }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
             } else if model.responds(to: #selector(MMCellModel.ssn_cellClass(_:isFloating:))) {
@@ -659,19 +673,33 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                     MMTry.try({
                         let clz:AnyClass = model.ssn_cellClass!(cellID,isFloating: isFloating)
                         if table != nil {
-                            table?.register(clz, forCellReuseIdentifier: cellID)
+                            if isFloating {//只做header
+                                table?.register(clz, forHeaderFooterViewReuseIdentifier: cellID)
+                            } else {
+                                table?.register(clz, forCellReuseIdentifier: cellID)
+                            }
                         } else {
-                            collection?.register(clz, forCellWithReuseIdentifier: cellID)
+                            if isFloating {
+                                collection?.register(clz, forSupplementaryViewOfKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID)
+                            } else {
+                                collection?.register(clz, forCellWithReuseIdentifier: cellID)
+                            }
                         }
                     }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
                 }
                 MMTry.try({
                     if table != nil {
-                        cell = table?.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
-                    } else if isFloating {
-                        cell = collection?.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
+                        if isFloating {//只做header
+                            cell = table?.dequeueReusableHeaderFooterView(withIdentifier: cellID)
+                        } else {
+                            cell = table?.dequeueReusableCell(withIdentifier: cellID, for: indexPath)
+                        }
                     } else {
-                        cell = collection?.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                        if isFloating {
+                            cell = collection?.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: cellID, for: indexPath)
+                        } else {
+                            cell = collection?.dequeueReusableCell(withReuseIdentifier: cellID, for: indexPath)
+                        }
                     }
                 }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
             }
