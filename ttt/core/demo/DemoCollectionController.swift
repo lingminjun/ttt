@@ -199,19 +199,19 @@ class DemoCollectionController : MMUICollectionController<MMCellModel> {
 //        node.title = "title\(0) 下的数据 \(0)"
 //        list.append(node)
         
-        for idx in 1...5 {
-
-            let node = HeadNode()
-            node.title = "title\(idx)"
-            list.append(node)
-
-
-            for i in 0..<27 {
-                let node = NormalNode()
-                node.title = "title\(idx) 下的数据 \(i)"
-                list.append(node)
-            }
-        }
+//        for idx in 1...5 {
+//
+//            let node = HeadNode()
+//            node.title = "title\(idx)"
+//            list.append(node)
+//
+//
+//            for i in 0..<27 {
+//                let node = NormalNode()
+//                node.title = "title\(idx) 下的数据 \(i)"
+//                list.append(node)
+//            }
+//        }
         
          ///
          let f = MMFetchList(list:list)

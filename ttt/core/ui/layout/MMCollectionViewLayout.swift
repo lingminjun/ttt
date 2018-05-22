@@ -346,12 +346,17 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         return list
     }
     
+    private var defaultAttributes:UICollectionViewLayoutAttributes!
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         guard let attributes = _cellLayouts[indexPath] else { return nil }
         if attributes.representedElementKind == COLLECTION_HEADER_KIND {//必须兼容返回一个default的布局
-            let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
-            attributes.frame.size.height = 0
-            return attributes
+            if defaultAttributes == nil {
+                defaultAttributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+                defaultAttributes.frame.size.height = 0
+                defaultAttributes.isHidden = true
+            }
+            defaultAttributes.indexPath = indexPath
+            return defaultAttributes
         } else {
             return attributes
         }
