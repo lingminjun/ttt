@@ -348,8 +348,10 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         guard let attributes = _cellLayouts[indexPath] else { return nil }
-        if attributes.representedElementKind == COLLECTION_HEADER_KIND {
-            return nil
+        if attributes.representedElementKind == COLLECTION_HEADER_KIND {//必须兼容返回一个default的布局
+            let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+            attributes.frame.size.height = 0
+            return attributes
         } else {
             return attributes
         }

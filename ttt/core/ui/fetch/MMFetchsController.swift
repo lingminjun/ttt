@@ -343,6 +343,8 @@ enum MMTable {
     @objc optional func ssn_controller(_ controller: AnyObject, tableView: UIScrollView, moveRowAtIndexPath sourceIndexPath: IndexPath, toIndexPath destinationIndexPath: IndexPath)
 }
 
+let DEFAULT_CELL_ID = ".default.cell"
+
 /**
  * MMFetchsController实现UITableViewDataSource
  */
@@ -592,7 +594,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         ssn_end_change(flag)
     }
     
-    fileprivate func generateCell(_ view: UIScrollView, cellForRowAt indexPath: IndexPath) -> UIView {
+    fileprivate func generateCell(_ view: UIScrollView, cellForRowAt indexPath: IndexPath, isSupplementary:Bool = false) -> UIView {
         // 使用普通方式创建cell
         var cellID = "cell"
         var isFloating = false
@@ -618,6 +620,24 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         cellID = model.ssn_cellID()
         isFloating = model.ssn_canFloating()
+        
+        //返回兼容的cell
+        if isFloating && !isSupplementary {
+            if let table = table {
+                cell = table.dequeueReusableCell(withIdentifier:DEFAULT_CELL_ID)
+                if cell == nil {
+                    cell = UITableViewCell(style: .default, reuseIdentifier: DEFAULT_CELL_ID)
+                }
+            } else {
+                if !_isRgst.contains(DEFAULT_CELL_ID) {
+                    _isRgst.insert(DEFAULT_CELL_ID)
+                    collection?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: DEFAULT_CELL_ID)
+                }
+                cell = collection?.dequeueReusableCell(withReuseIdentifier: DEFAULT_CELL_ID, for: indexPath)
+            }
+            cell?.ssn_weak_set_fetchs(self as AnyObject)
+            return cell!
+        }
         
         
         // 1.创建cell,此时cell是可选类型
@@ -716,7 +736,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             } else if isFloating {
                 cell = UICollectionReusableView()
             } else {
-                cell = UICollectionViewCell()
+                cell = collection?.dequeueReusableCell(withReuseIdentifier: DEFAULT_CELL_ID, for: indexPath)
             }
             cell?.ssn_weak_set_fetchs(self as AnyObject)
         }
@@ -733,12 +753,16 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     // MARK UIUICollectionViewDataSource
     public func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return _fetchs.count
+        let s = _fetchs.count
+//        print("section:\(s)")
+        return s
     }
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if let fetch = self[section] {
-            return fetch.count()
+            let c = fetch.count()
+//            print("section:\(section) row:\(c)")
+            return c
         } else {
             return 0
         }
@@ -752,7 +776,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     }
     
     public func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        if let cell = generateCell(collectionView, cellForRowAt: indexPath)  as? UICollectionReusableView {
+        if let cell = generateCell(collectionView, cellForRowAt: indexPath, isSupplementary: true)  as? UICollectionReusableView {
             return cell
         }
         return UICollectionReusableView()

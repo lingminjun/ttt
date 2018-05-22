@@ -132,7 +132,7 @@ class HeadNode : NSObject,MMCellModel {
         } else {
             return NormalCell.self
         }
-        
+    
     }
     
     public var title: String = ""
@@ -180,6 +180,7 @@ class DemoCollectionController : MMUICollectionController<MMCellModel> {
     
     override func loadLayoutConfig() -> MMLayoutConfig {
         var config = MMLayoutConfig()
+        config.columnCount = 2
         config.floating = true
         return config
     }
@@ -190,24 +191,63 @@ class DemoCollectionController : MMUICollectionController<MMCellModel> {
         ///构建测试数据
         var list:[MMCellModel] = []
         
-        for idx in 1...3 {
-            
+//        let node = HeadNode()
+//        node.title = "title\(0)"
+//        list.append(node)
+        
+//        let node = NormalNode()
+//        node.title = "title\(0) 下的数据 \(0)"
+//        list.append(node)
+        
+        for idx in 1...5 {
+
             let node = HeadNode()
             node.title = "title\(idx)"
             list.append(node)
-            
-            
-            for i in 0..<7 {
+
+
+            for i in 0..<27 {
                 let node = NormalNode()
                 node.title = "title\(idx) 下的数据 \(i)"
                 list.append(node)
             }
         }
-         
+        
          ///
          let f = MMFetchList(list:list)
  
          return [f]
  
+    }
+    
+    override func onViewDidLoad() {
+        super.onViewDidLoad()
+        
+        
+//                let node = HeadNode()
+//                node.title = "title\(0)"
+//                self.fetchs.fetch.append(node)
+        
+        //        let node = NormalNode()
+        //        node.title = "title\(0) 下的数据 \(0)"
+        //        list.append(node)
+        
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds:1)) {
+            for idx in 1...5 {
+                
+                let node = HeadNode()
+                node.title = "title\(idx)"
+                self.fetchs.fetch.append(node)
+                
+                
+                for i in 0..<27 {
+                    let node = NormalNode()
+                    node.title = "title\(idx) 下的数据 \(i)"
+                    self.fetchs.fetch.append(node)
+                }
+            }
+
+        }
+        
     }
 }
