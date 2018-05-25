@@ -30,89 +30,81 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
     
     /// Update
     override public func update(_ idx: Int, _ b: (() throws -> Void)?) {
-        guard let obj = self[idx] else {return}
-        _listener?.ssn_fetch_begin_change(self)
-        _listener?.ssn_fetch(self,didChange: obj, at:idx, for: MMFetchChangeType.update, newIndex:idx)
-        if let b = b {
-            MMTry.try({ do {
-                try b()
-            } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
-        }
-        _listener?.ssn_fetch_end_change(self)
+        _listener?.ssn_fetch_changing(self, updates: { (section) -> [IndexPath] in
+            guard let _ = self[idx] else { return [] }
+            if let b = b {
+                MMTry.try({ do {
+                    try b()
+                } catch { print("error:\(error)") } }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+            }
+            return [IndexPath(row:idx,section:section)]
+        })
     }
     /// Insert `newObject` at index `i`. Derived class implements.
     public override func insert<C: Sequence>(_ newObjects: C, atIndex i: Int) where C.Iterator.Element == T {
-        var idx = i
-        //compatibility out boundary
-        if i < 0 || i > _list.count {
-            idx = _list.count
-        }
-        
-        _listener?.ssn_fetch_begin_change(self)
-        
-        for obj in newObjects {
-            let at = idx
-            idx += 1
-            _list.insert(obj, at: at)
-            _listener?.ssn_fetch(self,didChange: obj, at: at, for: MMFetchChangeType.insert, newIndex: at)
-        }
-//        for ii in 0..<newObjects.underestimatedCount {
-//            _list.insert(newObjects[ii], at: ii + idx)
-//            _listener?.ssn_fetch(self,didChange: newObjects[ii], at: ii + idx, for: MMFetchChangeType.insert, newIndex: ii + idx)
-//        }
-        
-        _listener?.ssn_fetch_end_change(self)
-        
+        _listener?.ssn_fetch_changing(self, inserts: { (section) -> [IndexPath] in
+            
+            var idx = i
+            //compatibility out boundary
+            if i < 0 || i > self._list.count {
+                idx = self._list.count
+            }
+            
+            var results:[IndexPath] = []
+            for obj in newObjects {
+                let at = idx
+                self._list.insert(obj, at: at)
+                results.append(IndexPath(row:at,section:section))
+                idx += 1
+            }
+            return results
+        })
     }
     
     /// Remove and return the element at index `i`. Derived class implements.
     public override func delete(_ index: Int) -> T? {
-        if index < 0 || index >= _list.count {
-            return nil
-        }
-        
-        let obj = _list.remove(at: index)
-        _listener?.ssn_fetch(self,didChange: obj, at: index, for: MMFetchChangeType.delete, newIndex: index)
+        var obj:T? = nil
+        _listener?.ssn_fetch_changing(self, deletes: { (section) -> [IndexPath] in
+            if index < 0 || index >= self._list.count {
+                return []
+            }
+            
+            obj = self._list.remove(at: index)
+            return [IndexPath(row:index,section:section)]
+        })
         return obj
     }
     public override func delete(_ index: Int, length: Int) {
-        if index < 0 || index >= _list.count {
-            return
-        }
-        
-        let len = _list.count > (index + length) ? (index + length) : _list.count
-        
-        _listener?.ssn_fetch_begin_change(self)
-        
-        for ii in (index..<len).reversed() {
+        _listener?.ssn_fetch_changing(self, deletes: { (section) -> [IndexPath] in
+            if index < 0 || index >= self._list.count {
+                return []
+            }
             
-            let obj = _list.remove(at: ii)
-            
-            _listener?.ssn_fetch(self,didChange: obj, at: ii, for: MMFetchChangeType.delete, newIndex: ii)
-        }
-        
-        _listener?.ssn_fetch_end_change(self)
-
+            let len = self._list.count > (index + length) ? (index + length) : self._list.count
+            var results:[IndexPath] = []
+            for ii in (index..<len).reversed() {
+                self._list.remove(at: ii)
+                results.append(IndexPath(row:ii,section:section))
+            }
+            return results
+        })
     }
     
     
     /// Remove all elements. Derived class implements.
     public override func clear() {
-        if _list.isEmpty {
-            return
-        }
-        
-        _listener?.ssn_fetch_begin_change(self)
-        
-        for ii in (0..<_list.count).reversed() {
+        _listener?.ssn_fetch_changing(self, deletes: { (section) -> [IndexPath] in
+            if self._list.isEmpty {
+                return []
+            }
             
-            let obj = _list.remove(at: ii)
-            
-            _listener?.ssn_fetch(self,didChange: obj, at: ii, for: MMFetchChangeType.delete, newIndex: ii)
-        }
-        
-        _listener?.ssn_fetch_end_change(self)
-
+            var results:[IndexPath] = []
+            for ii in (0..<self._list.count).reversed() {
+                self._list.remove(at: ii)
+                results.append(IndexPath(row:ii,section:section))
+            }
+            return results
+        })
     }
     
     /// Get element at index. Derived class implements.

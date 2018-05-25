@@ -66,21 +66,25 @@ public class MMUITableController<T: MMCellModel>: MMUIController,UITableViewDele
     }
     
     /// MARK MMFetchsControllerDelegate
-    public func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?) {
-        guard let indexPath = indexPath else {
-            return
+    public func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int) {
+        if let deletes = deletes {
+            let indexPaths = deletes(section)
+            if indexPaths.count > 0 {
+                _table.deleteRows(at: indexPaths, with: .automatic)
+            }
         }
-        switch type {
-        case .delete:
-            _table.deleteRows(at: [indexPath], with: .automatic)
-        case .insert:
-            _table.insertRows(at: [indexPath], with: .automatic)
-        case .update:
-            _table.reloadRows(at: [indexPath], with: .automatic)
-        default:
-            if let newIndexPath = newIndexPath {
-                _table.deleteRows(at: [indexPath], with: .automatic)
-                _table.insertRows(at: [newIndexPath], with: .automatic)
+        
+        if let inserts = inserts {
+            let indexPaths = inserts(section)
+            if indexPaths.count > 0 {
+                _table.insertRows(at: indexPaths, with: .automatic)
+            }
+        }
+        
+        if let updates = updates {
+            let indexPaths = updates(section)
+            if indexPaths.count > 0 {
+                _table.reloadRows(at: indexPaths, with: .automatic)
             }
         }
     }

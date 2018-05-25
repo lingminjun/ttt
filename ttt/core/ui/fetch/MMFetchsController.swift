@@ -301,7 +301,9 @@ enum MMTable {
     	Update is reported when an object's state changes, and the changes do not affect the object's position in the results.
      */
     
-    @objc optional func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?)
+//    @objc optional func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?)
+    
+    @objc func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int)
     
     
     /* Notifies the delegate of added or removed sections.  Enables NSFetchedResultsController change tracking.
@@ -526,6 +528,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         return nil
     }
     
+    /*
     var _changing: Bool = false
     var _flags: Set<String> = Set<String>(minimumCapacity:2)
     private func ssn_begin_change(_ flag: String) {
@@ -553,16 +556,23 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                 }
             }
         }
+    }*/
+    
+    public func ssn_fetch_changing(_ fetch: MMFetch<T>, deletes: ((_ section:Int) -> [IndexPath])? = nil, inserts: ((_ section:Int) -> [IndexPath])? = nil, updates: ((_ section:Int) -> [IndexPath])? = nil) {
+        
+        guard let section = self.indexOf(fetch) else { return }
+        
+        guard let delegate = _delegate else {
+            if let deletes = deletes { let _ = deletes(section) }
+            if let inserts = inserts { let _ = inserts(section) }
+            if let updates = updates { let _ = updates(section) }
+            return
+        }
+        delegate.ssn_controllerWillChangeContent(self)
+        delegate.ssn_controller(self, deletes: deletes, inserts: inserts, updates: updates, at:section)
+        delegate.ssn_controllerDidChangeContent(self)
     }
-    
-//    public func ssn_fetch(_ fetch: MMFetch<T>, _ updates: (() -> Bool)) {
-//        guard let delegate = _delegate else {
-//            updates()
-//            return
-//        }
-////        delegate.
-//    }
-    
+    /*
     public func ssn_fetch_begin_change(_ fetch: MMFetch<T>) {
         ssn_begin_change("\(fetch)")
     }
@@ -601,7 +611,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
         
         ssn_end_change(flag)
-    }
+    }*/
     
     fileprivate func generateCell(_ view: UIScrollView, cellForRowAt indexPath: IndexPath, isSupplementary:Bool = false) -> UIView {
         // 使用普通方式创建cell
@@ -624,6 +634,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
         
         cellID = model.ssn_cellID()
+        if cellID.isEmpty {
+            cellID = ".auto.cell." + String(describing: type(of: model))
+        }
         isFloating = model.ssn_canFloating()
         
         //出现错位的情况返回兼容的cell

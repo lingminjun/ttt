@@ -74,28 +74,32 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
                 print("realm result initial...")
                 break
             case .update(_, let deletions, let insertions, let modifications):
-                delegate.ssn_fetch_begin_change(sself)
                 
-                //删除者已经拿不到数据
-                if deletions.count > 0 {
-                    for idx in deletions {
-                        delegate.ssn_fetch(sself, didChange: nil, at: idx, for: MMFetchChangeType.delete, newIndex: idx)
+                delegate.ssn_fetch_changing(sself, deletes: { (section) -> [IndexPath] in
+                    var results:[IndexPath] = []
+                    if deletions.count > 0 {
+                        for idx in deletions {
+                            results.append(IndexPath(row:idx,section:section))
+                        }
                     }
-                }
-                if insertions.count > 0 {
-                    for idx in insertions {
-                        let obj = sself._list[idx]
-                        delegate.ssn_fetch(sself, didChange: obj, at: idx, for: MMFetchChangeType.insert, newIndex: idx)
+                    return results
+                }, inserts: { (section) -> [IndexPath] in
+                    var results:[IndexPath] = []
+                    if insertions.count > 0 {
+                        for idx in insertions {
+                            results.append(IndexPath(row:idx,section:section))
+                        }
                     }
-                }
-                if modifications.count > 0 {
-                    for idx in modifications {
-                        let obj = sself._list[idx]
-                        delegate.ssn_fetch(sself, didChange: obj, at: idx, for: MMFetchChangeType.update, newIndex: idx)
+                    return results
+                }, updates: { (section) -> [IndexPath] in
+                    var results:[IndexPath] = []
+                    if modifications.count > 0 {
+                        for idx in modifications {
+                            results.append(IndexPath(row:idx,section:section))
+                        }
                     }
-                }
-                
-                delegate.ssn_fetch_end_change(sself)
+                    return results
+                })
                 break
             case .error(let error):
                 print("Error: \(error)")

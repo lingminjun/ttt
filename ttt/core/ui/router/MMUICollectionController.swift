@@ -112,55 +112,50 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     }
     
     /// MARK MMFetchsControllerDelegate
-    private class Node {
-        var object: MMCellModel?
-        var type:MMFetchChangeType
-        var indexPath:IndexPath
-        var newIndexPath:IndexPath?
-        init(type: MMFetchChangeType, object: MMCellModel?, indexPath: IndexPath, newIndexPath: IndexPath?) {
-            self.type = type
-            self.object = object
-            self.indexPath = indexPath
-            self.newIndexPath = newIndexPath
-        }
-    }
-    private var _ups:[Node] = []
-    
-    public func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?) {
-        if let indexPath = indexPath {
-            _ups.append(Node(type:type,object:anObject,indexPath:indexPath,newIndexPath:newIndexPath))
-        }
-    }
-    
-    public func ssn_controllerWillChangeContent(_ controller: AnyObject) {
-        _ups.removeAll()
-    }
-    
-    public func ssn_controllerDidChangeContent(_ controller: AnyObject) {
-        MMTry.try({
-            self._table.performBatchUpdates({ [weak self] () in
-                guard let sself = self else {return}
-                for node in sself._ups {
-                    switch node.type {
-                    case .delete:
-                        sself._table.deleteItems(at: [node.indexPath])
-                    case .insert:
-                        sself._table.insertItems(at: [node.indexPath])
-                    case .update:
-                        sself._table.reloadItems(at: [node.indexPath])
-                    default:
-                        if let newIndexPath = node.newIndexPath {
-                            sself._table.deleteItems(at: [node.indexPath])
-                            sself._table.insertItems(at: [newIndexPath])
-                        }
-                    }
+    public func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int) {
+        let block:(_ updateUI:Bool) -> Void = { (updateUI) in
+            if let deletes = deletes {
+                let indexPaths = deletes(section)
+                if updateUI && indexPaths.count > 0 {
+                    self._table.deleteItems(at: indexPaths)
                 }
-                }, completion: { [weak self] (b) in
-                    guard let sself = self else {return}
-                    sself._ups.removeAll()
-            })
-        }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+            }
+            
+            if let inserts = inserts {
+                let indexPaths = inserts(section)
+                if updateUI && indexPaths.count > 0 {
+                    self._table.insertItems(at: indexPaths)
+                }
+            }
+            
+            if let updates = updates {
+                let indexPaths = updates(section)
+                if updateUI && indexPaths.count > 0 {
+                    self._table.reloadItems(at: indexPaths)
+                }
+            }
+        }
+        
+        // 由于苹果对SupplementaryView动画支持有问题(局部更新动画更加不流畅，且导致图存crash)，只能采用无动画reload, 可查看：http://www.openradar.me/31749591
+        if self._layout.config.floating {
+            block(false)
+            self._table.reloadData()
+            return
+        }
+        
+        MMTry.try({
+            self._table.performBatchUpdates({
+                block(true)
+            }, completion: nil)
+        }, catch: { (exception) in
+            block(false)
+            print("error:\(String(describing: exception))")
+        }, finally: nil)
     }
+    
+    public func ssn_controllerWillChangeContent(_ controller: AnyObject) {}
+    
+    public func ssn_controllerDidChangeContent(_ controller: AnyObject) {}
     
     
     
