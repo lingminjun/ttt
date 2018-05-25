@@ -49,6 +49,11 @@ class NormalNode : NSObject,MMCellModel {
         return NormalCell.self
     }
     
+    deinit {
+        let point = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        print("deinit " + String(describing: type(of: self)) + " 0x\(String(format:"%2X", point.hashValue))")
+    }
+    
     public var title: String = ""
     public var subTitle: String = ""
     public var isExclusiveLine: Bool = false
@@ -65,6 +70,9 @@ class NormalCell: UICollectionViewCell {
         textLabel = UILabel.init(frame: self.bounds)
         self.addSubview(textLabel!)
         self.backgroundColor = UIColor.white
+        
+        let point = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        print("init " + String(describing: type(of: self)) + " 0x\(String(format:"%2X", point.hashValue))")
     }
     
     init() {
@@ -72,6 +80,14 @@ class NormalCell: UICollectionViewCell {
         textLabel = UILabel.init(frame: self.bounds)
         self.addSubview(textLabel!)
         self.backgroundColor = UIColor.white
+        
+        let point = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        print("init " + String(describing: type(of: self)) + " 0x\(String(format:"%2X", point.hashValue))")
+    }
+    
+    deinit {
+        let point = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        print("deinit " + String(describing: type(of: self)) + " 0x\(String(format:"%2X", point.hashValue))")
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -127,12 +143,17 @@ class HeadNode : NSObject,MMCellModel {
     }
     
     func ssn_cellClass(_ cellID: String, isFloating: Bool) -> AnyClass {
-        if isFloating {
+//        if isFloating {
             return HeadCell.self
-        } else {
-            return NormalCell.self
-        }
+//        } else {
+//            return NormalCell.self
+//        }
     
+    }
+    
+    deinit {
+        let point = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        print("deinit " + String(describing: type(of: self)) + " 0x\(String(format:"%2X", point.hashValue))")
     }
     
     public var title: String = ""
@@ -151,6 +172,9 @@ class HeadCell: UICollectionReusableView {
         textLabel = UILabel.init(frame: self.bounds)
         self.addSubview(textLabel!)
         self.backgroundColor = UIColor.yellow
+        
+        let point = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        print("init " + String(describing: type(of: self)) + " 0x\(String(format:"%2X", point.hashValue))")
     }
     
     init() {
@@ -158,6 +182,14 @@ class HeadCell: UICollectionReusableView {
         textLabel = UILabel.init(frame: self.bounds)
         self.addSubview(textLabel!)
         self.backgroundColor = UIColor.yellow
+        
+        let point = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        print("init " + String(describing: type(of: self)) + " 0x\(String(format:"%2X", point.hashValue))")
+    }
+    
+    deinit {
+        let point = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        print("deinit " + String(describing: type(of: self)) + " 0x\(String(format:"%2X", point.hashValue))")
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -240,7 +272,7 @@ class DemoCollectionController : MMUICollectionController<MMCellModel> {
                 self.fetchs.fetch.append(node)
                 
                 
-                for i in 0..<27 {
+                for i in 0..<21 {
                     let node = NormalNode()
                     node.title = "title\(idx) 下的数据 \(i)"
                     self.fetchs.fetch.append(node)

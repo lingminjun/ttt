@@ -372,6 +372,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
 //    private var defaultHeadAttributes:UICollectionViewLayoutAttributes!
     private func getDefaultHeadAttributes(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes {
         let defaultHeadAttributes = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: COLLECTION_HEADER_KIND, with: indexPath)
+        defaultHeadAttributes.frame.origin.y = 1000
         defaultHeadAttributes.frame.size.height = 0
         defaultHeadAttributes.isHidden = true
         defaultHeadAttributes.indexPath = indexPath
