@@ -344,6 +344,7 @@ enum MMTable {
 }
 
 let DEFAULT_CELL_ID = ".default.cell"
+let DEFAULT_HEAD_ID = ".default.head"
 
 /**
  * MMFetchsController实现UITableViewDataSource
@@ -554,6 +555,14 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
     }
     
+//    public func ssn_fetch(_ fetch: MMFetch<T>, _ updates: (() -> Bool)) {
+//        guard let delegate = _delegate else {
+//            updates()
+//            return
+//        }
+////        delegate.
+//    }
+    
     public func ssn_fetch_begin_change(_ fetch: MMFetch<T>) {
         ssn_begin_change("\(fetch)")
     }
@@ -609,11 +618,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
         
         guard let model = self[indexPath.section]?[indexPath.row] else {
-            if table != nil {
-                cell = UITableViewCell(style: .default, reuseIdentifier: cellID)
-            } else {
-                cell = UICollectionViewCell()
-            }
+            cell = generateDefaultCell(view, cellForRowAt: indexPath, isSupplementary: isSupplementary)
             cell?.ssn_weak_set_fetchs(self as AnyObject)
             return cell!
         }
@@ -621,20 +626,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         cellID = model.ssn_cellID()
         isFloating = model.ssn_canFloating()
         
-        //返回兼容的cell
-        if isFloating && !isSupplementary {
-            if let table = table {
-                cell = table.dequeueReusableCell(withIdentifier:DEFAULT_CELL_ID)
-                if cell == nil {
-                    cell = UITableViewCell(style: .default, reuseIdentifier: DEFAULT_CELL_ID)
-                }
-            } else {
-                if !_isRgst.contains(DEFAULT_CELL_ID) {
-                    _isRgst.insert(DEFAULT_CELL_ID)
-                    collection?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: DEFAULT_CELL_ID)
-                }
-                cell = collection?.dequeueReusableCell(withReuseIdentifier: DEFAULT_CELL_ID, for: indexPath)
-            }
+        //出现错位的情况返回兼容的cell
+        if (isFloating && !isSupplementary) || (!isFloating && isSupplementary) {
+            cell = generateDefaultCell(view, cellForRowAt: indexPath, isSupplementary: isSupplementary)
             cell?.ssn_weak_set_fetchs(self as AnyObject)
             return cell!
         }
@@ -731,13 +725,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
         
         if cell == nil {
-            if table != nil {
-                cell = UITableViewCell(style: .default, reuseIdentifier: cellID)
-            } else if isFloating {
-                cell = UICollectionReusableView()
-            } else {
-                cell = collection?.dequeueReusableCell(withReuseIdentifier: DEFAULT_CELL_ID, for: indexPath)
-            }
+            cell = generateDefaultCell(view, cellForRowAt: indexPath, isSupplementary: isSupplementary)
             cell?.ssn_weak_set_fetchs(self as AnyObject)
         }
         
@@ -747,6 +735,41 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             cell?.ssn_set_cellModel(model) //提前设置model的值
             cell?.ssn_onDisplay(view, model: model, atIndexPath: indexPath, reused: reused)
         }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
+        
+        return cell!
+    }
+    
+    fileprivate func generateDefaultCell(_ view: UIScrollView, cellForRowAt indexPath: IndexPath, isSupplementary:Bool = false) -> UIView {
+        var table:UITableView? = nil
+        var collection:UICollectionView? = nil
+        var cell:UIView? = nil
+        if view is UITableView {
+            table = (view as? UITableView)
+        } else if (view is UICollectionView) {
+            collection = (view as? UICollectionView)
+        }
+        
+        if table != nil {
+            if isSupplementary {
+                cell = UITableViewHeaderFooterView(reuseIdentifier: DEFAULT_HEAD_ID)
+            } else {
+                cell = UITableViewCell(style: .default, reuseIdentifier: DEFAULT_CELL_ID)
+            }
+        } else {
+            if isSupplementary {
+                if !_isRgst.contains(DEFAULT_HEAD_ID) {
+                    _isRgst.insert(DEFAULT_HEAD_ID)
+                    collection?.register(UICollectionReusableView.self, forSupplementaryViewOfKind: COLLECTION_HEADER_KIND, withReuseIdentifier: DEFAULT_HEAD_ID)
+                }
+                cell = collection?.dequeueReusableSupplementaryView(ofKind: COLLECTION_HEADER_KIND, withReuseIdentifier: DEFAULT_HEAD_ID, for: indexPath)
+            } else {
+                if !_isRgst.contains(DEFAULT_CELL_ID) {
+                    _isRgst.insert(DEFAULT_CELL_ID)
+                    collection?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: DEFAULT_CELL_ID)
+                }
+                cell = collection?.dequeueReusableCell(withReuseIdentifier: DEFAULT_CELL_ID, for: indexPath)
+            }
+        }
         
         return cell!
     }
@@ -807,6 +830,10 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return self[section]?.title
+    }
+    
+    public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return generateCell(tableView, cellForRowAt: IndexPath(row: 0, section: section), isSupplementary: true)
     }
     
     public func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {

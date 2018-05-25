@@ -80,13 +80,11 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
             return
         }
         
+        let len = _list.count > (index + length) ? (index + length) : _list.count
+        
         _listener?.ssn_fetch_begin_change(self)
         
-        for ii in (0..<length).reversed() {
-            
-            if index < 0 || index >= _list.count {
-                continue
-            }
+        for ii in (index..<len).reversed() {
             
             let obj = _list.remove(at: ii)
             

@@ -17,6 +17,7 @@ public struct MMLayoutConfig {
     var scrollDirection:UICollectionViewScrollDirection = .vertical
     
     var floating:Bool = false//存在某些cell飘浮，此选项开启，会造成性能损耗
+    var floatingOffsetY:CGFloat = -1 //存在cell飘浮时自定义offset起始位置；小于零表示采用默认
     
     //默认UITable风格，以下若属性命名均已vertical来命名，若设置horizontal时，则需要转换含义
     var columnCount:Int = 1
@@ -26,6 +27,7 @@ public struct MMLayoutConfig {
     var insets:UIEdgeInsets = UIEdgeInsets.zero //header将忽略左右上下的间距，只有cell有效
     var magicHorizontalEdge:CGFloat = 0//横向魔法边距，只有当cell返回支持时展示
 //    var magicVerticalEdge:CGFloat = 0//垂直魔法边距，只有当cell返回支持时展示
+
 }
 
 @objc protocol MMCollectionViewDelegate : UICollectionViewDelegate {
@@ -53,7 +55,10 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     
     public init(_ config:MMLayoutConfig = MMLayoutConfig()) {
         super.init()
-        _config = config;
+        _config = config
+        if config.floatingOffsetY >= 0 {//表示不走默认情况
+            setFloatingOffsetY(config.floatingOffsetY)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -64,7 +69,10 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     open var config:MMLayoutConfig {
         get { return _config; }
         set {
+            let changOffset =  _config.floatingOffsetY != newValue.floatingOffsetY
+            
             _config = newValue
+            
             if _config.columnCount <= 0 {//防止设置为非法数字
                 _config.columnCount = 1
             }
@@ -76,6 +84,10 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             }
             if _config.rowDefaultSpace < 0 {//防止设置为非法数字
                 _config.rowDefaultSpace = 1
+            }
+            
+            if changOffset {
+                setFloatingOffsetY(_config.floatingOffsetY)
             }
             
 //            guard let view = self.collectionView else {
@@ -347,27 +359,40 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     }
     
     private var defaultAttributes:UICollectionViewLayoutAttributes!
+    private func getDefaultAttributes(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes {
+        if defaultAttributes == nil {
+            defaultAttributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
+            defaultAttributes.frame.size.height = 0
+            defaultAttributes.isHidden = true
+        }
+        defaultAttributes.indexPath = indexPath
+        return defaultAttributes!
+    }
+    
+//    private var defaultHeadAttributes:UICollectionViewLayoutAttributes!
+    private func getDefaultHeadAttributes(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes {
+        let defaultHeadAttributes = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: COLLECTION_HEADER_KIND, with: indexPath)
+        defaultHeadAttributes.frame.size.height = 0
+        defaultHeadAttributes.isHidden = true
+        defaultHeadAttributes.indexPath = indexPath
+        return defaultHeadAttributes
+    }
+    
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        guard let attributes = _cellLayouts[indexPath] else { return nil }
+        guard let attributes = _cellLayouts[indexPath] else { return getDefaultAttributes(at: indexPath) }
         if attributes.representedElementKind == COLLECTION_HEADER_KIND {//必须兼容返回一个default的布局
-            if defaultAttributes == nil {
-                defaultAttributes = UICollectionViewLayoutAttributes(forCellWith: indexPath)
-                defaultAttributes.frame.size.height = 0
-                defaultAttributes.isHidden = true
-            }
-            defaultAttributes.indexPath = indexPath
-            return defaultAttributes
+            return getDefaultAttributes(at: indexPath)
         } else {
             return attributes
         }
     }
     
     override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        guard let attributes = _cellLayouts[indexPath] else { return nil }
+        guard let attributes = _cellLayouts[indexPath] else { return getDefaultAttributes(at: indexPath) }
         if attributes.representedElementKind == COLLECTION_HEADER_KIND {
             return attributes
         } else {
-            return nil
+            return getDefaultAttributes(at: indexPath)
         }
     }
     
@@ -486,6 +511,17 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     
     var _setedOffsetY = false
     var _offsetY:CGFloat = 0.0
+    
+    fileprivate final func setFloatingOffsetY(_ offsetY:CGFloat) {
+        if offsetY < 0 {
+            _setedOffsetY = false
+            _offsetY = 0
+        } else {
+            _setedOffsetY = true
+            _offsetY = offsetY
+        }
+    }
+    
     //原点的offset位置
     fileprivate final var originOffsetY:CGFloat {
         get {
