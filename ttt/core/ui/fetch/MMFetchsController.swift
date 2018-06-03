@@ -602,13 +602,8 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         ssn_end_change(flag)
     }
+    
     fileprivate func generateCell(_ view: UIScrollView, cellForRowAt indexPath: IndexPath, isSupplementary:Bool = false) -> UIView {
-        let cell = _generateCell(view, cellForRowAt: indexPath, isSupplementary: isSupplementary)
-        let point = Unmanaged<AnyObject>.passUnretained(cell as AnyObject).toOpaque()
-        print(">>" + String(describing: type(of: cell)) + " 0x\(String(format:"%2X", point.hashValue))")
-        return cell
-    }
-    fileprivate func _generateCell(_ view: UIScrollView, cellForRowAt indexPath: IndexPath, isSupplementary:Bool = false) -> UIView {
         // 使用普通方式创建cell
         var cellID = "cell"
         var isFloating = false

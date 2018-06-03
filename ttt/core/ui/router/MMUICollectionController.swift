@@ -140,7 +140,9 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
         MMTry.try({
             self._table.performBatchUpdates({ [weak self] () in
                 guard let sself = self else {return}
+                let sets = NSMutableIndexSet()
                 for node in sself._ups {
+                    sets.add(node.indexPath.section)
                     switch node.type {
                     case .delete:
                         sself._table.deleteItems(at: [node.indexPath])
@@ -155,6 +157,7 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
                         }
                     }
                 }
+                sself._table.reloadSections(sets as IndexSet)
                 }, completion: { [weak self] (b) in
                     guard let sself = self else {return}
                     sself._ups.removeAll()

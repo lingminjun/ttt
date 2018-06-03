@@ -372,7 +372,6 @@ class MMCollectionViewLayout: UICollectionViewLayout {
 //    private var defaultHeadAttributes:UICollectionViewLayoutAttributes!
     private func getDefaultHeadAttributes(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes {
         let defaultHeadAttributes = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: COLLECTION_HEADER_KIND, with: indexPath)
-        defaultHeadAttributes.frame.origin.y = 1000
         defaultHeadAttributes.frame.size.height = 0
         defaultHeadAttributes.isHidden = true
         defaultHeadAttributes.indexPath = indexPath
@@ -389,11 +388,11 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     }
     
     override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        guard let attributes = _cellLayouts[indexPath] else { return getDefaultAttributes(at: indexPath) }
+        guard let attributes = _cellLayouts[indexPath] else { return getDefaultHeadAttributes(at: indexPath) }
         if attributes.representedElementKind == COLLECTION_HEADER_KIND {
             return attributes
         } else {
-            return getDefaultAttributes(at: indexPath)
+            return getDefaultHeadAttributes(at: indexPath)
         }
     }
     
