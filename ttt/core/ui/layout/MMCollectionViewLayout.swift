@@ -379,9 +379,9 @@ class MMCollectionViewLayout: UICollectionViewLayout {
     }
     
     override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
-        guard let attributes = _cellLayouts[indexPath] else { return getDefaultAttributes(at: indexPath) }
+        guard let attributes = _cellLayouts[indexPath] else { return getDefaultHeadAttributes(at: indexPath) }
         if attributes.representedElementKind == COLLECTION_HEADER_KIND {//必须兼容返回一个default的布局
-            return getDefaultAttributes(at: indexPath)
+            return getDefaultHeadAttributes(at: indexPath)
         } else {
             return attributes
         }

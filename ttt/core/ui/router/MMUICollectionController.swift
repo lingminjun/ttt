@@ -114,6 +114,7 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     /// MARK MMFetchsControllerDelegate
     public func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int) {
         let block:(_ updateUI:Bool) -> Void = { (updateUI) in
+            
             if let deletes = deletes {
                 let indexPaths = deletes(section)
                 if updateUI && indexPaths.count > 0 {
@@ -134,14 +135,18 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
                     self._table.reloadItems(at: indexPaths)
                 }
             }
+            
+            if updateUI {
+                self._table.reloadSections(IndexSet(integer: section))
+            }
         }
         
         // 由于苹果对SupplementaryView动画支持有问题(局部更新动画更加不流畅，且导致图存crash)，只能采用无动画reload, 可查看：http://www.openradar.me/31749591
-        if self._layout.config.floating {
+        /*if self._layout.config.floating {
             block(false)
             self._table.reloadData()
             return
-        }
+        }*/
         
         MMTry.try({
             self._table.performBatchUpdates({
