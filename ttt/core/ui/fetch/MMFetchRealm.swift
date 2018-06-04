@@ -45,6 +45,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     //使用默认的数据库
     var _list : Results<T>!
     var _notice: NotificationToken? = nil
+    var _latestCount = 0 //最近的长度
     lazy var _realm = try! Realm()
     
     override public init(tag:String) {
@@ -99,12 +100,14 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
                         }
                     }
                     return results
-                })
+                }, optimizing: sself.calculateOptimizing(effected: insertions.count + modifications.count, delete: deletions.count))
                 break
             case .error(let error):
                 print("Error: \(error)")
                 break
             }
+            
+            sself._latestCount = sself._list.count
         }
     }
     
@@ -117,13 +120,16 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     override public func count() -> Int { return _list.count }
     override public func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return Array(_list)}
     
-    /// Update
-    override public func update(_ idx: Int, _ b: (() throws -> Void)?) {
+    /// Update. 注意 newObject不要传入，不安全
+    override public func update(_ idx: Int, newObject: T? = nil, _ b: (() throws -> Void)? = nil) {
         guard let obj = self[idx] else {return}
         do {
             try _realm.write {
-                _realm.add(obj, update: true);//(newObjects)
-                
+                if let nobj = newObject {
+                    _realm.add(nobj, update: true);//若newObject跨越线程，则可能出现crash
+                } else {
+                    _realm.add(obj, update: true);//(newObjects)
+                }
                 if let b = b {
                     do {
                         try b()
@@ -141,6 +147,18 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
         do {
             try _realm.write {
                 _realm.add(newObjects, update: true);//(newObjects)
+            }
+        } catch {
+            print("error:\(error)")
+        }
+    }
+    
+    /// reset `newObjects`. Derived class implements.
+    override public func reset<C>(_ newObjects: C) where T == C.Element, C : Sequence {
+        do {
+            try _realm.write {
+                _realm.delete(_list) //clear
+                _realm.add(newObjects, update: true);
             }
         } catch {
             print("error:\(error)")
@@ -208,5 +226,22 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
         }
         return Array(rs)
     }
-    
+    private func calculateOptimizing(effected number:Int = 0, delete rows:Int = 0) -> Bool {
+        //影响条数超过阈值
+        if number > min_threshold || rows > min_threshold {
+            return true
+        }
+        let c = _latestCount
+        //起始值为零或者归零
+        if c == 0 || rows >= c {
+            return true
+        }
+        
+        //影响数超过总是的一般
+        if c < 2 * (number + rows) {
+            return true
+        }
+        
+        return false
+    }
 }

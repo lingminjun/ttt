@@ -66,27 +66,8 @@ public class MMUITableController<T: MMCellModel>: MMUIController,UITableViewDele
     }
     
     /// MARK MMFetchsControllerDelegate
-    public func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int) {
-        if let deletes = deletes {
-            let indexPaths = deletes(section)
-            if indexPaths.count > 0 {
-                _table.deleteRows(at: indexPaths, with: .automatic)
-            }
-        }
-        
-        if let inserts = inserts {
-            let indexPaths = inserts(section)
-            if indexPaths.count > 0 {
-                _table.insertRows(at: indexPaths, with: .automatic)
-            }
-        }
-        
-        if let updates = updates {
-            let indexPaths = updates(section)
-            if indexPaths.count > 0 {
-                _table.reloadRows(at: indexPaths, with: .automatic)
-            }
-        }
+    public func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
+        _fetchs.perform(_table, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
     }
     
     public func ssn_controllerWillChangeContent(_ controller: AnyObject) {

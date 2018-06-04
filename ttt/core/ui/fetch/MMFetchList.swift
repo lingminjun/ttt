@@ -29,9 +29,12 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
     public override func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return Array(_list)}
     
     /// Update
-    override public func update(_ idx: Int, _ b: (() throws -> Void)?) {
+    public override func update(_ idx: Int, newObject: T? = nil, _ b: (() throws -> Void)? = nil) {
         _listener?.ssn_fetch_changing(self, updates: { (section) -> [IndexPath] in
             guard let _ = self[idx] else { return [] }
+            if let nobj = newObject {
+                self._list[idx] = nobj
+            }
             if let b = b {
                 MMTry.try({ do {
                     try b()
@@ -40,8 +43,9 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
             return [IndexPath(row:idx,section:section)]
         })
     }
-    /// Insert `newObject` at index `i`. Derived class implements.
+    /// Insert `newObjects` at index `i`. Derived class implements.
     public override func insert<C: Sequence>(_ newObjects: C, atIndex i: Int) where C.Iterator.Element == T {
+        var c = 0; for _ in newObjects { c += 1 }
         _listener?.ssn_fetch_changing(self, inserts: { (section) -> [IndexPath] in
             
             var idx = i
@@ -58,7 +62,33 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
                 idx += 1
             }
             return results
-        })
+        }, optimizing:calculateOptimizing(effected: c))
+    }
+    
+    /// reset `newObjects`. Derived class implements.
+    public override func reset<C>(_ newObjects: C) where T == C.Element, C : Sequence {
+        _listener?.ssn_fetch_changing(self,  deletes: { (section) -> [IndexPath] in
+            if self._list.isEmpty {
+                return []
+            }
+            
+            var results:[IndexPath] = []
+            for ii in (0..<self._list.count).reversed() {
+                self._list.remove(at: ii)
+                results.append(IndexPath(row:ii,section:section))
+            }
+            return results
+        }, inserts: { (section) -> [IndexPath] in
+            var idx = 0
+            var results:[IndexPath] = []
+            for obj in newObjects {
+                let at = idx
+                self._list.insert(obj, at: at)
+                results.append(IndexPath(row:at,section:section))
+                idx += 1
+            }
+            return results
+        }, optimizing:true)
     }
     
     /// Remove and return the element at index `i`. Derived class implements.
@@ -87,7 +117,7 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
                 results.append(IndexPath(row:ii,section:section))
             }
             return results
-        })
+        }, optimizing:calculateOptimizing(delete: length))
     }
     
     
@@ -104,7 +134,7 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
                 results.append(IndexPath(row:ii,section:section))
             }
             return results
-        })
+        }, optimizing:true)
     }
     
     /// Get element at index. Derived class implements.
@@ -134,5 +164,22 @@ public class MMFetchList<T: MMCellModel>: MMFetch<T> {
         })
     }
 
-    
+    private func calculateOptimizing(effected number:Int = 0, delete rows:Int = 0) -> Bool {
+        //影响条数超过阈值
+        if number > min_threshold || rows > min_threshold {
+            return true
+        }
+        let c = _list.count
+        //起始值为零或者归零
+        if c == 0 || rows >= c {
+            return true
+        }
+        
+        //影响数超过总是的一般
+        if c < 2 * (number + rows) {
+            return true
+        }
+        
+        return false
+    }
 }

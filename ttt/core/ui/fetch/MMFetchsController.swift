@@ -105,6 +105,8 @@ extension UIView {
 
 /// All fetch list abstract protocol
 public class MMFetch<T: MMCellModel> {
+    public let min_threshold = 50 //经验值，并无太多思考，当修改条数大于此值建议优化更新
+    
     let _tag: String
     weak var _listener : MMFetchsController<T>?
     
@@ -121,9 +123,13 @@ public class MMFetch<T: MMCellModel> {
     /// O(1) unless `self`'s storage is shared with another live array; O(`count`) if `self` does not wrap a bridged `NSArray`; otherwise the efficiency is unspecified..
     public final subscript (index: Int) -> T? { get{ return self.get(index)} set(newValue) {
         if let newValue = newValue {
-            self.insert(newValue, atIndex: index)}
+            if index >= 0 && index < self.count() {
+                self.update(index, newObject:newValue)
+            } else {
+                self.insert(newValue, atIndex: index)
+            }
         }
-    }
+    }}
     
     /// Gets the first element in the array.
     public final func first() -> T? { if self.count() > 0 { return get(0) } else { return nil }}
@@ -193,11 +199,14 @@ public class MMFetch<T: MMCellModel> {
     public func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return nil}
     
     /// Update
-    public func update(_ idx: Int, _ b: (() throws -> Void)?) {}
-    /// Insert `newObject` at index `i`. Derived class implements.
+    public func update(_ idx: Int, newObject: T? = nil, _ b: (() throws -> Void)? = nil) {}
+    /// Insert `newObjects` at index `i`. Derived class implements.
     public func insert<C: Sequence>(_ newObjects: C, atIndex i: Int) where C.Iterator.Element == T {
         /*_listener?.ssn_fetch(fetch: self,didChange: newObject, at: self.count(), for: MMFetchChangeType.insert, newIndex: self.count())*/
     }
+    
+    /// reset `newObjects`. Derived class implements.
+    public func reset<C: Sequence>(_ newObjects: C) where C.Iterator.Element == T {}
     
     /// Remove and return the element at index `i`. Derived class implements.
     public func delete(_ index: Int) -> T? {return nil}
@@ -303,7 +312,7 @@ enum MMTable {
     
 //    @objc optional func ssn_controller(_ controller: AnyObject, didChange anObject: MMCellModel?, at indexPath: IndexPath?, for type: MMFetchChangeType, newIndexPath: IndexPath?)
     
-    @objc func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int)
+    @objc func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool)
     
     
     /* Notifies the delegate of added or removed sections.  Enables NSFetchedResultsController change tracking.
@@ -444,8 +453,8 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     /* update indexPath.
      */
-    public func update(at indexPath: IndexPath,_ b: (() throws -> Void)?) {
-        self[indexPath.section]?.update(indexPath.row, b)
+    public func update(at indexPath: IndexPath, newObject: T? = nil, _ b: (() throws -> Void)? = nil) {
+        self[indexPath.section]?.update(indexPath.row, newObject:newObject, b)
     }
     
     /* delete indexPath.
@@ -459,7 +468,6 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     public func insert(obj:T, at indexPath: IndexPath) {
         self[indexPath.section]?.insert(obj, atIndex: indexPath.row)
     }
-    
     
     /* Returns the indexPath of a given object.
      */
@@ -558,7 +566,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
     }*/
     
-    public func ssn_fetch_changing(_ fetch: MMFetch<T>, deletes: ((_ section:Int) -> [IndexPath])? = nil, inserts: ((_ section:Int) -> [IndexPath])? = nil, updates: ((_ section:Int) -> [IndexPath])? = nil) {
+    public func ssn_fetch_changing(_ fetch: MMFetch<T>, deletes: ((_ section:Int) -> [IndexPath])? = nil, inserts: ((_ section:Int) -> [IndexPath])? = nil, updates: ((_ section:Int) -> [IndexPath])? = nil, optimizing:Bool = false) {
         
         guard let section = self.indexOf(fetch) else { return }
         
@@ -569,7 +577,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             return
         }
         delegate.ssn_controllerWillChangeContent(self)
-        delegate.ssn_controller(self, deletes: deletes, inserts: inserts, updates: updates, at:section)
+        delegate.ssn_controller(self, deletes: deletes, inserts: inserts, updates: updates, at:section, optimizing:optimizing)
         delegate.ssn_controllerDidChangeContent(self)
     }
     /*
@@ -612,6 +620,105 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         ssn_end_change(flag)
     }*/
+    
+    public func perform(_ table:UIView, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool = false) {
+        if let tb = table as? UITableView {
+            tableViewPerform(tb, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
+        } else if let tb = table as? UICollectionView {
+            collectionViewPerform(tb, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
+        }
+    }
+    
+    fileprivate func tableViewPerform(_ table:UITableView, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
+        //同一个对象判断
+        guard let ds = table.dataSource as? NSObject else {
+            return
+        }
+        if ds != self {
+            return
+        }
+        
+        if let deletes = deletes {
+            let indexPaths = deletes(section)
+            if indexPaths.count > 0 {
+                table.deleteRows(at: indexPaths, with: .automatic)
+            }
+        }
+        
+        if let inserts = inserts {
+            let indexPaths = inserts(section)
+            if indexPaths.count > 0 {
+                table.insertRows(at: indexPaths, with: .automatic)
+            }
+        }
+        
+        if let updates = updates {
+            let indexPaths = updates(section)
+            if indexPaths.count > 0 {
+                table.reloadRows(at: indexPaths, with: .automatic)
+            }
+        }
+        
+        table.reloadSections(IndexSet(integer: section), with: .automatic)
+    }
+    
+    fileprivate func collectionViewPerform(_ table:UICollectionView, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
+        
+        //同一个对象判断
+        guard let ds = table.dataSource as? NSObject else {
+            return
+        }
+        if ds != self {
+            return
+        }
+        
+        let block:(_ updateUI:Bool) -> Void = { (updateUI) in
+            
+            if let deletes = deletes {
+                let indexPaths = deletes(section)
+                if updateUI && indexPaths.count > 0 {
+                    table.deleteItems(at: indexPaths)
+                }
+            }
+            
+            if let inserts = inserts {
+                let indexPaths = inserts(section)
+                if updateUI && indexPaths.count > 0 {
+                    table.insertItems(at: indexPaths)
+                }
+            }
+            
+            if let updates = updates {
+                let indexPaths = updates(section)
+                if updateUI && indexPaths.count > 0 {
+                    table.reloadItems(at: indexPaths)
+                }
+            }
+            
+            if updateUI {
+                table.reloadSections(IndexSet(integer: section))
+            }
+        }
+        
+        // Change the strategy, since performBatchUpdates has an animation every time it submits, because the animation can't be avoided and the performance drops sharply, so in some scenarios, try to reload the data.
+        // 改变策略，由于performBatchUpdates每次提交都有动画，因为无法避免动画，性能急剧下降，所以某些场景，尽量reload数据
+        if optimizing {
+            block(false)
+            table.reloadData()
+            print("采用了优化策略更新！")
+            return
+        }
+        
+        MMTry.try({
+            table.performBatchUpdates({
+                block(true)
+            }, completion: nil)
+        }, catch: { (exception) in
+            block(false)
+            print("error:\(String(describing: exception))")
+        }, finally: nil)
+    }
+    
     
     fileprivate func generateCell(_ view: UIScrollView, cellForRowAt indexPath: IndexPath, isSupplementary:Bool = false) -> UIView {
         // 使用普通方式创建cell
