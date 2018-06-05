@@ -255,30 +255,30 @@ class DemoCollectionController : MMUICollectionController<MMCellModel> {
     }
     
     @objc func rightAction() -> Void {
-        let len = self.fetchs.fetch.count() - 1
-        self.fetchs.fetch.delete(1, length: len)
+//        let len = self.fetchs.fetch.count() - 1
+//        self.fetchs.fetch.delete(1, length: len)
 //
-//        self.fetchs.fetch.clear()
+        self.fetchs.fetch.clear()
 //        DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds:5)) {
 //            let len = self.fetchs.fetch.count() - 1
 //            self.fetchs.fetch.delete(1, length: len)
 //        }
         
         
-//        DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds:5)) {
-//            for idx in 1...5 {
-//
-//                let node = HeadNode()
-//                node.title = "xtitle\(idx)"
-//                self.fetchs.fetch.append(node)
-//
-//                for i in 0..<27 {
-//                    let node = NormalNode()
-//                    node.title = "xtitle\(idx) 下的数据 \(i)"
-//                    self.fetchs.fetch.append(node)
-//                }
-//            }
-//        }
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds:5)) {
+            for idx in 1...5 {
+
+                let node = HeadNode()
+                node.title = "xtitle\(idx)"
+                self.fetchs.fetch.append(node)
+
+                for i in 0..<27 {
+                    let node = NormalNode()
+                    node.title = "xtitle\(idx) 下的数据 \(i)"
+                    self.fetchs.fetch.append(node)
+                }
+            }
+        }
         
     }
 }

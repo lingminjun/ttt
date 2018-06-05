@@ -99,6 +99,9 @@ extension UINavigationController: MMContainer {
     }
     
     public func topController() -> MMController? {
+        if let vc = self.presentedViewController {
+            return vc
+        }
         return self.visibleViewController
     }
     
@@ -133,6 +136,9 @@ extension UITabBarController: MMContainer {
     }
     
     public func topController() -> MMController? {
+        if let vc = self.presentedViewController {
+            return vc
+        }
         return self.selectedViewController
     }
     

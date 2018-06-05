@@ -662,11 +662,15 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         table.beginUpdates()
         
+        var upSection = false
         if let deletes = deletes {
             let indexPaths = deletes(section)
             if indexPaths.count > 0 {
                 dels = indexPaths
                 table.deleteRows(at: indexPaths, with: .automatic)
+                
+                // 解决某些场景无法移除section问题
+                upSection = true
             }
         }
         
@@ -686,11 +690,13 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             }
         }
         
-        table.reloadSections(IndexSet(integer: section), with: .automatic)
-        
-        table.endUpdates()
+        if upSection {
+            table.reloadSections(IndexSet(integer: section), with: .none)
+        }
         
         delegate.ssn_controller(self, deletes: dels, inserts: ints, updates: upds)
+        
+        table.endUpdates()
     }
     
     fileprivate func collectionViewPerform(_ table:UICollectionView,delegate: MMFetchsControllerDelegate, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
@@ -700,6 +706,7 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             var dels:[IndexPath]? = nil
             var ints:[IndexPath]? = nil
             var upds:[IndexPath]? = nil
+            var upSection = false
             
             if let deletes = deletes {
                 let indexPaths = deletes(section)
@@ -708,6 +715,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                     if updateUI {
                         table.deleteItems(at: indexPaths)
                     }
+            
+                    // 解决某些场景无法移除section问题
+                    upSection = true
                 }
             }
             
@@ -731,8 +741,10 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                 }
             }
             
-            if updateUI {
-                table.reloadSections(IndexSet(integer: section))
+            if updateUI && upSection {
+                if let ly = table.collectionViewLayout as? MMCollectionViewLayout, ly.config.floating {
+                    table.reloadSections(IndexSet(integer: section))
+                }
             }
             
             delegate.ssn_controller(self, deletes: dels, inserts: ints, updates: upds)
