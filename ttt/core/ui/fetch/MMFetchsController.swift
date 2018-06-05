@@ -638,10 +638,14 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             return
         }
         
+        var upSection = false
         if let deletes = deletes {
             let indexPaths = deletes(section)
             if indexPaths.count > 0 {
                 table.deleteRows(at: indexPaths, with: .automatic)
+                
+                // 解决某些场景无法移除section问题
+                upSection = true
             }
         }
         
@@ -659,7 +663,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
             }
         }
         
-        table.reloadSections(IndexSet(integer: section), with: .automatic)
+        if upSection {
+            table.reloadSections(IndexSet(integer: section), with: .none)
+        }
     }
     
     fileprivate func collectionViewPerform(_ table:UICollectionView, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
@@ -674,10 +680,14 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         
         let block:(_ updateUI:Bool) -> Void = { (updateUI) in
             
+            var upSection = false
             if let deletes = deletes {
                 let indexPaths = deletes(section)
                 if updateUI && indexPaths.count > 0 {
                     table.deleteItems(at: indexPaths)
+                    
+                    // 解决某些场景无法移除section问题
+                    upSection = true
                 }
             }
             
@@ -695,8 +705,10 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
                 }
             }
             
-            if updateUI {
-                table.reloadSections(IndexSet(integer: section))
+            if updateUI && upSection {
+                if let ly = table.collectionViewLayout as? MMCollectionViewLayout, ly.config.floating {
+                    table.reloadSections(IndexSet(integer: section))
+                }
             }
         }
         
