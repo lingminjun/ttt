@@ -66,16 +66,16 @@ public class MMUITableController<T: MMCellModel>: MMUIController,UITableViewDele
     }
     
     /// MARK MMFetchsControllerDelegate
-    public func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
-        _fetchs.perform(_table, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
+    public func ssn_controller(_ controller: AnyObject, deletes: [IndexPath]?, inserts: [IndexPath]?, updates: [IndexPath]?) {
+        //_fetchs.perform(_table, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
     }
     
     public func ssn_controllerWillChangeContent(_ controller: AnyObject) {
-        _table.beginUpdates()
+        //_table.beginUpdates()
     }
     
     public func ssn_controllerDidChangeContent(_ controller: AnyObject) {
-        _table.endUpdates()
+        //_table.endUpdates()
     }
     
     private var _table : UITableView!

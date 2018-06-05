@@ -112,8 +112,8 @@ public class MMUICollectionController<T: MMCellModel>: MMUIController,UICollecti
     }
     
     /// MARK MMFetchsControllerDelegate
-    public func ssn_controller(_ controller: AnyObject, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
-        _fetchs.perform(_table, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
+    public func ssn_controller(_ controller: AnyObject, deletes: [IndexPath]?, inserts: [IndexPath]?, updates: [IndexPath]?) {
+        //_fetchs.perform(_table, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
     }
     
     public func ssn_controllerWillChangeContent(_ controller: AnyObject) {}
