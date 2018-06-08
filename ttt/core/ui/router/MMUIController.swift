@@ -37,6 +37,10 @@ public class MMUIController : UIViewController,MMUIControllerInitProtocol {
         }
     }
     
+    public func isViewLoad() -> Bool {
+        return _viewLoad
+    }
+    
     //System life-cycle methods
     override final public func loadView() {
         if _stack_flag { return } else { _stack_flag = true }
@@ -48,10 +52,12 @@ public class MMUIController : UIViewController,MMUIControllerInitProtocol {
         if !rt {
             super.loadView()
         }
+        _viewLoad = true
     }
     
     override final public func viewDidLoad() {
         if _stack_flag { return } else { _stack_flag = true }
+        if !_viewLoad { _viewLoad = true }
         MMTry.try({
             self.onViewDidLoad()
         }, catch: { (exception) in print("error:\(String(describing: exception))") }, finally: nil)
@@ -109,6 +115,7 @@ public class MMUIController : UIViewController,MMUIControllerInitProtocol {
     // MARK: - var
     private var _stack_flag = false
     
+    private var _viewLoad = false
     private var _visible = VisibleStatus.didDisappear
     final func visible() -> VisibleStatus { return _visible }
     
