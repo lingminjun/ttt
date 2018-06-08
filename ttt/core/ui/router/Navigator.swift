@@ -279,8 +279,8 @@ public final class Navigator: NSObject {
         tc.add(controller: vc, at: -1)
         
         //看看tc是否已经放入布局之中
-        let ftc = topContainer(volatile: false)
-        if let ttc = tc as? UIViewController, ttc !== ftc {
+        let ftc = topContainer()
+        if let ttc = tc as? UIViewController, !alreadyContainer(container: tc) {
             if let tftc = ftc as? UIViewController, isModal {
                 tftc.present(ttc, animated: true, completion: nil)
             } else {
@@ -508,6 +508,16 @@ public final class Navigator: NSObject {
         
         if let first = ctns.first { return first }
         else { return _window }
+    }
+    
+    fileprivate func alreadyContainer(container: MMContainer) -> Bool {
+        let ctns = containers()
+        for c in ctns.reversed() {
+            if c === container {
+                return true
+            }
+        }
+        return false
     }
     
     fileprivate func containers() -> [MMContainer] {
