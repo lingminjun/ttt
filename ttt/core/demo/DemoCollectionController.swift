@@ -233,20 +233,21 @@ class DemoCollectionController : MMUICollectionController<MMCellModel> {
         //        list.append(node)
         
         DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds:1)) {
-            for idx in 1..<6 {
-                
-                let node = HeadNode()
-                node.title = "title\(idx)"
-                self.fetchs.fetch.append(node)
-                
-                
-                for i in 0..<21 {
-                    let node = NormalNode()
-                    node.title = "title\(idx) 下的数据 \(i)"
+            self.fetchs.fetch.transaction({
+                for idx in 1..<6 {
+                    
+                    let node = HeadNode()
+                    node.title = "title\(idx)"
                     self.fetchs.fetch.append(node)
+                    
+                    
+                    for i in 0..<21 {
+                        let node = NormalNode()
+                        node.title = "title\(idx) 下的数据 \(i)"
+                        self.fetchs.fetch.append(node)
+                    }
                 }
-            }
-
+            })
         }
         
         let sel = #selector(ViewController.rightAction)
@@ -254,24 +255,66 @@ class DemoCollectionController : MMUICollectionController<MMCellModel> {
         self.navigationItem.rightBarButtonItem=item
     }
     
+    var flag = 0
+    
     @objc func rightAction() -> Void {
+        flag = flag + 1
+        
 //        let len = self.fetchs.fetch.count() - 1
 //        self.fetchs.fetch.delete(1, length: len)
 //
-        self.fetchs.fetch.clear()
+//        self.fetchs.fetch.clear()
 //        DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds:5)) {
 //            let len = self.fetchs.fetch.count() - 1
 //            self.fetchs.fetch.delete(1, length: len)
 //        }
         
-        
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds:5)) {
+        if flag%5 == 1 {
+            DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds:5)) {
+                self.fetchs.fetch.transaction({
+                    for idx in 1...5 {
+                        
+                        let node = HeadNode()
+                        node.title = "xtitle\(idx)"
+                        self.fetchs.fetch.append(node)
+                        
+                        for i in 0..<27 {
+                            let node = NormalNode()
+                            node.title = "xtitle\(idx) 下的数据 \(i)"
+                            self.fetchs.fetch.append(node)
+                        }
+                    }
+                })
+            }
+        } else if flag%5 == 2 {
+            self.fetchs.fetch.transaction({
+                let len = self.fetchs.fetch.count() - 1
+                self.fetchs.fetch.delete(1, length: len)
+            })
+        } else if flag%5 == 3 {
+            self.fetchs.fetch.transaction({
+                for idx in 1...5 {
+                    
+                    let node = HeadNode()
+                    node.title = "xtitle\(idx)"
+                    self.fetchs.fetch.append(node)
+                    
+                    for i in 0..<27 {
+                        let node = NormalNode()
+                        node.title = "xtitle\(idx) 下的数据 \(i)"
+                        self.fetchs.fetch.append(node)
+                    }
+                }
+            }, animated:false)
+        } else if flag%5 == 4 {
+            self.fetchs.fetch.clear()
+        } else {
             for idx in 1...5 {
-
+                
                 let node = HeadNode()
                 node.title = "xtitle\(idx)"
                 self.fetchs.fetch.append(node)
-
+                
                 for i in 0..<27 {
                     let node = NormalNode()
                     node.title = "xtitle\(idx) 下的数据 \(i)"

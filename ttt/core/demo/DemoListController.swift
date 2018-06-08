@@ -88,7 +88,7 @@ class DemoListController: MMUITableController<SettingNode> {
         } else if indexPath.row == 3 {
             let node = self.fetchs.object(at: indexPath)
             node?.subTitle = "修改"
-            self.fetchs.update(at: indexPath, nil)
+            self.fetchs.update(at: indexPath)
         } else if indexPath.row == 4 {
             Navigator.shared.open("https://m.mymm.com/dog/list.html")
         } else {

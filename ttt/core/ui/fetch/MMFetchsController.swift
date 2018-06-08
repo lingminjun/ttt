@@ -105,10 +105,9 @@ extension UIView {
 
 /// All fetch list abstract protocol
 public class MMFetch<T: MMCellModel> {
-    public let min_threshold = 50 //经验值，并无太多思考，当修改条数大于此值建议优化更新
     
     let _tag: String
-    weak var _listener : MMFetchsController<T>?
+    fileprivate weak var _listener : MMFetchsController<T>?
     
     public init(tag: String) {
         _tag = tag
@@ -136,8 +135,8 @@ public class MMFetch<T: MMCellModel> {
     /// Gets the last element from the array.
     public final func last() -> T? {if self.count() > 0 { return get(self.count() - 1) } else { return nil }}
     
-    public final func insert(_ newObject: T, atIndex i: Int) {
-        self.insert([newObject], atIndex: i)
+    public final func insert(_ newObject: T, atIndex i: Int, animated:Bool? = nil) {
+        self.insert([newObject], atIndex: i, animated: animated)
     }
     
     /// Remove an element from the end of the Array in O(1). Derived class implements.
@@ -183,13 +182,15 @@ public class MMFetch<T: MMCellModel> {
     }
 
     /// Append object.
-    public final func append(_ newObject: T) {
-        self.insert(newObject, atIndex: self.count())
+    public final func append(_ newObject: T, animated:Bool? = nil) {
+        self.insert(newObject, atIndex: self.count(), animated:animated)
     }
-    public final func append<C: Sequence>(_ newObjects: C) where C.Iterator.Element == T {
-        for obj in newObjects {
-            self.append(obj)
-        }
+    public final func append<C: Sequence>(_ newObjects: C, animated:Bool? = nil) where C.Iterator.Element == T {
+        self.transaction({
+            for obj in newObjects {
+                self.append(obj)
+            }
+        }, animated: animated)
     }
     
     // MARK: These require a subclass implementation
@@ -199,22 +200,46 @@ public class MMFetch<T: MMCellModel> {
     public func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return nil}
     
     /// Update
-    public func update(_ idx: Int, newObject: T? = nil, _ b: (() throws -> Void)? = nil) {}
+    public func update(_ idx: Int, newObject: T? = nil, animated:Bool? = nil) {}
     /// Insert `newObjects` at index `i`. Derived class implements.
-    public func insert<C: Sequence>(_ newObjects: C, atIndex i: Int) where C.Iterator.Element == T {
+    public func insert<C: Sequence>(_ newObjects: C, atIndex i: Int, animated:Bool? = nil) where C.Iterator.Element == T {
         /*_listener?.ssn_fetch(fetch: self,didChange: newObject, at: self.count(), for: MMFetchChangeType.insert, newIndex: self.count())*/
     }
     
     /// reset `newObjects`. Derived class implements.
-    public func reset<C: Sequence>(_ newObjects: C) where C.Iterator.Element == T {}
+    public func reset<C: Sequence>(_ newObjects: C, animated:Bool? = nil) where C.Iterator.Element == T {}
     
+    public final func delete(_ index: Int, animated:Bool? = nil) -> T? {
+        let obj = self.get(index)
+        delete(index, length: 1, animated: animated)
+        return obj
+    }
     /// Remove and return the element at index `i`. Derived class implements.
-    public func delete(_ index: Int) -> T? {return nil}
-    public func delete(_ index: Int, length: Int) {}
+    public func delete(_ index: Int, length: Int, animated:Bool? = nil) {}
     
     
     /// Remove all elements. Derived class implements.
-    public func clear() {}
+    public func clear(animated:Bool? = nil) {}
+    
+    /// Perform batch operats.
+    public final func transaction(_ batch:@escaping () -> Void, animated:Bool? = nil) {
+        if !Thread.isMainThread { fatalError("Must call the method transaction(_ batch: animated:) in main thread") }
+        if trst.has {
+            batch()
+        } else {
+            //从事务中回调回来，执行opt
+            _listener?.ssn_fetch_changing(self, batch:batch, animated: animated, transaction:trst)
+        }
+    }
+    
+    internal final func operation(deletes:((_ section:Int) -> [IndexPath])? = nil, inserts:((_ section:Int) -> [IndexPath])? = nil, updates:((_ section:Int) -> [IndexPath])? = nil, animated:Bool? = nil) {
+        if !Thread.isMainThread { fatalError("Must call the method operation(deletes: inserts: updates:) in main thread") }
+        self.transaction({
+            self._listener?.updates(self.trst.table, deletes: deletes, inserts: inserts, updates: updates, operations: self.trst.operations, at: self.trst.section, animated: self.trst.animated)
+        }, animated: animated)
+    }
+    
+    private var trst = MMFetchsController<T>.Transaction()
     
     /// Get element at index. Derived class implements.
     public func get(_ index: Int) -> T? {return nil}
@@ -381,6 +406,9 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         }
     }
     
+    // update cell use animation
+    public var defaultAnimated = true
+    
     /* ========================================================*/
     /* ========================= INITIALIZERS ====================*/
     /* ========================================================*/
@@ -454,19 +482,19 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
     
     /* update indexPath.
      */
-    public func update(at indexPath: IndexPath, newObject: T? = nil, _ b: (() throws -> Void)? = nil) {
-        self[indexPath.section]?.update(indexPath.row, newObject:newObject, b)
+    public func update(at indexPath: IndexPath, newObject: T? = nil, animated:Bool? = nil) {
+        self[indexPath.section]?.update(indexPath.row, newObject:newObject, animated:animated)
     }
     
     /* delete indexPath.
      */
-    public func delete(at indexPath: IndexPath) {
+    public func delete(at indexPath: IndexPath, animated:Bool? = nil) {
         _ = self[indexPath.section]?.delete(indexPath.row)
     }
     
     /* insert indexPath.
      */
-    public func insert(obj:T, at indexPath: IndexPath) {
+    public func insert(obj:T, at indexPath: IndexPath, animated:Bool? = nil) {
         self[indexPath.section]?.insert(obj, atIndex: indexPath.row)
     }
     
@@ -537,49 +565,41 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         return nil
     }
     
-    /*
-    var _changing: Bool = false
-    var _flags: Set<String> = Set<String>(minimumCapacity:2)
-    private func ssn_begin_change(_ flag: String) {
-        if !_flags.contains(flag) {
-            _flags.insert(flag)
-            
-            if !_changing {
-                _changing = true
-                
-                if let delegate = _delegate {
-                    delegate.ssn_controllerWillChangeContent(self)
-                }
-            }
-        }
+    fileprivate class BatchOperations {
+        var dels:[IndexPath] = []
+        var ints:[IndexPath] = []
+        var upds:[IndexPath] = []
+        var scts:Set<Int> = Set<Int>() //需要更新的section
     }
-    private func ssn_end_change(_ flag: String) {
-        if _flags.contains(flag) {
-            _flags.remove(flag)
-            
-            if _flags.count == 0 && _changing {
-                _changing = false
-                
-                if let delegate = _delegate {
-                    delegate.ssn_controllerDidChangeContent(self)
-                }
-            }
-        }
-    }*/
     
-    public func ssn_fetch_changing(_ fetch: MMFetch<T>, deletes: ((_ section:Int) -> [IndexPath])? = nil, inserts: ((_ section:Int) -> [IndexPath])? = nil, updates: ((_ section:Int) -> [IndexPath])? = nil, optimizing:Bool = false) {
+    fileprivate class Transaction {
+        var has = false
+        var section = -1
+        var table:UIScrollView? = nil
+        var animated:Bool = false
+        var operations:BatchOperations = BatchOperations()
+    }
+    
+    fileprivate func ssn_fetch_changing(_ fetch: MMFetch<T>, batch:@escaping () -> Void, animated:Bool? = nil, transaction:Transaction) {
+        transaction.has = true
+        transaction.animated = self.defaultAnimated
+        if let antd = animated {
+            transaction.animated = antd
+        }
+        transaction.operations = BatchOperations()
+        transaction.table = _table
+        defer { transaction.section = -1; transaction.table = nil; transaction.animated = false; transaction.operations = BatchOperations(); transaction.has = false }
         
         guard let section = self.indexOf(fetch) else { return }
+        transaction.section = section
         
         guard let delegate = _delegate,let table = _table, isCurrentDatasource(table) else {
-            if let deletes = deletes { let _ = deletes(section) }
-            if let inserts = inserts { let _ = inserts(section) }
-            if let updates = updates { let _ = updates(section) }
+            batch()
             return
         }
         
         delegate.ssn_controllerWillChangeContent(self)
-        perform(table, delegate:delegate, deletes: deletes, inserts: inserts, updates: updates, at:section, optimizing:optimizing)
+        perform(table, delegate:delegate, batch: batch, transaction: transaction)
         delegate.ssn_controllerDidChangeContent(self)
     }
     
@@ -606,167 +626,168 @@ public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource
         return false
     }
     
-    /*
-    public func ssn_fetch_begin_change(_ fetch: MMFetch<T>) {
-        ssn_begin_change("\(fetch)")
-    }
     
-    public func ssn_fetch_end_change(_ fetch: MMFetch<T>) {
-        ssn_end_change("\(fetch)")
-    }
-    
-    /// no data modify. just notice controller changes
-    public func ssn_fetch(_ fetch: MMFetch<T>, didChange anObject: T?, at index: Int, for type: MMFetchChangeType, newIndex: Int) {
-        guard let delegate = _delegate else {
-            return
-        }
-        
-        guard let section = self.indexOf(fetch) else { return }
-        
-        let indexPath = IndexPath(row:index,section:section)
-        
-        let flag = "FetchsInner"
-        ssn_begin_change(flag)
-        
-        switch type {
-        case MMFetchChangeType.insert:
-//            _fetchs[index].insert(anObject, atIndex: index)
-            delegate.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.insert, newIndexPath: indexPath)
-            break
-        case MMFetchChangeType.delete:
-            delegate.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.delete, newIndexPath: indexPath)
-            break
-        case MMFetchChangeType.update:
-            delegate.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.update, newIndexPath: indexPath)
-            break
-        case MMFetchChangeType.move:
-            delegate.ssn_controller!(self, didChange: anObject, at: indexPath, for: MMFetchChangeType.move, newIndexPath: IndexPath(row:newIndex,section:section))
-            break
-        }
-        
-        ssn_end_change(flag)
-    }*/
-    
-    fileprivate func perform(_ table:UIView,delegate: MMFetchsControllerDelegate, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool = false) {
+    fileprivate func perform(_ table:UIView, delegate: MMFetchsControllerDelegate, batch:@escaping () -> Void, transaction:Transaction) {
         if let tb = table as? UITableView {
-            tableViewPerform(tb, delegate:delegate, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
+            tableViewPerform(tb, delegate:delegate, batch:batch, transaction:transaction)
         } else if let tb = table as? UICollectionView {
-            collectionViewPerform(tb, delegate:delegate, deletes: deletes, inserts: inserts, updates: updates, at: section, optimizing: optimizing)
+            collectionViewPerform(tb, delegate:delegate, batch:batch, transaction:transaction)
         }
     }
     
-    fileprivate func tableViewPerform(_ table:UITableView,delegate: MMFetchsControllerDelegate, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
-        var dels:[IndexPath]? = nil
-        var ints:[IndexPath]? = nil
-        var upds:[IndexPath]? = nil
+    fileprivate func tableViewPerform(_ table:UITableView, delegate: MMFetchsControllerDelegate, batch:() -> Void, transaction:Transaction) {
         
         table.beginUpdates()
         
-        var upSection = false
-        if let deletes = deletes {
-            let indexPaths = deletes(section)
-            if indexPaths.count > 0 {
-                dels = indexPaths
-                table.deleteRows(at: indexPaths, with: .automatic)
-                
-                // 解决某些场景无法移除section问题
-                upSection = true
-            }
-        }
+        batch()
         
-        if let inserts = inserts {
-            let indexPaths = inserts(section)
-            if indexPaths.count > 0 {
-                ints = indexPaths
-                table.insertRows(at: indexPaths, with: .automatic)
-            }
-        }
+        /*
+        for sct in transaction.operations.scts {//不需要动画
+            table.reloadSections(IndexSet(integer: sct), with: UITableViewRowAnimation.none)
+        }*/
         
-        if let updates = updates {
-            let indexPaths = updates(section)
-            if indexPaths.count > 0 {
-                upds = indexPaths
-                table.reloadRows(at: indexPaths, with: .automatic)
-            }
-        }
-        
-        if upSection {
-            table.reloadSections(IndexSet(integer: section), with: .none)
-        }
-        
-        delegate.ssn_controller(self, deletes: dels, inserts: ints, updates: upds)
+        delegate.ssn_controller(self, deletes: transaction.operations.dels, inserts: transaction.operations.ints, updates: transaction.operations.upds)
         
         table.endUpdates()
     }
     
-    fileprivate func collectionViewPerform(_ table:UICollectionView,delegate: MMFetchsControllerDelegate, deletes: ((_ section:Int) -> [IndexPath])?, inserts: ((_ section:Int) -> [IndexPath])?, updates: ((_ section:Int) -> [IndexPath])?, at section:Int, optimizing:Bool) {
+    fileprivate func collectionViewPerform(_ table:UICollectionView, delegate: MMFetchsControllerDelegate, batch:@escaping () -> Void, transaction:Transaction) {
 
-        let block:(_ updateUI:Bool) -> Void = { (updateUI) in
+        let block:() -> Void = {
             
-            var dels:[IndexPath]? = nil
-            var ints:[IndexPath]? = nil
-            var upds:[IndexPath]? = nil
-            var upSection = false
+            batch()
             
+            for sct in transaction.operations.scts {
+                table.reloadSections(IndexSet(integer: sct))
+            }
+            
+            delegate.ssn_controller(self, deletes: transaction.operations.dels, inserts: transaction.operations.ints, updates: transaction.operations.upds)
+        }
+        
+        MMTry.try({
+            if !transaction.animated {//动画控制
+                UIView.performWithoutAnimation {
+                    table.performBatchUpdates({
+                        block()
+                    }, completion: nil)
+                }
+            } else {
+                table.performBatchUpdates({
+                    block()
+                }, completion: nil)
+            }
+        }, catch: { (exception) in
+            block()
+            print("error:\(String(describing: exception))")
+        }, finally: nil)
+    }
+    
+    fileprivate func updates(_ table:UIScrollView?, deletes:((_ section:Int) -> [IndexPath])? = nil, inserts:((_ section:Int) -> [IndexPath])? = nil, updates:((_ section:Int) -> [IndexPath])? = nil, operations:BatchOperations, at section:Int, animated:Bool) {
+        if let tb = table as? UITableView {
+            tableViewUpdates(tb, deletes: deletes, inserts: inserts, updates: updates, operations: operations, at: section, animated: animated)
+        } else if let tb = table as? UICollectionView {
+            collectionViewUpdates(tb, deletes: deletes, inserts: inserts, updates: updates, operations: operations, at: section, animated: animated)
+        } else {
             if let deletes = deletes {
                 let indexPaths = deletes(section)
                 if indexPaths.count > 0 {
-                    dels = indexPaths
-                    if updateUI {
-                        table.deleteItems(at: indexPaths)
-                    }
-            
-                    // 解决某些场景无法移除section问题
-                    upSection = true
+                    operations.dels.append(contentsOf: indexPaths)
                 }
             }
             
             if let inserts = inserts {
                 let indexPaths = inserts(section)
                 if indexPaths.count > 0 {
-                    ints = indexPaths
-                    if updateUI {
-                        table.insertItems(at: indexPaths)
-                    }
+                    operations.ints.append(contentsOf: indexPaths)
                 }
             }
             
             if let updates = updates {
                 let indexPaths = updates(section)
                 if indexPaths.count > 0 {
-                    upds = indexPaths
-                    if updateUI {
-                        table.reloadItems(at: indexPaths)
+                    operations.upds.append(contentsOf: indexPaths)
+                }
+            }
+        }
+    }
+    
+    fileprivate func tableViewUpdates(_ table:UITableView, deletes:((_ section:Int) -> [IndexPath])? = nil, inserts:((_ section:Int) -> [IndexPath])? = nil, updates:((_ section:Int) -> [IndexPath])? = nil, operations:BatchOperations, at section:Int, animated:Bool) {
+  
+        let animation = animated ? UITableViewRowAnimation.automatic : UITableViewRowAnimation.none
+        
+        if let deletes = deletes {
+            let indexPaths = deletes(section)
+            if indexPaths.count > 0 {
+                operations.dels.append(contentsOf: indexPaths)
+                table.deleteRows(at: indexPaths, with: animation)
+                
+                // 解决某些场景无法移除section问题
+                operations.scts.insert(section)
+            }
+        }
+        
+        if let inserts = inserts {
+            let indexPaths = inserts(section)
+            if indexPaths.count > 0 {
+                operations.ints.append(contentsOf: indexPaths)
+                table.insertRows(at: indexPaths, with: animation)
+            }
+        }
+        
+        if let updates = updates {
+            let indexPaths = updates(section)
+            if indexPaths.count > 0 {
+                operations.upds.append(contentsOf: indexPaths)
+                table.reloadRows(at: indexPaths, with: animation)
+            }
+        }
+    }
+    
+    fileprivate func collectionViewUpdates(_ table:UICollectionView, deletes:((_ section:Int) -> [IndexPath])? = nil, inserts:((_ section:Int) -> [IndexPath])? = nil, updates:((_ section:Int) -> [IndexPath])? = nil, operations:BatchOperations, at section:Int, animated:Bool) {
+        
+        var upSection = operations.scts.contains(section)
+        
+        if let deletes = deletes {
+            let indexPaths = deletes(section)
+            if indexPaths.count > 0 {
+                operations.dels.append(contentsOf: indexPaths)
+                table.deleteItems(at: indexPaths)
+                // 解决某些场景无法移除section问题
+                operations.scts.insert(section)
+            }
+        }
+        
+        if let inserts = inserts {
+            let indexPaths = inserts(section)
+            if indexPaths.count > 0 {
+                operations.ints.append(contentsOf: indexPaths)
+                table.insertItems(at: indexPaths)
+            }
+        }
+        
+        if let updates = updates {
+            let indexPaths = updates(section)
+            if indexPaths.count > 0 {
+                operations.upds.append(contentsOf: indexPaths)
+                table.reloadItems(at: indexPaths)
+                
+                var hasFloating = false
+                if let ly = table.collectionViewLayout as? MMCollectionViewLayout, ly.config.floating {
+                    hasFloating = true
+                }
+                
+                //某些场景，会导致floating Cell的CALayer无法
+                if hasFloating && !upSection {
+                    for idx in indexPaths {
+                        if let m = self[idx.section]?[idx.row], m.ssn_canFloating() {
+                            upSection = true
+                            operations.scts.insert(section)
+                            break
+                        }
                     }
                 }
             }
-            
-            if updateUI && upSection {
-                if let ly = table.collectionViewLayout as? MMCollectionViewLayout, ly.config.floating {
-                    table.reloadSections(IndexSet(integer: section))
-                }
-            }
-            
-            delegate.ssn_controller(self, deletes: dels, inserts: ints, updates: upds)
         }
-        
-        // Change the strategy, since performBatchUpdates has an animation every time it submits, because the animation can't be avoided and the performance drops sharply, so in some scenarios, try to reload the data.
-        // 改变策略，由于performBatchUpdates每次提交都有动画，因为无法避免动画，性能急剧下降，所以某些场景，尽量reload数据
-        if optimizing {
-            block(false)
-            table.reloadData()
-            print("采用了优化策略更新！")
-            return
-        }
-        
-        MMTry.try({
-            table.performBatchUpdates({
-                block(true)
-            }, completion: nil)
-        }, catch: { (exception) in
-            block(false)
-            print("error:\(String(describing: exception))")
-        }, finally: nil)
     }
     
     

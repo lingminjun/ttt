@@ -68,15 +68,14 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
         _notice?.invalidate()
         _notice = _list?._observe { [weak self] (changes: RealmCollectionChange) in
             guard let sself = self else { return }
-            guard let delegate = sself._listener else { return }
+//            guard let delegate = sself._listener else { return }
             switch changes {
             case .initial:
                 // tableView.reloadData()
                 print("realm result initial...")
                 break
             case .update(_, let deletions, let insertions, let modifications):
-                
-                delegate.ssn_fetch_changing(sself, deletes: { (section) -> [IndexPath] in
+                sself.operation(deletes: { (section) -> [IndexPath] in
                     var results:[IndexPath] = []
                     if deletions.count > 0 {
                         for idx in deletions {
@@ -100,7 +99,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
                         }
                     }
                     return results
-                }, optimizing: sself.calculateOptimizing(effected: insertions.count + modifications.count, delete: deletions.count))
+                }, animated: false)
                 break
             case .error(let error):
                 print("Error: \(error)")
@@ -121,7 +120,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     override public func objects/*<S: SequenceType where S.Generator.Element: Object>*/() -> [T]? { return Array(_list)}
     
     /// Update. 注意 newObject不要传入，不安全
-    override public func update(_ idx: Int, newObject: T? = nil, _ b: (() throws -> Void)? = nil) {
+    override public func update(_ idx: Int, newObject: T? = nil, animated:Bool? = nil) {
         guard let obj = self[idx] else {return}
         do {
             try _realm.write {
@@ -130,20 +129,13 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
                 } else {
                     _realm.add(obj, update: true);//(newObjects)
                 }
-                if let b = b {
-                    do {
-                        try b()
-                    } catch {
-                        print("error:\(error)")
-                    }
-                }
             }
         } catch {
             print("error:\(error)")
         }
     }
     /// Insert `newObject` at index `i`. Derived class implements.
-    override public func insert<C: Sequence>(_ newObjects: C, atIndex i: Int) where C.Iterator.Element == T {
+    override public func insert<C: Sequence>(_ newObjects: C, atIndex i: Int, animated:Bool? = nil) where C.Iterator.Element == T {
         do {
             try _realm.write {
                 _realm.add(newObjects, update: true);//(newObjects)
@@ -154,7 +146,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     }
     
     /// reset `newObjects`. Derived class implements.
-    override public func reset<C>(_ newObjects: C) where T == C.Element, C : Sequence {
+    override public func reset<C>(_ newObjects: C, animated:Bool? = nil) where T == C.Element, C : Sequence {
         do {
             try _realm.write {
                 _realm.delete(_list) //clear
@@ -166,21 +158,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     }
     
     /// Remove and return the element at index `i`. Derived class implements.
-    override public func delete(_ index: Int) -> T? {
-        if index < 0 || index >= _list.count {
-            return nil
-        }
-        let obj = _list[index]
-        do {
-            try _realm.write {
-                _realm.delete(obj)
-            }
-        } catch {
-            print("error:\(error)")
-        }
-        return obj
-    }
-    override public func delete(_ index: Int, length: Int) {
+    override public func delete(_ index: Int, length: Int, animated:Bool? = nil) {
         var objs = [T]()
         for i in (0..<length).reversed() {
             if i + index < _list.count {
@@ -197,7 +175,7 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     }
     
     /// Remove all elements. Derived class implements.
-    override public func clear() {
+    override public func clear(animated:Bool? = nil) {
         do {
             try _realm.write {
                 _realm.delete(_list)
@@ -219,29 +197,12 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     override public func indexOf(_ object: T) -> Int? {
         return _list.index(of: object)
     }
+    
     override public func filter(_ predicate: NSPredicate) -> [T] {
         let rs = _list.filter(predicate)
         if rs.count <= 0 {
             return []
         }
         return Array(rs)
-    }
-    private func calculateOptimizing(effected number:Int = 0, delete rows:Int = 0) -> Bool {
-        //影响条数超过阈值
-        if number > min_threshold || rows > min_threshold {
-            return true
-        }
-        let c = _latestCount
-        //起始值为零或者归零
-        if c == 0 || rows >= c {
-            return true
-        }
-        
-        //影响数超过总是的一般
-        if c < 2 * (number + rows) {
-            return true
-        }
-        
-        return false
     }
 }
