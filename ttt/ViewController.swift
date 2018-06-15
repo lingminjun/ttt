@@ -9,6 +9,7 @@
 import UIKit
 
 import RealmSwift
+import HandyJSON
 
 extension Dog {
     @objc public override func ssn_cellID() -> String {return "dog"}
@@ -18,6 +19,14 @@ extension Dog {
     @objc public override func ssn_canEdit() -> Bool {return false}
     @objc public override func ssn_canMove() -> Bool {return false}
 }
+
+class BasicTypes: HandyJSON {
+    var testa: Int = 0
+    var testb: String = ""
+    var testc: Bool = false
+    required init() {}
+}
+
 
 class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     
@@ -43,6 +52,16 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
 //        table.delegate = self
 //        guard let v = Int("aaa") else { return }
 //        print("====\(v)")
+        
+        let jsonString = "{\"testa\":\"1\",\"testb\":\"hello\",\"testc\":\"true\"}"
+        if let object = BasicTypes.deserialize(from: jsonString) {
+            print("json \(object.testa) \(object.testb) \(object.testc)")
+        }
+
+        let jsonString1 = "{\"testa\":\"34\",\"testb\":123444,\"testc\":1}"
+        if let object2 = BasicTypes.deserialize(from: jsonString1) {
+            print("json \(object2.testa) \(object2.testb) \(object2.testc)")
+        }
     }
     
     @objc public func scrollViewDidScroll(_ scrollView: UIScrollView) {
