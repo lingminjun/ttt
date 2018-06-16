@@ -79,4 +79,9 @@
         controller="ProfileViewController"
         container=""
         description="二级"/>
+    <item url="https://m.mymm.com/gif/gif.html"
+        key=""
+        controller="GifViewController"
+        container=""
+        description="GIF"/>
 </items>

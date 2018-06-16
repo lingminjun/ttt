@@ -11,6 +11,7 @@
 
 #import "MMTry.h"
 #import <CommonCrypto/CommonCrypto.h>
+#import "GifImageInfo.h"
 
 //#endif /* ttt_Bridging_Header_h */
 
