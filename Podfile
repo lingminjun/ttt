@@ -9,6 +9,6 @@ target 'ttt' do
   # Pods for ttt
   pod 'RealmSwift',               '3.0.2'
   pod 'HandyJSON',                '4.1.1'
-  pod 'Kingfisher',               '4.5.0'
+  pod 'Kingfisher',               '4.8.0'
 
 end

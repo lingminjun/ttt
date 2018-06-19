@@ -8,7 +8,7 @@
 
 import Foundation
 import ImageIO
-
+import Kingfisher
 
 
 class GifViewController: MMUIController {
@@ -65,6 +65,7 @@ class GifViewController: MMUIController {
         webShowGif(data: data1)
         gifShowGif(data: data1)
         iioShowGif(data: data1)
+        imgShowGif(data: data1)
     }
     
     func webShowGif(data:Data) {
@@ -94,6 +95,14 @@ class GifViewController: MMUIController {
         print("\((Date().timeIntervalSince1970 * 1000) - now))");
     }
     
+    func imgShowGif(data:Data) {
+        let now = Date().timeIntervalSince1970 * 1000
+        if let image = Kingfisher<UIImage>.animated(with: data, scale: 1, duration: 0.0, preloadAll: true, onlyFirstFrame: false) {
+           img.image = image
+        }
+        print("\((Date().timeIntervalSince1970 * 1000) - now))");
+    }
+    
     @objc func rightAction() -> Void {
         
         flag = flag + 1
@@ -104,18 +113,22 @@ class GifViewController: MMUIController {
             webShowGif(data: data3)
             gifShowGif(data: data3)
             iioShowGif(data: data3)
+            imgShowGif(data: data3)
         } else if flag % mode == 1 {
             webShowGif(data: data1)
             gifShowGif(data: data1)
             iioShowGif(data: data1)
+            imgShowGif(data: data1)
         } else if flag % mode == 2 {
             webShowGif(data: data2)
             gifShowGif(data: data2)
             iioShowGif(data: data2)
+            imgShowGif(data: data2)
         }else if let url = Bundle.main.url(forResource: "gif0\((flag % mode - 2))", withExtension: "gif"), let data = try? Data(contentsOf: url) {
             webShowGif(data: data)
             gifShowGif(data: data)
             iioShowGif(data: data)
+            imgShowGif(data: data)
         }
         
 //        let sheet = UIActionSheet(title: "跳转", delegate: self, cancelButtonTitle: "取消", destructiveButtonTitle: "百度")
@@ -182,11 +195,11 @@ extension UIImage {
         }
         
         delay = delayObject as! Double
-        print("frame delayl \(delay)");
+//        print("frame delayl \(delay)");
         if delay < 0.01 {//兼容一些过老的gif
             delay = 0.10
         }
-        print("frame delayx \(delay)");
+//        print("frame delayx \(delay)");
         return delay
     }
     
