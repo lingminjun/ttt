@@ -206,7 +206,7 @@ extension Kingfisher where Base: Image {
 
 // MARK: - Create images from data
 extension Kingfisher where Base: Image {
-    static func animated(with data: Data, scale: CGFloat = 1.0, duration: TimeInterval = 0.0, preloadAll: Bool, onlyFirstFrame: Bool = false) -> Image? {
+    public static func animated(with data: Data, scale: CGFloat = 1.0, duration: TimeInterval = 0.0, preloadAll: Bool, onlyFirstFrame: Bool = false) -> Image? {
         
         func decode(from imageSource: CGImageSource, for options: NSDictionary) -> ([Image], TimeInterval)? {
             
@@ -224,36 +224,77 @@ extension Kingfisher where Base: Image {
                 
                 guard let frameDuration = duration else { return gifDefaultFrameDuration }
                 
-                return frameDuration.doubleValue > 0.011 ? frameDuration.doubleValue : gifDefaultFrameDuration
+                return frameDuration.doubleValue > 0.01 ? frameDuration.doubleValue : gifDefaultFrameDuration
             }
             
             let frameCount = CGImageSourceGetCount(imageSource)
             var images = [Image]()
             var gifDuration = 0.0
+            
+//            var cgImages = [CGImage]()
+            var delays = [Int]()
+            
             for i in 0 ..< frameCount {
                 
                 guard let imageRef = CGImageSourceCreateImageAtIndex(imageSource, i, options) else {
                     return nil
                 }
-
+                
                 if frameCount == 1 {
                     // Single frame
                     gifDuration = Double.infinity
                 } else {
-                    
                     // Animated GIF
                     guard let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, i, nil) else {
                         return nil
                     }
 
                     let gifInfo = (properties as NSDictionary)[kCGImagePropertyGIFDictionary as String] as? NSDictionary
-                    gifDuration += frameDuration(from: gifInfo)
+                    let frameTime = frameDuration(from: gifInfo)
+                    gifDuration += frameTime
+                    
+                    delays.append(Int(frameTime * 1000))//换算成毫秒记录下来
                 }
                 
                 images.append(Kingfisher<Image>.image(cgImage: imageRef, scale: scale, refImage: nil))
                 
                 if onlyFirstFrame { break }
             }
+            
+            #if os(macOS)
+            #else
+            if !onlyFirstFrame && frameCount > 1 {
+                
+                let duration: Int = {
+                    var sum = 0
+                    
+                    for val: Int in delays {
+                        sum += val
+                    }
+                    
+                    return sum
+                }()
+                
+                let gcd = gcdForArray(array: delays)
+                var frames = [UIImage]()
+                
+                var frame: UIImage
+                var frameSize: Int
+                for i in 0..<frameCount {
+                    frame = images[Int(i)] // UIImage(cgImage: cgImages[Int(i)])
+                    frameSize = Int(delays[Int(i)] / gcd)
+                    
+                    //匀速控制,自动增加帧数
+                    for _ in 0..<frameSize {
+                        frames.append(frame)
+                    }
+                }
+                
+                //替换原来的值
+                gifDuration = Double(duration) / 1000.0
+                images = frames
+            }
+            #endif
             
             return (images, gifDuration)
         }
@@ -331,6 +372,157 @@ extension Kingfisher where Base: Image {
         #endif
 
         return image
+    }
+}
+
+// MARK: - gif resolver
+extension Kingfisher where Base: Image {
+    public static func gifImageWithData(data: NSData) -> UIImage? {
+        guard let source = CGImageSourceCreateWithData(data, nil) else {
+            print("image doesn't exist")
+            return nil
+        }
+        
+        return animatedImageWithSource(source: source)
+    }
+    
+    public static func gifImageWithURL(gifUrl:String) -> UIImage? {
+        guard let bundleURL = NSURL(string: gifUrl)
+            else {
+                print("image named \"\(gifUrl)\" doesn't exist")
+                return nil
+        }
+        guard let imageData = NSData(contentsOf: bundleURL as URL) else {
+            print("image named \"\(gifUrl)\" into NSData")
+            return nil
+        }
+        
+        return gifImageWithData(data: imageData)
+    }
+    
+    public static func gifImageWithName(name: String) -> UIImage? {
+        guard let bundleURL = Bundle.main
+            .url(forResource: name, withExtension: "gif") else {
+                print("SwiftGif: This image named \"\(name)\" does not exist")
+                return nil
+        }
+        
+        guard let imageData = NSData(contentsOf: bundleURL) else {
+            print("SwiftGif: Cannot turn image named \"\(name)\" into NSData")
+            return nil
+        }
+        
+        return gifImageWithData(data: imageData)
+    }
+    
+    static func delayForImageAtIndex(index: Int, source: CGImageSource!) -> Double {
+        var delay = 0.1
+        
+        let cfProperties = CGImageSourceCopyPropertiesAtIndex(source, index, nil)
+        let gifProperties: CFDictionary = unsafeBitCast(CFDictionaryGetValue(cfProperties, Unmanaged.passUnretained(kCGImagePropertyGIFDictionary).toOpaque()), to: CFDictionary.self)
+        
+        var delayObject: AnyObject = unsafeBitCast(CFDictionaryGetValue(gifProperties, Unmanaged.passUnretained(kCGImagePropertyGIFUnclampedDelayTime).toOpaque()), to: AnyObject.self)
+        
+        if delayObject.doubleValue == 0 {
+            delayObject = unsafeBitCast(CFDictionaryGetValue(gifProperties, Unmanaged.passUnretained(kCGImagePropertyGIFDelayTime).toOpaque()), to: AnyObject.self)
+        }
+        
+        delay = delayObject as! Double
+        //        print("frame delayl \(delay)");
+        if delay < 0.01 {//兼容一些过老的gif
+            delay = 0.10
+        }
+        //        print("frame delayx \(delay)");
+        return delay
+    }
+    
+    static func gcdForPair(a: Int?, _ b: Int?) -> Int {
+        var a = a
+        var b = b
+        if b == nil || a == nil {
+            if b != nil {
+                return b!
+            } else if a != nil {
+                return a!
+            } else {
+                return 0
+            }
+        }
+        
+        if a! < b! {
+            let c = a!
+            a = b!
+            b = c
+        }
+        
+        var rest: Int
+        while true {
+            rest = a! % b!
+            
+            if rest == 0 {
+                return b!
+            } else {
+                a = b!
+                b = rest
+            }
+        }
+    }
+    
+    static func gcdForArray(array: Array<Int>) -> Int {
+        if array.isEmpty {
+            return 1
+        }
+        
+        var gcd = array[0]
+        
+        for val in array {
+            gcd = gcdForPair(a: val, gcd)
+        }
+        
+        return gcd
+    }
+    
+    static func animatedImageWithSource(source: CGImageSource) -> UIImage? {
+        let count = CGImageSourceGetCount(source)
+        var images = [CGImage]()
+        var delays = [Int]()
+        
+        for i in 0..<count {
+            if let image = CGImageSourceCreateImageAtIndex(source, i, nil) {
+                images.append(image)
+            }
+            
+            let delaySeconds = delayForImageAtIndex(index: Int(i), source: source)
+            delays.append(Int(delaySeconds * 1000.0)) // Seconds to ms
+        }
+        
+        let duration: Int = {
+            var sum = 0
+            
+            for val: Int in delays {
+                sum += val
+            }
+            
+            return sum
+        }()
+        
+        let gcd = gcdForArray(array: delays)
+        var frames = [UIImage]()
+        
+        var frame: UIImage
+        var frameCount: Int
+        for i in 0..<count {
+            frame = UIImage(cgImage: images[Int(i)])
+            frameCount = Int(delays[Int(i)] / gcd)
+            
+            for _ in 0..<frameCount {
+                frames.append(frame)
+            }
+        }
+        
+        let animation = UIImage.animatedImage(with: frames, duration: Double(duration) / 1000.0)
+        
+        return animation
     }
 }
 
