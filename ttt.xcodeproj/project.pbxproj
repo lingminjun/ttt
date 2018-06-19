@@ -28,6 +28,14 @@
 		5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */; };
 		53888940204AD85600859ED6 /* BriefRSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5388893F204AD85600859ED6 /* BriefRSA.swift */; };
 		5388894A204F80CA00859ED6 /* SMP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53888949204F80CA00859ED6 /* SMP.swift */; };
+		538F1E1020D8A30400947845 /* gif08.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0820D8A30400947845 /* gif08.gif */; };
+		538F1E1120D8A30400947845 /* gif06.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0920D8A30400947845 /* gif06.gif */; };
+		538F1E1220D8A30400947845 /* gif07.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0A20D8A30400947845 /* gif07.gif */; };
+		538F1E1320D8A30400947845 /* gif05.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0B20D8A30400947845 /* gif05.gif */; };
+		538F1E1420D8A30400947845 /* gif04.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0C20D8A30400947845 /* gif04.gif */; };
+		538F1E1520D8A30400947845 /* gif01.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0D20D8A30400947845 /* gif01.gif */; };
+		538F1E1620D8A30400947845 /* gif03.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0E20D8A30400947845 /* gif03.gif */; };
+		538F1E1720D8A30400947845 /* gif02.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0F20D8A30400947845 /* gif02.gif */; };
 		538F9E8C200A2B41006B3A28 /* DemoRealmController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */; };
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
 		538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8F200A2DDE006B3A28 /* SettingNode.swift */; };
@@ -95,6 +103,14 @@
 		5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		5388893F204AD85600859ED6 /* BriefRSA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BriefRSA.swift; sourceTree = "<group>"; };
 		53888949204F80CA00859ED6 /* SMP.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMP.swift; sourceTree = "<group>"; };
+		538F1E0820D8A30400947845 /* gif08.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif08.gif; sourceTree = "<group>"; };
+		538F1E0920D8A30400947845 /* gif06.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif06.gif; sourceTree = "<group>"; };
+		538F1E0A20D8A30400947845 /* gif07.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif07.gif; sourceTree = "<group>"; };
+		538F1E0B20D8A30400947845 /* gif05.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif05.gif; sourceTree = "<group>"; };
+		538F1E0C20D8A30400947845 /* gif04.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif04.gif; sourceTree = "<group>"; };
+		538F1E0D20D8A30400947845 /* gif01.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif01.gif; sourceTree = "<group>"; };
+		538F1E0E20D8A30400947845 /* gif03.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif03.gif; sourceTree = "<group>"; };
+		538F1E0F20D8A30400947845 /* gif02.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif02.gif; sourceTree = "<group>"; };
 		538F9E8B200A2B41006B3A28 /* DemoRealmController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoRealmController.swift; sourceTree = "<group>"; };
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		538F9E8F200A2DDE006B3A28 /* SettingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNode.swift; sourceTree = "<group>"; };
@@ -176,6 +192,21 @@
 				538350ED2063A80C005DDA8A /* MMTrack.swift */,
 			);
 			path = track;
+			sourceTree = "<group>";
+		};
+		538F1E0720D8A30400947845 /* GIF-Beauty */ = {
+			isa = PBXGroup;
+			children = (
+				538F1E0820D8A30400947845 /* gif08.gif */,
+				538F1E0920D8A30400947845 /* gif06.gif */,
+				538F1E0A20D8A30400947845 /* gif07.gif */,
+				538F1E0B20D8A30400947845 /* gif05.gif */,
+				538F1E0C20D8A30400947845 /* gif04.gif */,
+				538F1E0D20D8A30400947845 /* gif01.gif */,
+				538F1E0E20D8A30400947845 /* gif03.gif */,
+				538F1E0F20D8A30400947845 /* gif02.gif */,
+			);
+			path = "GIF-Beauty";
 			sourceTree = "<group>";
 		};
 		538F9E91200A47AF006B3A28 /* fetch */ = {
@@ -334,6 +365,7 @@
 		D9FDDBB22008672200A88631 /* ttt */ = {
 			isa = PBXGroup;
 			children = (
+				538F1E0720D8A30400947845 /* GIF-Beauty */,
 				53C6842A20D4B9540099B2F1 /* gif2.gif */,
 				53C6842920D4B9540099B2F1 /* gif3.gif */,
 				53C6842420D4B9220099B2F1 /* gif1.gif */,
@@ -412,10 +444,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9FDDBBB2008672200A88631 /* Assets.xcassets in Resources */,
+				538F1E1420D8A30400947845 /* gif04.gif in Resources */,
+				538F1E1620D8A30400947845 /* gif03.gif in Resources */,
+				538F1E1220D8A30400947845 /* gif07.gif in Resources */,
+				538F1E1120D8A30400947845 /* gif06.gif in Resources */,
+				538F1E1520D8A30400947845 /* gif01.gif in Resources */,
 				D9CCAD13200C5C4B00C03276 /* page_router.xml in Resources */,
 				53C6842B20D4B9540099B2F1 /* gif3.gif in Resources */,
 				53C6842720D4B9220099B2F1 /* gif1.gif in Resources */,
+				538F1E1720D8A30400947845 /* gif02.gif in Resources */,
+				538F1E1320D8A30400947845 /* gif05.gif in Resources */,
 				53C6842C20D4B9540099B2F1 /* gif2.gif in Resources */,
+				538F1E1020D8A30400947845 /* gif08.gif in Resources */,
 				53822F2920440CD5009CDE66 /* WFHeaderView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -464,12 +504,14 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-ttt/Pods-ttt-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/HandyJSON/HandyJSON.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HandyJSON.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
 			);

@@ -97,18 +97,25 @@ class GifViewController: MMUIController {
     @objc func rightAction() -> Void {
         
         flag = flag + 1
-        if flag % 3 == 0 {
+        
+        let mode = 11
+        
+        if flag % mode == 0 {
             webShowGif(data: data3)
             gifShowGif(data: data3)
             iioShowGif(data: data3)
-        } else if flag % 3 == 1 {
+        } else if flag % mode == 1 {
             webShowGif(data: data1)
             gifShowGif(data: data1)
             iioShowGif(data: data1)
-        } else if flag % 3 == 2 {
+        } else if flag % mode == 2 {
             webShowGif(data: data2)
             gifShowGif(data: data2)
             iioShowGif(data: data2)
+        }else if let url = Bundle.main.url(forResource: "gif0\((flag % mode - 2))", withExtension: "gif"), let data = try? Data(contentsOf: url) {
+            webShowGif(data: data)
+            gifShowGif(data: data)
+            iioShowGif(data: data)
         }
         
 //        let sheet = UIActionSheet(title: "跳转", delegate: self, cancelButtonTitle: "取消", destructiveButtonTitle: "百度")
@@ -175,11 +182,11 @@ extension UIImage {
         }
         
         delay = delayObject as! Double
-        
-        if delay < 0.1 {
-            delay = 0.1
+        print("frame delayl \(delay)");
+        if delay < 0.01 {//兼容一些过老的gif
+            delay = 0.10
         }
-        
+        print("frame delayx \(delay)");
         return delay
     }
     

@@ -207,8 +207,11 @@ typedef struct GIF_Color {
 		
 		//delay must larger than 0, the minimum delay in firefox is 10.
         //一般的处理，并不是采取火狐处理方式，主要是为了兼容老版本gif
-        if (frame.delay < 5) {
-            frame.delay = 10 + frame.delay;
+//        if (frame.delay < 5) {
+//            frame.delay = 10 + frame.delay;
+//        }
+        if (frame.delay < 1) {
+            frame.delay = 1;
         }
         //		if (frame.delay <= 0) {
         //			frame.delay = 10;
@@ -437,6 +440,7 @@ typedef struct GIF_Color {
 			//printf("extend %s\n",buffer);
 			// We save the delays for easy access.
 			frame.delay = (buffer[1] | buffer[2] << 8);//此参数比一定准确，不等于1一般表示延迟，一般是1/100秒
+            printf("frame delay %f ",frame.delay);
 			
 			unsigned char board[8] = {0};
 			board[0] = 0x21;
