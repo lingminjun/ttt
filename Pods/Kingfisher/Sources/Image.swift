@@ -231,7 +231,7 @@ extension Kingfisher where Base: Image {
             var images = [Image]()
             var gifDuration = 0.0
             
-//            var cgImages = [CGImage]()
+            //            var cgImages = [CGImage]()
             var delays = [Int]()
             
             for i in 0 ..< frameCount {
@@ -248,7 +248,7 @@ extension Kingfisher where Base: Image {
                     guard let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, i, nil) else {
                         return nil
                     }
-
+                    
                     let gifInfo = (properties as NSDictionary)[kCGImagePropertyGIFDictionary as String] as? NSDictionary
                     let frameTime = frameDuration(from: gifInfo)
                     gifDuration += frameTime
