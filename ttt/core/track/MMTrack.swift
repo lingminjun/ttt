@@ -30,6 +30,8 @@ public let REVEAL_DEPTH = 3
     //属性
     func track_vid() -> String //vid = [appId.]pageId.compId.compIdx.dataType.dataId.dataIndex
 //    func track_vidPath() -> String //vid的相对值：compId.compIdx.dataType.dataId.dataIndex
+    func track_data_id() -> String   // 关联的业务数据id,与track_data_type()同时使用
+    func track_data_type() -> String // 关联的业务数据类型,与track_data_id()同时使用
     func track_name() -> String //组件上元素的具体名称，如登录、注册、提交、下单等等
     
     func track_mediaLink() -> String //事件所打的媒体数据
@@ -102,6 +104,7 @@ private var VIEW_PID_PROPERTY = 0
 private var VIEW_VID_PATH_PROPERTY = 0
 private var VIEW_VID_PROPERTY = 0
 private var VIEW_MEDIA_PROPERTY = 0
+private var VIEW_DATA_PROPERTY = 0
 
 public extension NSObject {
     //元素描述
@@ -189,6 +192,44 @@ public extension NSObject {
                 objc_setAssociatedObject(self, &VIEW_VID_PROPERTY, nil, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
             }
         }
+    }
+    
+    //业务数据id和type
+    public var track_data_id : String {
+        get{
+            return NSObject.track_parse_data_id(data:self.track_data)
+        }
+    }
+    public var track_data_type : String {
+        get{
+            return NSObject.track_parse_data_type(data:self.track_data)
+        }
+    }
+    
+    public func track_data(id:String, type:String) {
+        let newValue = "\(type).\(id)"
+        objc_setAssociatedObject(self, &VIEW_DATA_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+    }
+    fileprivate var track_data : String {
+        get{
+            if let result = objc_getAssociatedObject(self, &VIEW_DATA_PROPERTY) as? String,!result.isEmpty {  return result }
+            //从vid中取值
+            let vid = self.track_visitId //pageId.compId.compIdx.dataType.dataId.dataIndex
+            let ss = vid.split(separator: ".")
+            if ss.count != 6 {
+                return ""
+            }
+            return "\(ss[3]).\(ss[4])"
+        }
+    }
+    fileprivate static func track_parse_data_id(data:String) -> String {
+        guard let idx = data.index(of: ".") else { return "" }
+        let begin = String.Index(encodedOffset: idx.encodedOffset + 1)
+        return "\(data[begin..<data.endIndex])"
+    }
+    fileprivate static func track_parse_data_type(data:String) -> String {
+        guard let idx = data.index(of: ".") else { return "" }
+        return "\(data[data.startIndex...idx])"
     }
     
     //media link
@@ -316,7 +357,55 @@ extension UIPageViewController {
 }
 
 // MARK:- UIView: MMTrackComponent
+let TRACK_FIND_ELEMENT_FLAG_DEEP:UInt = 3
+
 extension UIView:MMTrackComponent {
+    
+    public func track_data_id() -> String {
+        return NSObject.track_parse_data_id(data:self.track_data(superView:true))
+    }
+    
+    public func track_data_type() -> String {
+        return NSObject.track_parse_data_type(data:self.track_data(superView:true))
+    }
+    
+    @objc func track_data(superView:Bool) -> String {
+        let vid = self.track_data
+        if !vid.isEmpty {
+            return vid
+        }
+        
+        // 支持一些特殊按钮，系统UIBarButtonItem中的几种，返回
+        if !superView {
+            return ""
+        }
+        
+        //往上找3层
+        return UIView.track_super_data(view: self, depth: TRACK_FIND_ELEMENT_FLAG_DEEP)
+    }
+    
+    private static func track_super_data(view:UIView, depth:UInt) -> String {
+        if depth == 0 {
+            return ""
+        }
+        
+        //先取
+        guard let svs = view.superview else { return "" }
+        let str = svs.track_data(superView: false)
+        if !str.isEmpty {
+            return str
+        }
+        
+        //再递归
+        if depth > 1 {
+            let str = UIView.track_super_data(view: svs, depth: depth - 1)
+            if !str.isEmpty {
+                return str
+            }
+        }
+        return ""
+    }
+
     
     public func track_page() -> MMTrackPage {
         if let page = self as? MMTrackPage {
@@ -385,10 +474,10 @@ extension UIView:MMTrackComponent {
         }
         
         //往上找3层
-        return UIView.track_superName(view: self, depth: 3)
+        return UIView.track_super_vid(view: self, depth: TRACK_FIND_ELEMENT_FLAG_DEEP)
     }
     
-    private static func track_superName(view:UIView, depth:UInt) -> String {
+    private static func track_super_vid(view:UIView, depth:UInt) -> String {
         if depth == 0 {
             return ""
         }
@@ -402,7 +491,7 @@ extension UIView:MMTrackComponent {
         
         //再递归
         if depth > 1 {
-            let str = UIView.track_superName(view: svs, depth: depth - 1)
+            let str = UIView.track_super_vid(view: svs, depth: depth - 1)
             if !str.isEmpty {
                 return str
             }
@@ -425,10 +514,10 @@ extension UIView:MMTrackComponent {
             return ""
         }
         
-        return UIView.track_childrenName(view: self, depth: 3)
+        return UIView.track_children_name(view: self, depth: TRACK_FIND_ELEMENT_FLAG_DEEP)
     }
     
-    private static func track_childrenName(view:UIView, depth:UInt) -> String {
+    private static func track_children_name(view:UIView, depth:UInt) -> String {
         if depth == 0 {
             return ""
         }
@@ -445,7 +534,7 @@ extension UIView:MMTrackComponent {
         //再递归
         if depth > 1 {
             for v in svs {
-                let str = UIView.track_childrenName(view: v, depth: depth - 1)
+                let str = UIView.track_children_name(view: v, depth: depth - 1)
                 if !str.isEmpty {
                     return str
                 }
@@ -538,6 +627,14 @@ extension UILabel {
 }
 
 extension UIBarButtonItem:MMTrackComponent {
+    public func track_data_id() -> String {
+        return NSObject.track_parse_data_id(data:track_data)
+    }
+    
+    public func track_data_type() -> String {
+        return NSObject.track_parse_data_id(data:track_data)
+    }
+    
     
     public func track_page() -> MMTrackPage {
         if let vc = self.presentingPage()?.track_topPage() {
