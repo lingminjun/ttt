@@ -207,6 +207,10 @@ public extension NSObject {
     }
     
     public func track_data(id:String, type:String) {
+        if id.isEmpty && type.isEmpty {
+            objc_setAssociatedObject(self, &VIEW_DATA_PROPERTY, nil, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            return
+        }
         let newValue = "\(type).\(id)"
         objc_setAssociatedObject(self, &VIEW_DATA_PROPERTY, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
     }
@@ -223,13 +227,12 @@ public extension NSObject {
         }
     }
     fileprivate static func track_parse_data_id(data:String) -> String {
-        guard let idx = data.index(of: ".") else { return "" }
-        let begin = String.Index(encodedOffset: idx.encodedOffset + 1)
-        return "\(data[begin..<data.endIndex])"
+        guard let range = data.range(of: ".") else { return "" }
+        return "\(data[range.upperBound..<data.endIndex])"
     }
     fileprivate static func track_parse_data_type(data:String) -> String {
         guard let idx = data.index(of: ".") else { return "" }
-        return "\(data[data.startIndex...idx])"
+        return "\(data[data.startIndex..<idx])"
     }
     
     //media link
