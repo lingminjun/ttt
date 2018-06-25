@@ -314,6 +314,14 @@ public final class Urls {
         return query(query:f, decord:decord)
     }
     
+    /// get url fragment dictionary
+    public static func fragmentString(url: String, decord: Bool = true) -> String {
+        let surl = encoding(url: url)
+        guard let u = URL(string:surl) else { return "" }
+        guard let f = u.fragment else { return "" }
+        return f
+    }
+    
     /// get query dictionary
     public static func query(query: String, decord: Bool = true) -> QBundle {
         var map = QBundle();
@@ -490,7 +498,7 @@ public final class Urls {
     /// just uri:<scheme>://<host>:<port>/<path>;<params>
     /// *param: only is just url path
     /// *param: sensitve is path case sensitve
-    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = true, scheme:String? = nil, host:String? = nil, query: QBundle? = nil) -> String {
+    public static func tidy(url:String, path only:Bool = false, nofragment: Bool = false, case sensitve:Bool = true, scheme:String? = nil, host:String? = nil, query: QBundle? = nil, fragment: QBundle? = nil) -> String {
         //decoding and encoding can compatibility more scene
         let surl = encoding(url: url)
         
@@ -570,19 +578,59 @@ public final class Urls {
         }
         
         //fragment
-        if let fragment = uri.fragment {
-            let dic = self.query(query: fragment)
-            if dic.isEmpty {//just string 
-                result += "#" + fragment
-            } else {
-                let str = self.queryString(dic: dic)
-                if !str.isEmpty {
-                    result += "#" + str
-                }
-            }
+        var frg:QBundle = QBundle()
+        if let fragment = fragment {
+            frg = fragment
+        } else if let strqry = uri.fragment {
+            frg = self.query(query: strqry)
         }
+        let fstr = self.queryString(dic: frg)
+        if !fstr.isEmpty {
+            result += "#" + fstr
+        }
+//        if let fragment = uri.fragment {
+//            let dic = self.query(query: fragment)
+//            if dic.isEmpty {//just string
+//                result += "#" + fragment
+//            } else {
+//                let str = self.queryString(dic: dic)
+//                if !str.isEmpty {
+//                    result += "#" + str
+//                }
+//            }
+//        }
         
         return result
+    }
+    
+    public static func appendFragmentPath(url:String, relativePath:String) -> String {
+        var fragment = Urls.fragmentString(url: url)
+        var params = ""
+        if let idx = fragment.index(of: "?") {
+            params = "\(fragment[idx..<fragment.endIndex])";
+            fragment = "\(fragment[fragment.startIndex..<idx])";
+        }
+        
+        //之前的fragment不含path结构，统一做参数
+        if !fragment.isEmpty  && !fragment.starts(with: "/") {
+            if (!params.isEmpty) {//多个 ? 不管了
+                params = fragment + params;
+            } else {
+                params = "?" + fragment;
+            }
+            fragment = "";
+        }
+        
+        var pathFragment = "";
+        if relativePath.starts(with: "/") {
+            pathFragment = fragment + relativePath + params;
+        } else {
+            pathFragment = fragment + "/" + relativePath + params;
+        }
+        
+        var bundle = QBundle()
+        bundle[pathFragment] = QValue("")
+        return tidy(url: url, fragment: bundle)
     }
     
     /// compared <scheme>://<host>:<port>/<path>;<params>?<query>#<fragment>

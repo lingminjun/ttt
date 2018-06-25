@@ -62,6 +62,16 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         if let object2 = BasicTypes.deserialize(from: jsonString1) {
             print("json \(object2.testa) \(object2.testb) \(object2.testc)")
         }
+        
+        
+        // url重置
+        let url = "https://m.mymm.com/zb/132/132"
+        let rt = Urls.appendFragmentPath(url: url, relativePath: "/inner");
+        print("result = " + rt)
+        
+        let url1 = "https://m.mymm.com/zb/132/132#/xxx?aa=333"
+        let rt1 = Urls.appendFragmentPath(url: url1, relativePath: "/inner");
+        print("result = " + rt1)
     }
     
     @objc public func scrollViewDidScroll(_ scrollView: UIScrollView) {
