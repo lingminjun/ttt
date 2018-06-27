@@ -71,13 +71,13 @@ public final class Navigator: NSObject {
             var value = String(host.lowercased())
             var regex = false
             if host.contains("**") {
-                // \w  [a-zA-Z_0-9]
-                value = value.replacingOccurrences(of: "**", with: "[\\w|.]*")
+                // \w  [a-zA-Z_0-9] - .
+                value = value.replacingOccurrences(of: "**", with: "[\\w.\\-_]*")
                 value = value.replacingOccurrences(of: ".", with: "\\.")
                 regex = true
             } else if host.contains("*") {
-                // \w  [a-zA-Z_0-9]
-                value = value.replacingOccurrences(of: "*", with: "\\w+")
+                // \w  [a-zA-Z_0-9] -
+                value = value.replacingOccurrences(of: "*", with: "[\\w\\-_]+")
                 value = value.replacingOccurrences(of: ".", with: "\\.")
                 regex = true
             }
