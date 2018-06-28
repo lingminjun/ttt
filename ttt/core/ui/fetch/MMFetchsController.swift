@@ -106,7 +106,7 @@ extension UIView {
 /// All fetch list abstract protocol
 public class MMFetch<T: MMCellModel> {
     
-    let _tag: String
+    private let _tag: String
     fileprivate weak var _listener : MMFetchsController<T>?
     
     public init(tag: String) {
@@ -387,12 +387,12 @@ let DEFAULT_HEAD_ID = ".default.head"
  */
 public class MMFetchsController<T: MMCellModel> : NSObject,UITableViewDataSource,UICollectionViewDataSource /*,UITableViewDelegate*/ {
     
-    var _fetchs = [] as [MMFetch<T>]
-    var _isRgst:Set<String> = Set<String>()
+    private var _fetchs = [] as [MMFetch<T>]
+    private var _isRgst:Set<String> = Set<String>()
     
     
-    weak var _delegate : MMFetchsControllerDelegate?
-    weak var _table: UIScrollView?
+    private weak var _delegate : MMFetchsControllerDelegate?
+    private weak var _table: UIScrollView?
     
     /// 设置delegate
     public var delegate : MMFetchsControllerDelegate? {
