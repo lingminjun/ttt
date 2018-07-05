@@ -21,6 +21,11 @@ public class MMUIWebController: MMUIController,UIWebViewDelegate {
         } else if let ext = ext, let v = ext[LOAD_URL_KEY], (v is String || v is Substring) {
             _url = "\(v)"
         }
+        
+        //最后直接取 node url
+        if _url.isEmpty {
+            _url = self._node.url
+        }
     }
     
     public override func onLoadView() -> Bool {
