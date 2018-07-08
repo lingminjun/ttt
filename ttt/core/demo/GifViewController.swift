@@ -97,9 +97,9 @@ class GifViewController: MMUIController {
     
     func imgShowGif(data:Data) {
         let now = Date().timeIntervalSince1970 * 1000
-        if let image = Kingfisher<UIImage>.animated(with: data, scale: 1, duration: 0.0, preloadAll: true, onlyFirstFrame: false) {
-           img.image = image
-        }
+//        if let image = Kingfisher<UIImage>.animated(with: data, scale: 1, duration: 0.0, preloadAll: true, onlyFirstFrame: false) {
+//           img.image = image
+//        }
         print("\((Date().timeIntervalSince1970 * 1000) - now))");
     }
     

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		530802CE20EEFE980007AE31 /* DB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530802CD20EEFE980007AE31 /* DB.swift */; };
+		530802D020F0B8BB0007AE31 /* DBTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530802CF20F0B8BB0007AE31 /* DBTable.swift */; };
 		5326877B20983A3A0004F1DF /* Flyweight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5326877A20983A3A0004F1DF /* Flyweight.swift */; };
 		532F4C9720B29DAA00B1DBCB /* DemoCollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */; };
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
@@ -79,6 +81,8 @@
 /* Begin PBXFileReference section */
 		358FAD53CC2AD532340D1967 /* Pods-ttt.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ttt.release.xcconfig"; path = "Pods/Target Support Files/Pods-ttt/Pods-ttt.release.xcconfig"; sourceTree = "<group>"; };
 		35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ttt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		530802CD20EEFE980007AE31 /* DB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DB.swift; sourceTree = "<group>"; };
+		530802CF20F0B8BB0007AE31 /* DBTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBTable.swift; sourceTree = "<group>"; };
 		5326877A20983A3A0004F1DF /* Flyweight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flyweight.swift; sourceTree = "<group>"; };
 		532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoCollectionController.swift; sourceTree = "<group>"; };
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
@@ -169,6 +173,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		530802CC20EEFDED0007AE31 /* db */ = {
+			isa = PBXGroup;
+			children = (
+				530802CD20EEFE980007AE31 /* DB.swift */,
+				530802CF20F0B8BB0007AE31 /* DBTable.swift */,
+			);
+			path = db;
+			sourceTree = "<group>";
+		};
 		53822F2B20440CF6009CDE66 /* CollectionWaterfallLayout */ = {
 			isa = PBXGroup;
 			children = (
@@ -249,6 +262,7 @@
 		D958F781200868FC00E3F0C5 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				530802CC20EEFDED0007AE31 /* db */,
 				D9F5CA14206C7CDC00251D3F /* ext */,
 				538350EC2063A7C3005DDA8A /* track */,
 				D9CCAD18200CBB1100C03276 /* foundation */,
@@ -318,9 +332,9 @@
 				D9CCAD19200CBB7900C03276 /* Injects.swift */,
 				D9CCAD16200C8F2700C03276 /* Urls.swift */,
 				D9414050200F3E3F0050132B /* MMJsonable.swift */,
-				D941405A20107C610050132B /* MMTry.h */,
 				D941405B20107C610050132B /* MMTry.m */,
 				D941405F20107D700050132B /* ttt-Bridging-Header.h */,
+				D941405A20107C610050132B /* MMTry.h */,
 				5342EA8C20143B7D00A806B3 /* RPC.swift */,
 				D94140662016D6420050132B /* RigidCache.swift */,
 				D94140682016F1120050132B /* CycleStack.swift */,
@@ -503,17 +517,21 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-ttt/Pods-ttt-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/HandyJSON/HandyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SQLite.swift/SQLite.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HandyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SQLite.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -540,6 +558,7 @@
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
 				5355BF81209ABA9C00C7CAC0 /* DetailViewController.swift in Sources */,
+				530802CE20EEFE980007AE31 /* DB.swift in Sources */,
 				53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
 				538350EE2063A80C005DDA8A /* MMTrack.swift in Sources */,
@@ -547,6 +566,7 @@
 				53822F3120450B89009CDE66 /* MMCollectionViewLayout.swift in Sources */,
 				D94140692016F1120050132B /* CycleStack.swift in Sources */,
 				D99152D7201836EE00FD8B92 /* ProfileViewController.swift in Sources */,
+				530802D020F0B8BB0007AE31 /* DBTable.swift in Sources */,
 				5326877B20983A3A0004F1DF /* Flyweight.swift in Sources */,
 				538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */,
 				53888940204AD85600859ED6 /* BriefRSA.swift in Sources */,
