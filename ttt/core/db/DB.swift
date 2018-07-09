@@ -47,6 +47,7 @@ public final class DB : Equatable {
         
         self._scope = scope
         self._path = DB.path(for: scope)
+        print("open:\(_path)")
         if let cn = try? Connection(self._path) {
             self._cnnt = cn
         } else {
@@ -57,9 +58,11 @@ public final class DB : Equatable {
         
         //注册更新通知
         self._cnnt.updateHook { [weak self] (opt, dbName, tbName, rowId) in
-            //主线程回调
-            let dict:[String : Any] = [SQLITE_OPERATION_KEY:opt,SQLITE_TABLE_KEY:tbName,SQLITE_ROW_ID_KEY:rowId]
-            NotificationCenter.default.post(name: SQLITE_UPDATED_NOTICE, object: self, userInfo: dict)
+            if let sself = self {
+                //主线程回调
+                let dict:[String : Any] = [SQLITE_OPERATION_KEY:opt,SQLITE_TABLE_KEY:tbName,SQLITE_ROW_ID_KEY:rowId]
+                NotificationCenter.default.post(name: SQLITE_UPDATED_NOTICE, object: sself, userInfo: dict)
+            }
         }
         
     }
@@ -71,6 +74,7 @@ public final class DB : Equatable {
     
     // MARK: sql method
     public func execute(_ sql:String) {//错误直接忽略
+        print("execute:\(sql)")
         do {
             try self._cnnt.execute(sql)
         } catch {
@@ -81,6 +85,7 @@ public final class DB : Equatable {
     //请使用execute来执行命令，若查询数据，请使用 objects:sql:args:方法
     @discardableResult
     public func prepare(sql:String, args: [Binding?]) -> String {
+        print("prepare:\(sql)")
         do {
             let list = try self._cnnt.prepare(sql, args)
             for data in list {
@@ -94,6 +99,7 @@ public final class DB : Equatable {
 
     // aclass传入NULL时默认用NSDictionary代替，当执行单纯的sql时，忽略aclass，返回值将为nil,为了防止sql注入，请输入参数
     public func prepare<T: HandyJSON>(type:T.Type, sql:String, args: [Binding?]) -> [T] {
+        print("prepare:\(sql)")
         var result:[T] = []
         do {
             let list = try self._cnnt.prepare(sql, args)
@@ -145,8 +151,13 @@ public final class DB : Equatable {
 //     */
 //    - (void)removeAttachDatabase:(NSString *)attachDatabase;//删除临时数据库
     
-    private static func path(for scope:String, filename:String = "db.sqlite") -> String {
+    private static func path(for scope:String, filename:String = "core.db") -> String {
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        //创建目录
+        let dir = paths[0].appending("/\(scope)")
+        let manager = FileManager()
+        try? manager.createDirectory(atPath: dir, withIntermediateDirectories: true, attributes: nil)
+        
         let path = paths[0].appending("/\(scope)/\(filename)")
         return path
     }

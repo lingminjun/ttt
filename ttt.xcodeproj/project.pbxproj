@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		530802CE20EEFE980007AE31 /* DB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530802CD20EEFE980007AE31 /* DB.swift */; };
 		530802D020F0B8BB0007AE31 /* DBTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 530802CF20F0B8BB0007AE31 /* DBTable.swift */; };
+		5325EAF220F2F7C0006C2209 /* MMFetchSQLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5325EAF120F2F7C0006C2209 /* MMFetchSQLite.swift */; };
+		5325EAF420F34FB1006C2209 /* person.json in Resources */ = {isa = PBXBuildFile; fileRef = 5325EAF320F34FB1006C2209 /* person.json */; };
+		5325EAF620F3508A006C2209 /* ContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5325EAF520F3508A006C2209 /* ContactViewController.swift */; };
 		5326877B20983A3A0004F1DF /* Flyweight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5326877A20983A3A0004F1DF /* Flyweight.swift */; };
 		532F4C9720B29DAA00B1DBCB /* DemoCollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */; };
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
@@ -83,6 +86,9 @@
 		35E6648AED6BA9FF1A44C2BE /* Pods_ttt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ttt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		530802CD20EEFE980007AE31 /* DB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DB.swift; sourceTree = "<group>"; };
 		530802CF20F0B8BB0007AE31 /* DBTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBTable.swift; sourceTree = "<group>"; };
+		5325EAF120F2F7C0006C2209 /* MMFetchSQLite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMFetchSQLite.swift; sourceTree = "<group>"; };
+		5325EAF320F34FB1006C2209 /* person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person.json; sourceTree = "<group>"; };
+		5325EAF520F3508A006C2209 /* ContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactViewController.swift; sourceTree = "<group>"; };
 		5326877A20983A3A0004F1DF /* Flyweight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flyweight.swift; sourceTree = "<group>"; };
 		532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoCollectionController.swift; sourceTree = "<group>"; };
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
@@ -228,6 +234,7 @@
 				D958F7852008694200E3F0C5 /* MMFetchList.swift */,
 				D958F7842008694200E3F0C5 /* MMFetchRealm.swift */,
 				D958F7882008694200E3F0C5 /* MMFetchsController.swift */,
+				5325EAF120F2F7C0006C2209 /* MMFetchSQLite.swift */,
 			);
 			path = fetch;
 			sourceTree = "<group>";
@@ -307,6 +314,7 @@
 				5355BF82209ABFC300C7CAC0 /* DogManager.swift */,
 				532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */,
 				53C6841F20D4B4020099B2F1 /* GifViewController.swift */,
+				5325EAF520F3508A006C2209 /* ContactViewController.swift */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -379,6 +387,7 @@
 		D9FDDBB22008672200A88631 /* ttt */ = {
 			isa = PBXGroup;
 			children = (
+				5325EAF320F34FB1006C2209 /* person.json */,
 				538F1E0720D8A30400947845 /* GIF-Beauty */,
 				53C6842A20D4B9540099B2F1 /* gif2.gif */,
 				53C6842920D4B9540099B2F1 /* gif3.gif */,
@@ -460,6 +469,7 @@
 				D9FDDBBB2008672200A88631 /* Assets.xcassets in Resources */,
 				538F1E1420D8A30400947845 /* gif04.gif in Resources */,
 				538F1E1620D8A30400947845 /* gif03.gif in Resources */,
+				5325EAF420F34FB1006C2209 /* person.json in Resources */,
 				538F1E1220D8A30400947845 /* gif07.gif in Resources */,
 				538F1E1120D8A30400947845 /* gif06.gif in Resources */,
 				538F1E1520D8A30400947845 /* gif01.gif in Resources */,
@@ -583,6 +593,8 @@
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D94140652011DC8E0050132B /* MMUIWebController.swift in Sources */,
 				5374F942209C54530036225E /* StringExt.swift in Sources */,
+				5325EAF220F2F7C0006C2209 /* MMFetchSQLite.swift in Sources */,
+				5325EAF620F3508A006C2209 /* ContactViewController.swift in Sources */,
 				538350F02063AC20005DDA8A /* HomePageViewController.swift in Sources */,
 				53822F3B2047E766009CDE66 /* CltProfileViewController.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,

@@ -84,4 +84,9 @@
         controller="GifViewController"
         container=""
         description="GIF"/>
+    <item url="https://m.mymm.com/contact.html"
+        key=""
+        controller="ContactViewController"
+        container=""
+        description="Contact"/>
 </items>

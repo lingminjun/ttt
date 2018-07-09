@@ -1,0 +1,12 @@
+{
+    "tb":"person",
+    "its":[{
+           "vs":1,
+           "cl":[
+                 {"name":"uid",  "type":"int",   "level":"Primary",  "fill":"",  "index":"Index",  "mapping":""},
+                 {"name":"name", "type":"text",  "level":"",  "fill":"",  "index":"",  "mapping":""},
+                 {"name":"age",  "type":"int",   "level":"",  "fill":"",  "index":"",  "mapping":""},
+                 {"name":"sex",  "type":"int",   "level":"",  "fill":"",  "index":"",  "mapping":""}
+                 ]
+           }]
+}

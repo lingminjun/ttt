@@ -148,15 +148,7 @@ public final class DBTable : Equatable {
         return _db!
     }
     
-    private var _tableDef:DBTableDefinition = DBTableDefinition() {
-        didSet {
-            _lastVersion = _tableDef.lastVersion()
-            _columns = _tableDef.columns(for: _lastVersion)
-            _primaries = DBColumn.primaries(columns: _columns)
-            _columnDict = DBColumn.columnNames(columns: _columns)
-        }
-    }
-    
+    private var _tableDef:DBTableDefinition = DBTableDefinition()
     private var _tableName:String = ""
     private var _columns:[DBColumn] = []
     private var _lastVersion:UInt = 0    //最终版本
@@ -168,16 +160,17 @@ public final class DBTable : Equatable {
     // 创建可执行操作表（注入链接）
     public convenience init(db:DB, tableJSONDescription url:URL) {
         self.init(tableJSONDescription:url)
-        _isTemplate = false
+        self._isTemplate = false
         //        NSAssert(db && path, @"创建数据表实例参数非法");
         self._db = db
+        DBTable.checkCreateTableLog(db:db)
         
         // 4、检查表状态并更新
         DBTable.upgrade(db: db, table: self.name, table: self._tableDef)
-        _status = .ok
+        self._status = .ok
         
         // 5、监听变化,分发监听
-        NotificationCenter.default.addObserver(self, selector: #selector(DBTable.tableUpdateNotice(sender:userInfo:)), name: SQLITE_UPDATED_NOTICE, object: db)
+        NotificationCenter.default.addObserver(self, selector: #selector(DBTable.tableUpdateNotice(notfication:)), name: SQLITE_UPDATED_NOTICE, object: db)
     }
     
     // 创建分表场景需要
@@ -186,24 +179,29 @@ public final class DBTable : Equatable {
         _isTemplate = false
         
         // 1、同步模板数据
-        _tableDef = table._tableDef
-        _tableName = name
+        self._tableDef = table._tableDef
+        self._lastVersion = _tableDef.lastVersion()
+        self._columns = _tableDef.columns(for: _lastVersion)
+        self._primaries = DBColumn.primaries(columns: _columns)
+        self._columnDict = DBColumn.columnNames(columns: _columns)
+        self._tableName = name
         
         // 2、设置db
         self._db = db
+        DBTable.checkCreateTableLog(db:db)
         
         // 4、检查表状态并更新
         DBTable.upgrade(db: db, table: self.name, table: self._tableDef)
-        _status = .ok
+        self._status = .ok
         
         // 5、监听变化,分发监听
-        NotificationCenter.default.addObserver(self, selector: #selector(DBTable.tableUpdateNotice(sender:userInfo:)), name: SQLITE_UPDATED_NOTICE, object: db)
+        NotificationCenter.default.addObserver(self, selector: #selector(DBTable.tableUpdateNotice(notfication:)), name: SQLITE_UPDATED_NOTICE, object: db)
     }
     
     //TemplateTable
     public convenience init(tableJSONDescription url:URL) {
         self.init()
-        _isTemplate = true
+        self._isTemplate = true
         
         // 1、解析数据表描述
         guard let data = try? Data(contentsOf: url),
@@ -213,16 +211,20 @@ public final class DBTable : Equatable {
         }
         
         // 2、缓存列名
-        _tableDef = tableDef
+        self._tableDef = tableDef
+        self._lastVersion = _tableDef.lastVersion()
+        self._columns = _tableDef.columns(for: _lastVersion)
+        self._primaries = DBColumn.primaries(columns: _columns)
+        self._columnDict = DBColumn.columnNames(columns: _columns)
     }
     
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
 
-    @objc private func tableUpdateNotice(sender:Any, userInfo:[AnyHashable : Any]?) {
+    @objc func tableUpdateNotice(notfication: NSNotification) {
         //消息转发，仅仅关注此表修改
-        if let info = userInfo, let table = info[SQLITE_TABLE_KEY] as? String, table == self.name {
+        if let info = notfication.userInfo, let table = info[SQLITE_TABLE_KEY] as? String, table == self.name {
             NotificationCenter.default.post(name: DBTABLE_DATA_CHANGED_NOTICE, object: self, userInfo: info)
         }
     }
@@ -241,7 +243,7 @@ public final class DBTable : Equatable {
         }
         
         let table = self.name
-        let sql = "DROP TABLE `\(table)`"
+        let sql = "DROP TABLE \(table)"
         self.db.transaction { (db) in
             db.execute(sql)
             
@@ -274,12 +276,12 @@ public final class DBTable : Equatable {
                         keystr = keystr + ","
                         valstr = valstr + ","
                     }
-                    keystr = keystr + "`\(key)`"
+                    keystr = keystr + "\(key)"
                     valstr = valstr + "?"
                     valary.append(value)
                 }
                 
-                db.prepare(sql: "INSERT INTO `\(self.name)` (\(keystr) VALUES(\(valstr)", args: valary)
+                db.prepare(sql: "INSERT INTO \(self.name) ( \(keystr) ) VALUES( \(valstr) )", args: valary)
             }
         }
     }
@@ -307,7 +309,7 @@ public final class DBTable : Equatable {
                         if !keystr.isEmpty {
                             keystr = keystr + ","
                         }
-                        keystr = keystr + "`\(key)` = ?"
+                        keystr = keystr + "\(key) = ?"
                         valary.append(value)
                     }
                 }
@@ -318,11 +320,11 @@ public final class DBTable : Equatable {
                     if !wherestr.isEmpty {
                         wherestr = wherestr + " AND "
                     }
-                    wherestr = wherestr + "`\(colName)` = ?"
+                    wherestr = wherestr + "\(colName) = ?"
                     valary.append(kv[colName])
                 }
                 
-                db.prepare(sql: "UPDATE `\(self.name)` SET \(keystr) WHERE \(wherestr)", args: valary)
+                db.prepare(sql: "UPDATE \(self.name) SET \(keystr) WHERE \(wherestr)", args: valary)
             }
         }
     }
@@ -346,11 +348,11 @@ public final class DBTable : Equatable {
                     if !wherestr.isEmpty {
                         wherestr = wherestr + " AND "
                     }
-                    wherestr = wherestr + "`\(colName)` = ?"
+                    wherestr = wherestr + "\(colName) = ?"
                     valary.append(kv[colName])
                 }
                 
-                db.prepare(sql: "DELETE FROM `\(self.name)` WHERE \(wherestr)", args: valary)
+                db.prepare(sql: "DELETE FROM \(self.name) WHERE \(wherestr)", args: valary)
             }
         }
     }
@@ -379,19 +381,20 @@ public final class DBTable : Equatable {
                 for (key,value) in kv {
                     //不取主键
                     if let col = self._columnDict[key], col.level != .primary {
+                        //更新
                         if !upkeystr.isEmpty {
                             upkeystr = upkeystr + ","
                         }
-                        upkeystr = upkeystr + "`\(key)` = ?"
+                        upkeystr = upkeystr + "\(key) = ?"
                         upvalary.append(value)
                     }
                     
-                    //插入所有
+                    //插入所有字段
                     if !inkeystr.isEmpty {
                         inkeystr = inkeystr + ","
                         invalstr = invalstr + ","
                     }
-                    inkeystr = inkeystr + "`\(key)` = ?"
+                    inkeystr = inkeystr + "\(key) = ?"
                     invalstr = invalstr + "?"
                     invalary.append(value)
                 }
@@ -402,12 +405,12 @@ public final class DBTable : Equatable {
                     if !wherestr.isEmpty {
                         wherestr = wherestr + " AND "
                     }
-                    wherestr = wherestr + "`\(colName)` = ?"
+                    wherestr = wherestr + "\(colName) = ?"
                     upvalary.append(kv[colName])
                 }
                 
-                db.prepare(sql: "UPDATE `\(self.name)` SET \(upkeystr) WHERE \(wherestr)", args: upvalary)
-                db.prepare(sql: "INSERT INTO `\(self.name)` (\(inkeystr) VALUES(\(invalstr)", args: invalary)
+                db.prepare(sql: "UPDATE \(self.name) SET \(upkeystr) WHERE \(wherestr)", args: upvalary)
+                db.prepare(sql: "INSERT INTO \(self.name) ( \(inkeystr) ) VALUES( \(invalstr) )", args: invalary)
             }
         }
     }
@@ -415,7 +418,7 @@ public final class DBTable : Equatable {
     
     public func objects<T: HandyJSON>(_ type:T.Type, predicate:NSPredicate) -> [T] {
         //无法使用format
-        return self.db.prepare(type: type, sql: "SELECT * FROM `\(self.name)` WHERE \(predicate.predicateFormat)", args: [])
+        return self.db.prepare(type: type, sql: "SELECT * FROM \(self.name) WHERE \(predicate.predicateFormat)", args: [])
     }
     
     public func objects<T: HandyJSON>(_ type:T.Type, conditions:[String:Binding?]) -> [T] {
@@ -425,23 +428,23 @@ public final class DBTable : Equatable {
             if !wherestr.isEmpty {
                 wherestr = wherestr + " AND "
             }
-            wherestr = wherestr + "`\(key)` = ?"
+            wherestr = wherestr + "\(key) = ?"
             upvalary.append(value)
         }
         
         if wherestr.isEmpty {
-            return self.db.prepare(type: type, sql: "SELECT * FROM `\(self.name)`", args:[])
+            return self.db.prepare(type: type, sql: "SELECT * FROM \(self.name)", args:[])
         } else {
-            return self.db.prepare(type: type, sql: "SELECT * FROM `\(self.name)` WHERE \(wherestr)", args: upvalary)
+            return self.db.prepare(type: type, sql: "SELECT * FROM \(self.name) WHERE \(wherestr)", args: upvalary)
         }
     }
 
     public func truncate() {//清空表，请务必调用此方法，否则hook失效，并非sql语句“truncate table xxx”，实际执行delete语句，所以可以与其他方法一起在事务中使用
-        self.db.execute("DELETE FROM `\(self.name)` WHERE rowid > 0")
+        self.db.execute("DELETE FROM \(self.name) WHERE rowid > 0")
     }
 
     public func objectsCount() -> UInt64 {
-        let value = self.db.prepare(sql: "SELECT count(1) AS count FROM `\(self.name)`", args: [])
+        let value = self.db.prepare(sql: "SELECT count(1) AS count FROM \(self.name)", args: [])
         if let count = QValue(value).uint64 {
             return count
         }
@@ -618,12 +621,12 @@ public final class DBColumn {
                 if str.count > 0 {
                     str = str + ","
                 }
-                str = str + "`\(column.name)`"
+                str = str + "\(column.name)"
             }
         }
         
         if str.count > 0 {
-            return "PRIMARY KEY(\(str)"
+            return "PRIMARY KEY(\(str)) "
         } else {
             return ""
         }
@@ -632,7 +635,11 @@ public final class DBColumn {
     // MARK: sql 支持
     //单纯数据创建
     public func sqlFragmentAtCreateTable(mutablePrimaryKeys:Bool) -> String {
-        return "`\(_name)` \(DBColumn.columnTypeDisplay(value: _type)) \(DBColumn.columnLevelDisplay(level: _level, supportPrimaryKey: !mutablePrimaryKeys)) DEFAULT \(self.fillString)"
+        if _level == .notnull {
+            return "\(_name) \(DBColumn.columnTypeDisplay(value: _type)) \(DBColumn.columnLevelDisplay(level: _level, supportPrimaryKey: !mutablePrimaryKeys)) "
+        } else {
+            return "\(_name) \(DBColumn.columnTypeDisplay(value: _type)) \(DBColumn.columnLevelDisplay(level: _level, supportPrimaryKey: !mutablePrimaryKeys)) DEFAULT \(self.fillString) "
+        }
     }
     
     public func sqlCreateIndex(in tableName:String) -> String {
@@ -640,18 +647,18 @@ public final class DBColumn {
             return ""
         }
         let unique = self._index == .unique ? "UNIQUE" : ""
-        return "CREATE \(unique) INDEX IF NOT EXISTS `IDX_\(tableName)_\(_name)` ON `\(tableName)` (`\(_name)`)"
+        return "CREATE \(unique) INDEX IF NOT EXISTS IDX_\(tableName)_\(_name) ON \(tableName) (\(_name))"
     }
     
     public func sqlFragmentMappingTable(oldExist:Bool) -> String {
         if !_mapping.isEmpty { //需要迁移,直接as就好了
-            return "\(_mapping) AS `\(_name)`"
+            return "\(_mapping) AS \(_name)"
         } else {
             if oldExist {
-                return "`\(_name)`"
+                return "\(_name)"
             }
             else {
-                return "\(fillString) AS `\(_name)`"
+                return "\(fillString) AS \(_name)"
             }
         }
     }
@@ -676,7 +683,7 @@ public final class DBColumn {
     //MARK: creat table
     public static func sqlCreateTable(columns:[DBColumn],in table:String) -> String {
         //直接创建数据表
-        var sql = "CREATE TABLE IF NOT EXISTS `\(table)` ("
+        var sql = "CREATE TABLE IF NOT EXISTS \(table) ("
         
         let primaryKeys = DBColumn.mutablePrimaryKeys(columns:columns)
         let isMutable = !primaryKeys.isEmpty
@@ -687,7 +694,7 @@ public final class DBColumn {
             if (!isFirst) {
                 sql = sql + ","
             } else {
-                isFirst = true
+                isFirst = false
             }
             sql = sql + column.sqlFragmentAtCreateTable(mutablePrimaryKeys:isMutable)
         }
@@ -777,13 +784,13 @@ public final class DBColumn {
         }
         
         // 1 改变原来表名字
-        sqls.append("ALTER TABLE `\(table)` RENAME TO `__temp__\(table)`")
+        sqls.append("ALTER TABLE \(table) RENAME TO __temp__\(table)")
         
         // 2 创建新的表
         sqls.append(DBColumn.sqlCreateTable(columns: toColumns, in: table))
         
         // 3 导入数据（create table as 虽然速度快，但是表字段定义类型模糊【无类型】，主键索引都无法描述）
-        var mappingSql = "INSERT INTO `\(table)` SELECT "
+        var mappingSql = "INSERT INTO \(table) SELECT "
         var isFirst = true
         for col in toColumns {
             if (isFirst) {
@@ -793,11 +800,11 @@ public final class DBColumn {
             }
             mappingSql = mappingSql + col.sqlFragmentMappingTable(oldExist: fromSet.contains(col.name))
         }
-        mappingSql = mappingSql + " FROM `__temp__\(table)`"
+        mappingSql = mappingSql + " FROM __temp__\(table)"
         sqls.append(mappingSql)
         
         // 4 删除临时表
-        sqls.append("DROP TABLE `__temp__\(table)`")
+        sqls.append("DROP TABLE __temp__\(table)")
         
         // 5 重新创建索引(最后一次创建索引，索引创建消耗比较大)
         if (last) {
@@ -865,6 +872,13 @@ extension DBTable {
             for (key, value) in dict {
                 //仅仅处理包含的字段
                 if let col = dictionary[key] {
+                    //过滤非法的主键字段
+                    if col.level == .primary {
+                        if col.type == SQLITE_INTEGER || col.type == SQLITE_FLOAT {
+                            if let v = QValue("\(value)").int, v == 0 { continue }
+                        } else if "\(value)".isEmpty { continue }
+                    }
+                    
                     var v:Binding? = nil
                     if col.type == SQLITE_INTEGER { v = QValue("\(value)").int64 }
                     else if col.type == SQLITE_FLOAT { v = QValue("\(value)").double }
@@ -880,11 +894,11 @@ extension DBTable {
     
     //MARK: 日志表操作
     private static func checkCreateTableLog(db:DB) {
-        db.execute("CREATE TABLE IF NOT EXISTS `ssn_db_tb_log` (`name` TEXT, `value` INTEGER, PRIMARY KEY(`name`))")
+        db.execute("CREATE TABLE IF NOT EXISTS ssn_db_tb_log (name TEXT, value INTEGER, PRIMARY KEY(name))")
     }
     
     private static func version(db:DB, for table:String) -> UInt {
-        let result = db.prepare(sql: "SELECT `value` FROM `ssn_db_tb_log` WHERE `name` = ?", args: [table])
+        let result = db.prepare(sql: "SELECT value FROM ssn_db_tb_log WHERE name = ?", args: [table])
         if let value = QValue(result).uint {
             return value
         }
@@ -894,8 +908,8 @@ extension DBTable {
     private static func update(db:DB, version:UInt, for table:String) {
         if version > 0 {
             //采用sql0将造成rowid更新，实际操作是delete and insert
-            let sql1 = "UPDATE `ssn_db_tb_log` SET `value` = ? WHERE `name` = ?"
-            let sql2 = "INSERT INTO `ssn_db_tb_log` (`name`,`value`) VALUES(?,?)"
+            let sql1 = "UPDATE ssn_db_tb_log SET value = ? WHERE name = ?"
+            let sql2 = "INSERT INTO ssn_db_tb_log (name,value) VALUES(?,?)"
             db.transaction(block: { (db) in
                 db.prepare(sql: sql1, args: [Int(version),table])
                 db.prepare(sql: sql2, args: [table,Int(version)])
@@ -906,7 +920,7 @@ extension DBTable {
     }
     
     private static func removeVersion(db:DB, for table:String) {
-        db.prepare(sql: "DELETE FROM `ssn_db_tb_log` WHERE `name` = ?", args: [table])
+        db.prepare(sql: "DELETE FROM ssn_db_tb_log WHERE name = ?", args: [table])
     }
     
     private static func upgrade(db:DB, table:String, table definition:DBTableDefinition) {

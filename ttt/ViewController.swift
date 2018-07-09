@@ -80,6 +80,7 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     
     @objc func rightAction() -> Void {
         let sheet = UIActionSheet(title: "跳转", delegate: self, cancelButtonTitle: "取消", destructiveButtonTitle: "百度")
+        sheet.addButton(withTitle: "通讯录")
         sheet.addButton(withTitle: "GIF")
         sheet.addButton(withTitle: "测试")
         sheet.addButton(withTitle: "测试1")
@@ -144,6 +145,8 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         let title = actionSheet.buttonTitle(at: buttonIndex)
         if title == "测试" {
            Navigator.shared.dopen("https://m.mymm.com#/product/123")
+        } else if title == "通讯录" {
+            Navigator.shared.dopen("https://m.mymm.com/contact.html")
         } else if title == "GIF" {
             Navigator.shared.dopen("https://m.mymm.com/gif/gif.html")
         } else if title == "测试1" {
