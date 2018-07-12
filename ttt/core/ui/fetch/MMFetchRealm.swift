@@ -48,9 +48,9 @@ public class MMFetchRealm<T: RealmSwift.Object>: MMFetch<T> {
     var _latestCount = 0 //最近的长度
     lazy var _realm = try! Realm()
     
-    override public init(tag:String) {
-        super.init(tag: tag)
-    }
+//    override public init(tag:String) {
+//        super.init(tag: tag)
+//    }
     
     public init(result: Results<T>, realm: Realm = try! Realm()) {
         super.init(tag:"realm:" + T.className())

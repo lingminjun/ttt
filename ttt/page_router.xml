@@ -5,6 +5,16 @@
         controller="ViewController"
         container=""
         description="启动页"/>
+    <item url="https://m.mymm.com/main"
+        key=""
+        controller="ViewController"
+        container=""
+        description="启动页"/>
+    <item url="https://m.mymm.com/main/tab1"
+        key=""
+        controller="ViewController"
+        container=""
+        description="启动页"/>
     <item url="https://m.mymm.com/m-index.html#/product/{skuId}"
         key=""
         controller="DemoListController"
@@ -30,7 +40,7 @@
         controller="DemoRealmController"
         container=""
         description="狗狗列表"/>
-    <item url="https://m.mymm.com/dog/detail/{breed}.html"
+    <item url="https://m.mymm.com/dog/{detail}/breed.html"
         key=""
         controller="DetailViewController"
         container=""

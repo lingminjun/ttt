@@ -12,6 +12,7 @@
 		5325EAF220F2F7C0006C2209 /* MMFetchSQLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5325EAF120F2F7C0006C2209 /* MMFetchSQLite.swift */; };
 		5325EAF420F34FB1006C2209 /* person.json in Resources */ = {isa = PBXBuildFile; fileRef = 5325EAF320F34FB1006C2209 /* person.json */; };
 		5325EAF620F3508A006C2209 /* ContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5325EAF520F3508A006C2209 /* ContactViewController.swift */; };
+		5325EAFA20F64A5B006C2209 /* DIFF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5325EAF920F64A5B006C2209 /* DIFF.swift */; };
 		5326877B20983A3A0004F1DF /* Flyweight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5326877A20983A3A0004F1DF /* Flyweight.swift */; };
 		532F4C9720B29DAA00B1DBCB /* DemoCollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */; };
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
@@ -89,6 +90,7 @@
 		5325EAF120F2F7C0006C2209 /* MMFetchSQLite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MMFetchSQLite.swift; sourceTree = "<group>"; };
 		5325EAF320F34FB1006C2209 /* person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person.json; sourceTree = "<group>"; };
 		5325EAF520F3508A006C2209 /* ContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactViewController.swift; sourceTree = "<group>"; };
+		5325EAF920F64A5B006C2209 /* DIFF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIFF.swift; sourceTree = "<group>"; };
 		5326877A20983A3A0004F1DF /* Flyweight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flyweight.swift; sourceTree = "<group>"; };
 		532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoCollectionController.swift; sourceTree = "<group>"; };
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
@@ -352,6 +354,7 @@
 				5326877A20983A3A0004F1DF /* Flyweight.swift */,
 				5374F93F209C42E60036225E /* DataStore.swift */,
 				53B133A2209F2ED900B2A3FD /* LRUCache.swift */,
+				5325EAF920F64A5B006C2209 /* DIFF.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -593,6 +596,7 @@
 				D9917D2A20089F56003682AD /* Dog.swift in Sources */,
 				D94140652011DC8E0050132B /* MMUIWebController.swift in Sources */,
 				5374F942209C54530036225E /* StringExt.swift in Sources */,
+				5325EAFA20F64A5B006C2209 /* DIFF.swift in Sources */,
 				5325EAF220F2F7C0006C2209 /* MMFetchSQLite.swift in Sources */,
 				5325EAF620F3508A006C2209 /* ContactViewController.swift in Sources */,
 				538350F02063AC20005DDA8A /* HomePageViewController.swift in Sources */,

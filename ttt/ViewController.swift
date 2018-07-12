@@ -72,6 +72,29 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         let url1 = "https://m.mymm.com/zb/132/132#/xxx?aa=333"
         let rt1 = Urls.appendFragmentPath(url: url1, relativePath: "/inner");
         print("result = " + rt1)
+        
+        
+        
+        // 测试 diff
+        
+        let str1 = "abcdefght"
+        let str2 = "acdeught"
+        let steps = str1.ssn_diff(str2) { (r, l) -> Bool in
+            return r == l
+        }
+        for step in steps {
+            switch step.operation {
+            case .nan:
+                print(" \(step.fromIndex):\(step.from!)")
+                break
+            case .insert:
+                print("+\(step.toIndex):\(step.to!)")
+                break
+            case .delete:
+                print("-\(step.fromIndex):\(step.from!)")
+                break
+            }
+        }
     }
     
     @objc public func scrollViewDidScroll(_ scrollView: UIScrollView) {
