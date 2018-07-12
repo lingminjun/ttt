@@ -33,7 +33,7 @@ let SQLITE_OPERATION_KEY = "Operation"
 let SQLITE_ROW_ID_KEY = "RowId"
 
 //数据库（单链接）包装类
-public final class DB : Equatable {
+public final class DB : NSObject {
     
     public var scope:String {
         return _scope
@@ -44,7 +44,7 @@ public final class DB : Equatable {
     private var _path = ""
     
     public init(_ scope:String = "default") {
-        
+        super.init()
         self._scope = scope
         self._path = DB.path(for: scope)
         print("open:\(_path)")
@@ -61,7 +61,9 @@ public final class DB : Equatable {
             if let sself = self {
                 //主线程回调
                 let dict:[String : Any] = [SQLITE_OPERATION_KEY:opt,SQLITE_TABLE_KEY:tbName,SQLITE_ROW_ID_KEY:rowId]
-                NotificationCenter.default.post(name: SQLITE_UPDATED_NOTICE, object: sself, userInfo: dict)
+                // 防止hook同来自sqlite事务的同一个栈，尽量不要终止原有事务操作，故将通知转到另一个loop source
+                sself.performSelector(onMainThread: #selector(DB.hook(dict:)), with: dict, waitUntilDone: false)
+//                NotificationCenter.default.post(name: SQLITE_UPDATED_NOTICE, object: sself, userInfo: dict)
             }
         }
         
@@ -70,6 +72,10 @@ public final class DB : Equatable {
     deinit {
         //源码没有释放
         self._cnnt.updateHook(nil)
+    }
+    
+    @objc fileprivate func hook(dict:[String : Any]) {
+        NotificationCenter.default.post(name: SQLITE_UPDATED_NOTICE, object: self, userInfo: dict)
     }
     
     // MARK: sql method

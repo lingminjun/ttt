@@ -9,7 +9,9 @@
 import Foundation
 import HandyJSON
 
-class Person: NSObject, MMCellModel, HandyJSON {
+class Person: NSObject, SQLiteModel {
+    var ssn_rowid: Int64 = -1
+    
     func ssn_cellID() -> String {
         return "Person"
     }
@@ -63,33 +65,50 @@ class Person: NSObject, MMCellModel, HandyJSON {
 class PersonCell: UITableViewCell {
     override func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject, atIndexPath indexPath: IndexPath, reused: Bool) {
         if let person = model as? Person {
-            self.textLabel?.text = person.name
+            self.textLabel?.text = "\(person.name) age:\(person.age)"
         }
     }
 }
 
 class ContactViewController: MMUITableController<Person> {
     
+    var sbtable:DBTable!
+    
     override func loadFetchs() -> [MMFetch<Person>] {
-        let f = MMFetchList<Person>(list:[])
+        let query = SQLQuery<Person>(table: "person", sort:"name")
+        let db = DB.db(with: "default")
+        let f = MMFetchSQLite(query: query, db: db)
         return [f]
     }
     
     override func onViewDidLoad() {
+        super.onViewDidLoad()
+        let db = DB.db(with: "default")
+        sbtable = DBTable.table(db: db, name: "person")
         let sel = #selector(ContactViewController.rightAction)
-        let item = UIBarButtonItem(title: "选项", style: UIBarButtonItemStyle.plain, target: self, action: sel)
+        let item = UIBarButtonItem(title: "添加", style: UIBarButtonItemStyle.plain, target: self, action: sel)
         self.navigationItem.rightBarButtonItem=item
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row > 5 {
+            if let obj = self.fetchs.fetch.get(indexPath.row) {
+                obj.age = obj.age + 1
+                self.sbtable.update(object: obj)
+            }
+        } else {
+            if let obj = self.fetchs.fetch.get(indexPath.row) {
+                self.sbtable.delete(object: obj)
+            }
+        }
+    }
+    
     @objc func rightAction() -> Void {
-        let db = DB.db(with: "default")
-        let table = DBTable.table(db: db, name: "person")
-        
         let ps = Person()
         ps.name = "测试\(arc4random())"
         ps.age = Int(arc4random()%30)
         ps.sex = Int(arc4random()%2)
-        table.insert(object: ps)
+        sbtable.insert(object: ps)
     }
     
 }

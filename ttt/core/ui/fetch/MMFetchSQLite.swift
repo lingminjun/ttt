@@ -236,11 +236,15 @@ public struct SQLQuery<T: HandyJSON> {
             if tb.name.isEmpty { continue }
             
             //字段分类
-            for cl in tb.columns {
-                if !cl.isEmpty && !set.contains(cl) {
-                    sql = sql + ", "
-                    sql = sql + "tbl\(idx).\(cl) AS \(cl)"
-                    set.insert(cl)
+            if tb.columns.isEmpty {
+                sql = sql + ", tbl\(idx).*"
+            } else {
+                for cl in tb.columns {
+                    if !cl.isEmpty && !set.contains(cl) {
+                        sql = sql + ", "
+                        sql = sql + "tbl\(idx).\(cl) AS \(cl)"
+                        set.insert(cl)
+                    }
                 }
             }
             
@@ -258,7 +262,7 @@ public struct SQLQuery<T: HandyJSON> {
             if idx > 0 {
                 sql = sql + ", "
             }
-            sql = sql + "\(tb) AS tbl\(idx)"
+            sql = sql + "\(tb.name) AS tbl\(idx)"
             idx = idx + 1
         }
         return sql
@@ -394,7 +398,7 @@ public class MMFetchSQLite<T: SQLiteModel> : MMFetch<T> {
         //消息转发，仅仅关注此表修改
         if let info = notfication.userInfo, let table = info[SQLITE_TABLE_KEY] as? String, self._tables.contains(table) {
             //监听修改
-            guard let rowid = info[SQLITE_ROW_ID_KEY] as? Int64, let opt = info[SQLITE_ROW_ID_KEY] as? Connection.Operation else {
+            guard let rowid = info[SQLITE_ROW_ID_KEY] as? Int64, let opt = info[SQLITE_OPERATION_KEY] as? Connection.Operation else {
                 return
             }
             
@@ -523,13 +527,17 @@ public class MMFetchSQLite<T: SQLiteModel> : MMFetch<T> {
         self.operation(deletes: { (section) -> [IndexPath] in
             var rt:[IndexPath] = []
             for step in dels {
+                self._list.remove(at: step.fromIndex)
                 rt.append(IndexPath(row:step.fromIndex,section:section))
             }
             return rt
         }, inserts: { (section) -> [IndexPath] in
             var rt:[IndexPath] = []
             for step in inss {
-                rt.append(IndexPath(row:step.toIndex,section:section))
+                if let obj = step.to {
+                    self._list.insert(obj, at: step.toIndex)
+                    rt.append(IndexPath(row:step.toIndex,section:section))
+                }
             }
             return rt
         }, updates: { (section) -> [IndexPath] in
