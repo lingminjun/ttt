@@ -7,65 +7,71 @@
 //
 
 import Foundation
-import SQLite.Swift
 //直接采用HandyJSON内存赋值模型（不重复造轮子）
 import HandyJSON
 
 public struct SQLTable {
     public var name:String = ""      //表名
+    public var template:String = ""  //模板名
     public var columns:[String] = [] //要展示的字段
     public var on:String = "" //inner join on 右边字段或左边字段
     public var left:String = "" //inner join on 左边字段
     
-    public init(name:String) {
+    public init(name:String, template:String = "") {
         self.name = name
+        self.template = template
     }
     
-    public init(name:String, join column:String) {
+    public init(name:String, join column:String, template:String = "") {
         self.name = name
         self.on = column
+        self.template = template
     }
     
-    public init(name:String, columns:[String]) {
+    public init(name:String, columns:[String], template:String = "") {
         self.name = name
         self.columns = columns
+        self.template = template
     }
     
-    public init(name:String, join left:String, on column:String) {
+    public init(name:String, join left:String, on column:String, template:String = "") {
         self.name = name
         self.left = left
         self.on = column
+        self.template = template
     }
     
-    public init(name:String, join column:String, columns:[String]) {
+    public init(name:String, join column:String, columns:[String], template:String = "") {
         self.name = name
         self.on = column
         self.columns = columns
+        self.template = template
     }
     
-    public init(name:String, join left:String, on column:String, columns:[String]) {
+    public init(name:String, join left:String, on column:String, columns:[String], template:String = "") {
         self.name = name
         self.left = left
         self.on = column
         self.columns = columns
+        self.template = template
     }
 }
 
 public struct SQLQuery<T: HandyJSON> {
     
     //构建单页查询
-    public init(table:String,predicate:NSPredicate? = nil, sort:String = "", desc:Bool = false, offset:UInt = 0, limit:UInt = 10000) {
-        self.init(table:table,predicate:predicate,sorts:(sort.isEmpty ? [] : [NSSortDescriptor(key: sort, ascending: !desc)]),offset:offset,limit:limit)
+    public init(table:String, template:String = "", predicate:NSPredicate? = nil, sort:String = "", desc:Bool = false, offset:UInt = 0, limit:UInt = 10000) {
+        self.init(table:table,template:template,predicate:predicate,sorts:(sort.isEmpty ? [] : [NSSortDescriptor(key: sort, ascending: !desc)]),offset:offset,limit:limit)
     }
     
     //构建单页查询
-    public init(table:String,predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
-        self.init(table: table, columns: [], predicate: predicate, sorts: sorts, offset: offset, limit: limit)
+    public init(table:String, template:String = "", predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
+        self.init(table: table, columns: [], template:template, predicate: predicate, sorts: sorts, offset: offset, limit: limit)
     }
     
     //构建单页查询
-    public init(table:String, columns:[String] ,predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
-        self.init(tables: [SQLTable(name: table,columns: columns)], predicate: predicate, sorts: sorts, offset: offset, limit: limit)
+    public init(table:String, columns:[String] ,template:String = "", predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
+        self.init(tables: [SQLTable(name: table,columns: columns, template:template)], predicate: predicate, sorts: sorts, offset: offset, limit: limit)
     }
     
     //构建多表查询，表与表之间采用join on字段关联，若
@@ -112,7 +118,7 @@ public struct SQLQuery<T: HandyJSON> {
     public var limit:UInt = 0
     public var predicate:NSPredicate? = nil
     public var sorts:[NSSortDescriptor] = []
-    public var tables:[String] { //关联的表
+    public var tableNames:[String] { //关联的表
         var tbs:[String] = []
         for idx in 0..<self._tables.count {
             let tb = self._tables[idx]
@@ -141,7 +147,9 @@ public struct SQLQuery<T: HandyJSON> {
     
     private var _sql:String = ""      //单独写sql的情况
     private var _tables:[SQLTable] = []
-    
+    public var tables:[SQLTable] { //关联的表
+        return _tables
+    }
     private func buildSql() -> String {
         //构建sql
         var sql = ""
@@ -382,7 +390,7 @@ public class MMFetchSQLite<T: SQLiteModel> : MMFetch<T> {
         super.init(tag: "sqlite:" + query.describe)
         _query = query
         _db = db
-        _tables = _query.tables
+        _tables = _query.tableNames
         
         //监听
         NotificationCenter.default.addObserver(self, selector: #selector(DBTable.tableUpdateNotice(notfication:)), name: SQLITE_UPDATED_NOTICE, object: db)
@@ -398,7 +406,7 @@ public class MMFetchSQLite<T: SQLiteModel> : MMFetch<T> {
         //消息转发，仅仅关注此表修改
         if let info = notfication.userInfo, let table = info[SQLITE_TABLE_KEY] as? String, self._tables.contains(table) {
             //监听修改
-            guard let rowid = info[SQLITE_ROW_ID_KEY] as? Int64, let opt = info[SQLITE_OPERATION_KEY] as? Connection.Operation else {
+            guard let rowid = info[SQLITE_ROW_ID_KEY] as? Int64, let opt = info[SQLITE_OPERATION_KEY] as? DB.Operation else {
                 return
             }
             
@@ -410,13 +418,20 @@ public class MMFetchSQLite<T: SQLiteModel> : MMFetch<T> {
         if _load {
             return
         }
+        
+        //先检查表是否创建，防止表未创建
+        for tb in self._query.tables {
+            let _ = DBTable.table(db: _db, name: tb.name, template:tb.template )
+        }
+        
+        //查询数据
         let sql = _query.sql
         let objs = self._db.prepare(type: T.self, sql: sql, args: [])
         _list.append(contentsOf: objs)
         _load = true
     }
     
-    private func handleNotice(table:String, operation:Connection.Operation, rowid:Int64) {
+    private func handleNotice(table:String, operation:DB.Operation, rowid:Int64) {
         switch operation {
         case .insert:
             handleInsertNotice(table: table, rowid: rowid)

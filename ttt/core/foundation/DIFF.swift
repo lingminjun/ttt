@@ -69,14 +69,14 @@ public final class Diff {
         }
         
         //特殊场景处理
-        if from.isEmpty {//仅仅删除
+        if to.isEmpty {//仅仅删除
             var idx = 0
             for e in from {
                 result.append(Diff.Step<T>(delete: e, index: idx))
                 idx = idx + 1
             }
             return result
-        } else if to.isEmpty {//仅仅插入
+        } else if from.isEmpty {//仅仅插入
             var idx = 0
             for e in to {
                 result.append(Diff.Step<T>(insert: e, index:idx))

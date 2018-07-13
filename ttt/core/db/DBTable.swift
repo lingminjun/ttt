@@ -20,8 +20,6 @@ import SQLite3
 
 import HandyJSON
 
-import SQLite.Swift
-
 //通知定义 (主线程)
 //let DBTABLE_WILL_MIGRARE_NOTICE = NSNotification.Name(rawValue:"DBTable.will.Migrate")
 //let DBTABLE_DID_MIGRARE_NOTICE = NSNotification.Name(rawValue:"DBTable.did.Migrate")
@@ -941,7 +939,7 @@ extension DBTable {
         }
         
         //需要更新标信息存储
-        db.transaction(block: { (db) in
+        db.sync(block: { (db) in
             if currentVersion == 0 {
                 let cols = definition.columns(for: lastVersion)
                 DBTable.create(db: db, table: table, columns: cols)
