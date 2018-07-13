@@ -16,7 +16,7 @@
                  {"name":"name", "type":"text",  "level":"",  "fill":"",  "index":"",  "mapping":""},
                  {"name":"age",  "type":"int",   "level":"",  "fill":"",  "index":"",  "mapping":""},
                  {"name":"sex",  "type":"int",   "level":"",  "fill":"",  "index":"",  "mapping":""},
-                 {"name":"birth",  "type":"text",   "level":"",  "fill":"",  "index":"",  "mapping":"date('now','-age year')"}
+                 {"name":"birth",  "type":"text",   "level":"",  "fill":"",  "index":"",  "mapping":"date('now','-9 year')"}
                  ]
            }
            ]

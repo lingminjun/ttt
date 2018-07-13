@@ -517,8 +517,8 @@ public final class DBColumn {
         self._type = DBColumn.columnTypeValue(display:definition.type.uppercased())
         self._level = DBColumn.columnLevelValue(display:definition.level.uppercased())
         self._index = DBColumn.columnIndexValue(display:definition.index.uppercased())
-        self._fill = fill
-        self._mapping = mapping
+        self._fill = definition.fill
+        self._mapping = definition.mapping
     }
     
     public init(_ name:String, _ type:Int32, _ level:DBColumnLevel = .normal, _ index:DBColumnIndex = .nan,fill:String = "", mapping:String = "") {
