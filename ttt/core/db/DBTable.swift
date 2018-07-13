@@ -438,7 +438,7 @@ public final class DBTable : Equatable {
     }
 
     public func truncate() {//清空表，请务必调用此方法，否则hook失效，并非sql语句“truncate table xxx”，实际执行delete语句，所以可以与其他方法一起在事务中使用
-        self.db.execute("DELETE FROM \(self.name) WHERE rowid > 0")
+        self.db.execute("DELETE FROM \(self.name) WHERE rowid >= 0")
     }
 
     public func objectsCount() -> UInt64 {
