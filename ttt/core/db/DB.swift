@@ -119,7 +119,9 @@ public final class DB : NSObject {
         do {
             let list = try self._cnnt.prepare(sql, args)
             for data in list {
-                return "\(String(describing: data[0]))"
+                if let value = data[0] {
+                    return "\(String(describing: value))"
+                }
             }
         } catch {
             print("error:\(error)")

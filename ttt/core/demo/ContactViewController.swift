@@ -60,12 +60,14 @@ class Person: NSObject, SQLiteModel {
     var name = ""
     var age = 0
     var sex = 0
+    var birth = ""
 }
 
 class PersonCell: UITableViewCell {
     override func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject, atIndexPath indexPath: IndexPath, reused: Bool) {
         if let person = model as? Person {
-            self.textLabel?.text = "\(person.name) age:\(person.age)"
+            self.textLabel?.text = "\(person.name) age:\(person.age) birth:\(person.birth)"
+            print("age:\(person.age) birth:\(person.birth)")
         }
     }
 }

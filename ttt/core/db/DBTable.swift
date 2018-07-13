@@ -650,13 +650,13 @@ public final class DBColumn {
     
     public func sqlFragmentMappingTable(oldExist:Bool) -> String {
         if !_mapping.isEmpty { //需要迁移,直接as就好了
-            return "\(_mapping) AS \(_name)"
+            return "( \(_mapping) ) AS \(_name)"
         } else {
             if oldExist {
                 return "\(_name)"
             }
             else {
-                return "\(fillString) AS \(_name)"
+                return "( \(fillString) ) AS \(_name)"
             }
         }
     }
