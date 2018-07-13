@@ -25,7 +25,7 @@ public struct MMLayoutConfig {
     var columnSpace:CGFloat = 1//(dp)
     var rowDefaultSpace:CGFloat = 1//默认行间距(dp)
     var insets:UIEdgeInsets = UIEdgeInsets.zero //header将忽略左右上下的间距，只有cell有效
-    var magicHorizontalEdge:CGFloat = 0//横向魔法边距，只有当cell返回支持时展示
+    var supportMagicHorizontalEdge:Bool = false//横向魔法边距，只有当cell返回支持时展示
 //    var magicVerticalEdge:CGFloat = 0//垂直魔法边距，只有当cell返回支持时展示
 
 }
@@ -41,8 +41,8 @@ public struct MMLayoutConfig {
     //cell的内边距, floating cell不支持
     @objc optional func collectionView(_ collectionView: UICollectionView, insetsForCellAt indexPath: IndexPath) -> UIEdgeInsets
     
-    //cell的魔法边距描述,floating cell不支持
-    @objc optional func collectionView(_ collectionView: UICollectionView, supportMagicEdgeForCellAt indexPath: IndexPath) -> Bool
+    //cell的魔法边距描述,floating cell不支持,
+    @objc optional func collectionView(_ collectionView: UICollectionView, magicHorizontalEdgeForCellAt indexPath: IndexPath) -> CGFloat
     
     //cell是否SpanSize，返回值小于等于零时默认为1
     @objc optional func collectionView(_ collectionView: UICollectionView, spanSizeForCellAt indexPath: IndexPath) -> Int
@@ -147,7 +147,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
             respondCanFloating = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:canFloatingCellAt:)))
             respondHeightForCell = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:heightForCellAt:)))
             respondInsetForCell = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:insetsForCellAt:)))
-            respondMagicEdgeForCell = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:supportMagicEdgeForCellAt:)))
+            respondMagicEdgeForCell = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:magicHorizontalEdgeForCellAt:)))
             respondSpanSize = ds.responds(to: #selector(MMCollectionViewDelegate.collectionView(_:spanSizeForCellAt:)))
         }
         
@@ -251,15 +251,16 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                 if isFloating {
                     x = 0
                     width = floatingWidth
-                } else if let ds = ds, _config.magicHorizontalEdge > 0 && _config.scrollDirection == .vertical && respondMagicEdgeForCell {// 魔法边距
-                    if ds.collectionView!(view, supportMagicEdgeForCellAt: indexPath) {
-                        //左边
+                } else if let ds = ds, _config.supportMagicHorizontalEdge && _config.scrollDirection == .vertical && respondMagicEdgeForCell {// 魔法边距
+                    let magic = ds.collectionView!(view, magicHorizontalEdgeForCellAt: indexPath)
+                    if magic > 0 {
+                        //左边 TODO : FIXME
                         if suitableSetion == 0 {
-                            x = x + _config.magicHorizontalEdge
+                            x = x + magic
                         }
                         
                         //重新计算行宽
-                        let ncellWidth = CGFloat(roundf(Float((viewWidth - viewWidthInsets - (2 * _config.magicHorizontalEdge) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
+                        let ncellWidth = CGFloat(roundf(Float((viewWidth - viewWidthInsets - (2 * magic) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
                         width = ncellWidth * CGFloat(spanSize) + _config.columnSpace * CGFloat(spanSize - 1)
                     }
                 }
