@@ -362,9 +362,8 @@ public struct SQLQuery<T: HandyJSON> {
     
 }
 
-public protocol SQLiteModel : HandyJSON,MMCellModel {
-    var ssn_rowid:Int64 { get set }
-}
+public typealias SQLiteModel = DBModel & MMCellModel
+
 
 fileprivate class SQLiteItem : HandyJSON {
     var ssn_rowid:Int64 = -1
@@ -393,7 +392,7 @@ public class MMFetchSQLite<T: SQLiteModel> : MMFetch<T> {
         _tables = _query.tableNames
         
         //监听
-        NotificationCenter.default.addObserver(self, selector: #selector(DBTable.tableUpdateNotice(notfication:)), name: SQLITE_UPDATED_NOTICE, object: db)
+        NotificationCenter.default.addObserver(self, selector: #selector(MMFetchSQLite.tableUpdateNotice(notfication:)), name: SQLITE_UPDATED_NOTICE, object: db)
         
         load()
     }

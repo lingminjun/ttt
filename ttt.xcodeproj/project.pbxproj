@@ -13,6 +13,7 @@
 		5325EAF420F34FB1006C2209 /* person.json in Resources */ = {isa = PBXBuildFile; fileRef = 5325EAF320F34FB1006C2209 /* person.json */; };
 		5325EAF620F3508A006C2209 /* ContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5325EAF520F3508A006C2209 /* ContactViewController.swift */; };
 		5325EAFA20F64A5B006C2209 /* DIFF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5325EAF920F64A5B006C2209 /* DIFF.swift */; };
+		5325EAFC20FB9159006C2209 /* FlyweightSQLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5325EAFB20FB9159006C2209 /* FlyweightSQLite.swift */; };
 		5326877B20983A3A0004F1DF /* Flyweight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5326877A20983A3A0004F1DF /* Flyweight.swift */; };
 		532F4C9720B29DAA00B1DBCB /* DemoCollectionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */; };
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
@@ -34,6 +35,7 @@
 		5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */; };
 		53888940204AD85600859ED6 /* BriefRSA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5388893F204AD85600859ED6 /* BriefRSA.swift */; };
 		5388894A204F80CA00859ED6 /* SMP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53888949204F80CA00859ED6 /* SMP.swift */; };
+		5389DA0520FC4E010097C77B /* FlyweightStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5389DA0420FC4E010097C77B /* FlyweightStore.swift */; };
 		538F1E1020D8A30400947845 /* gif08.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0820D8A30400947845 /* gif08.gif */; };
 		538F1E1120D8A30400947845 /* gif06.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0920D8A30400947845 /* gif06.gif */; };
 		538F1E1220D8A30400947845 /* gif07.gif in Resources */ = {isa = PBXBuildFile; fileRef = 538F1E0A20D8A30400947845 /* gif07.gif */; };
@@ -91,6 +93,7 @@
 		5325EAF320F34FB1006C2209 /* person.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = person.json; sourceTree = "<group>"; };
 		5325EAF520F3508A006C2209 /* ContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactViewController.swift; sourceTree = "<group>"; };
 		5325EAF920F64A5B006C2209 /* DIFF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DIFF.swift; sourceTree = "<group>"; };
+		5325EAFB20FB9159006C2209 /* FlyweightSQLite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyweightSQLite.swift; sourceTree = "<group>"; };
 		5326877A20983A3A0004F1DF /* Flyweight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flyweight.swift; sourceTree = "<group>"; };
 		532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoCollectionController.swift; sourceTree = "<group>"; };
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
@@ -115,6 +118,7 @@
 		5386382A2033DB2C00AE4DE6 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		5388893F204AD85600859ED6 /* BriefRSA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BriefRSA.swift; sourceTree = "<group>"; };
 		53888949204F80CA00859ED6 /* SMP.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMP.swift; sourceTree = "<group>"; };
+		5389DA0420FC4E010097C77B /* FlyweightStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyweightStore.swift; sourceTree = "<group>"; };
 		538F1E0820D8A30400947845 /* gif08.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif08.gif; sourceTree = "<group>"; };
 		538F1E0920D8A30400947845 /* gif06.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif06.gif; sourceTree = "<group>"; };
 		538F1E0A20D8A30400947845 /* gif07.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = gif07.gif; sourceTree = "<group>"; };
@@ -355,6 +359,8 @@
 				5374F93F209C42E60036225E /* DataStore.swift */,
 				53B133A2209F2ED900B2A3FD /* LRUCache.swift */,
 				5325EAF920F64A5B006C2209 /* DIFF.swift */,
+				5325EAFB20FB9159006C2209 /* FlyweightSQLite.swift */,
+				5389DA0420FC4E010097C77B /* FlyweightStore.swift */,
 			);
 			path = foundation;
 			sourceTree = "<group>";
@@ -568,8 +574,10 @@
 				D9CCAD15200C809E00C03276 /* VCNode.swift in Sources */,
 				D958F78A2008694200E3F0C5 /* MMFetchList.swift in Sources */,
 				D958F7892008694200E3F0C5 /* MMFetchRealm.swift in Sources */,
+				5325EAFC20FB9159006C2209 /* FlyweightSQLite.swift in Sources */,
 				5355BF81209ABA9C00C7CAC0 /* DetailViewController.swift in Sources */,
 				530802CE20EEFE980007AE31 /* DB.swift in Sources */,
+				5389DA0520FC4E010097C77B /* FlyweightStore.swift in Sources */,
 				53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */,
 				D9414061201096CC0050132B /* MMController.swift in Sources */,
 				538350EE2063A80C005DDA8A /* MMTrack.swift in Sources */,

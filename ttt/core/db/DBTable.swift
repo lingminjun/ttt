@@ -113,7 +113,12 @@ public enum DBTableStatus:Int {
     ok = 2        //已经是可操作的表
 }
 
+//数据实体对象
+public protocol DBModel : HandyJSON {
+    var ssn_rowid:Int64 { get set }
+}
 
+// 数据库表托管对象
 public final class DBTable : Equatable {
     public var name:String {    //名字
         return !_tableName.isEmpty ? _tableName : _tableDef.tb
@@ -355,6 +360,10 @@ public final class DBTable : Equatable {
         }
     }
     
+    public func delete(primary column:String, value:Binding) {
+        db.prepare(sql: "DELETE FROM \(self.name) WHERE \(column) = ?", args: [value])
+    }
+    
     public func upinsert(object:HandyJSON) {
         upinsert(objects: [object])
     }
@@ -413,10 +422,20 @@ public final class DBTable : Equatable {
         }
     }
 
+    public func object<T: HandyJSON>(_ type:T.Type, predicate:NSPredicate) -> T? {
+        //无法使用format
+        let objs = objects(type, predicate: predicate)
+        return objs.first
+    }
+    
+    public func object<T: HandyJSON>(_ type:T.Type, conditions:[String:Binding?]) -> T? {
+        let objs = objects(type, conditions: conditions)
+        return objs.first
+    }
     
     public func objects<T: HandyJSON>(_ type:T.Type, predicate:NSPredicate) -> [T] {
         //无法使用format
-        return self.db.prepare(type: type, sql: "SELECT * FROM \(self.name) WHERE \(predicate.predicateFormat)", args: [])
+        return self.db.prepare(type: type, sql: "SELECT rowid AS ssn_rowid, * FROM \(self.name) WHERE \(predicate.predicateFormat)", args: [])
     }
     
     public func objects<T: HandyJSON>(_ type:T.Type, conditions:[String:Binding?]) -> [T] {
@@ -431,9 +450,9 @@ public final class DBTable : Equatable {
         }
         
         if wherestr.isEmpty {
-            return self.db.prepare(type: type, sql: "SELECT * FROM \(self.name)", args:[])
+            return self.db.prepare(type: type, sql: "SELECT rowid AS ssn_rowid, * FROM \(self.name)", args:[])
         } else {
-            return self.db.prepare(type: type, sql: "SELECT * FROM \(self.name) WHERE \(wherestr)", args: upvalary)
+            return self.db.prepare(type: type, sql: "SELECT rowid AS ssn_rowid, * FROM \(self.name) WHERE \(wherestr)", args: upvalary)
         }
     }
 

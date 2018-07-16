@@ -21,9 +21,9 @@ enum StoreDirectory {
 }
 
 
-class DataStore : Equatable {
+public class DataStore : Equatable {
     
-    static func == (lhs: DataStore, rhs: DataStore) -> Bool {
+    public static func == (lhs: DataStore, rhs: DataStore) -> Bool {
         return lhs._scope == rhs._scope
     }
     
@@ -31,7 +31,7 @@ class DataStore : Equatable {
     /**
      @brief Documents/ssnstore/[scope]目录下缓存
      */
-    static func documentsStore(withScope scope:String) -> DataStore {
+    public static func documentsStore(withScope scope:String) -> DataStore {
         return documents.get(scope)!
     }
     private static let documents: RigidCache<DataStore> = {
@@ -46,7 +46,7 @@ class DataStore : Equatable {
     /**
      @brief Library/Caches/ssnstore/[scope]目录下缓存
      */
-    static func cachesStoreWithScope(withScope scope:String) -> DataStore {
+    public static func cachesStoreWithScope(withScope scope:String) -> DataStore {
         return caches.get(scope)!
     }
     private static let caches: RigidCache<DataStore> = {
@@ -60,7 +60,7 @@ class DataStore : Equatable {
     /**
      @brief tmp/ssnstore/[scope]目录下缓存
      */
-    static func temporaryStore(withScope scope:String) -> DataStore {
+    public static func temporaryStore(withScope scope:String) -> DataStore {
         return temporary.get(scope)!
     }
     private static let temporary: RigidCache<DataStore> = {
@@ -71,7 +71,7 @@ class DataStore : Equatable {
         return cache
     }()
 
-    var scope:String { get { return _scope } }
+    public var scope:String { get { return _scope } }
     
     init(scope:String, directory:StoreDirectory = .document) {
         self._scope = scope
@@ -111,7 +111,7 @@ class DataStore : Equatable {
     }
     
     ////// 对象支持
-    func model<T>(forKey key:String, type: T.Type) -> T? where T : Decodable {
+    public func model<T>(forKey key:String, type: T.Type) -> T? where T : Decodable {
         guard let data = data(forKey: key) else {
             return nil
         }
@@ -122,7 +122,7 @@ class DataStore : Equatable {
         return model
     }
     
-    func accessModel<T>(forKey key:String, type: T.Type) -> T? where T : Decodable  {
+    public func accessModel<T>(forKey key:String, type: T.Type) -> T? where T : Decodable  {
         guard let data = accessData(forKey: key) else {
             return nil
         }
@@ -133,7 +133,7 @@ class DataStore : Equatable {
         return model
     }
     
-    func model<T>(forKey key:String, isExpired: inout Bool, type: T.Type) -> T? where T : Decodable {
+    public func model<T>(forKey key:String, isExpired: inout Bool, type: T.Type) -> T? where T : Decodable {
         guard let data = data(forKey: key, isExpired: &isExpired) else {
             return nil
         }
@@ -144,7 +144,7 @@ class DataStore : Equatable {
         return model
     }
     
-    func accessModel<T>(forKey key:String, isExpired: inout Bool, type: T.Type) -> T? where T : Decodable {
+    public func accessModel<T>(forKey key:String, isExpired: inout Bool, type: T.Type) -> T? where T : Decodable {
         guard let data = accessData(forKey: key, isExpired: &isExpired) else {
             return nil
         }
@@ -155,20 +155,22 @@ class DataStore : Equatable {
         return model
     }
     
-    func store<T>(model:T, forKey key:String, expire:Int64 = 0) where T : Encodable {
+    /// 注意，由于Encodable协议泛型限定，必须传入实现的Encodable协议的实例对象
+    public func store<T>(model:T, forKey key:String, expire:Int64 = 0) -> Void where T : Encodable {
         let encoder = JSONEncoder()
+        //open func encode<T>(_ value: T) throws -> Data where T : Encodable
         guard let data = try? encoder.encode(model) else {
             return
         }
         store(data: data, forKey: key, expire: expire)
     }
     
-    func removeModel(forKey key:String) {
+    public func removeModel(forKey key:String) {
         removeData(forKey: key)
     }
     
     ////// 对字符串支持
-    func string(forKey key:String) -> String {
+    public func string(forKey key:String) -> String {
         if let data = data(forKey: key), let str = String(data: data, encoding: String.Encoding.utf8) {
             return str
         } else {
@@ -176,7 +178,7 @@ class DataStore : Equatable {
         }
     }
     
-    func accessString(forKey key:String) -> String {
+    public func accessString(forKey key:String) -> String {
         if let data = accessData(forKey: key), let str = String(data: data, encoding: String.Encoding.utf8) {
             return str
         } else {
@@ -184,7 +186,7 @@ class DataStore : Equatable {
         }
     }
     
-    func string(forKey key:String, isExpired: inout Bool) -> String {
+    public func string(forKey key:String, isExpired: inout Bool) -> String {
         if let data = data(forKey: key, isExpired: &isExpired), let str = String(data: data, encoding: String.Encoding.utf8) {
             return str
         } else {
@@ -192,7 +194,7 @@ class DataStore : Equatable {
         }
     }
     
-    func accessString(forKey key:String, isExpired: inout Bool) -> String {
+    public func accessString(forKey key:String, isExpired: inout Bool) -> String {
         if let data = accessData(forKey: key, isExpired: &isExpired), let str = String(data: data, encoding: String.Encoding.utf8) {
             return str
         } else {
@@ -200,13 +202,13 @@ class DataStore : Equatable {
         }
     }
     
-    func store(string:String, forKey key:String, expire:Int64 = 0) {
+    public func store(string:String, forKey key:String, expire:Int64 = 0) {
         if let data = string.data(using: String.Encoding.utf8) {
             store(data: data, forKey: key, expire: expire)
         }
     }
     
-    func removeString(forKey key:String) {
+    public func removeString(forKey key:String) {
         removeData(forKey: key)
     }
     
@@ -215,7 +217,7 @@ class DataStore : Equatable {
      @param key 需要寻找的key
      @return 返回找到的数据，可能返回nil
      */
-    func data(forKey key:String) -> Data? {
+    public func data(forKey key:String) -> Data? {
         if key.isEmpty {
             return nil
         }
@@ -234,7 +236,7 @@ class DataStore : Equatable {
      @param key 需要寻找的key
      @return 返回找到的数据，可能返回nil
      */
-    func accessData(forKey key:String) -> Data? {
+    public func accessData(forKey key:String) -> Data? {
         if key.isEmpty {
             return nil
         }
@@ -254,7 +256,7 @@ class DataStore : Equatable {
      @param isExpired 数据是否过期
      @return 返回找到的数据，可能返回nil
      */
-    func data(forKey key:String, isExpired: inout Bool) -> Data? {
+    public func data(forKey key:String, isExpired: inout Bool) -> Data? {
         if key.isEmpty {
             isExpired = true
             return nil
@@ -269,7 +271,7 @@ class DataStore : Equatable {
      @param isExpired 数据是否过期
      @return 返回找到的数据，可能返回nil，找到过期仍然返回
      */
-    func accessData(forKey key:String, isExpired: inout Bool) -> Data? {
+    public func accessData(forKey key:String, isExpired: inout Bool) -> Data? {
         if key.isEmpty {
             isExpired = true
             return nil
@@ -298,7 +300,7 @@ class DataStore : Equatable {
      @param key 对应的key
      @param expire 过期时间(秒)，传入零表示永远不过期
      */
-    func store(data:Data, forKey key:String, expire:Int64 = 0) {
+    public func store(data:Data, forKey key:String, expire:Int64 = 0) {
         if key.isEmpty || data.isEmpty {
             return
         }
@@ -320,7 +322,7 @@ class DataStore : Equatable {
      @brief 删除对应的数据
      @param key 对应的key
      */
-    func removeData(forKey key:String) {
+    public func removeData(forKey key:String) {
         if key.isEmpty {
             return
         }
@@ -358,7 +360,7 @@ class DataStore : Equatable {
     /**
      @brief 整理磁盘，主要清除过期文件， 非线程安全
      */
-    func tidyDisk() {
+    public func tidyDisk() {
         
         //扫描目录
         let manager = FileManager()
@@ -386,7 +388,7 @@ class DataStore : Equatable {
     /**
      @brief 清理磁盘【不可逆】, 非线程安全
      */
-    func clearDisk() {
+    public func clearDisk() {
         
         //目录删除
         let manager = FileManager()
@@ -398,7 +400,7 @@ class DataStore : Equatable {
     
     
     // #pragma mark 文件存储实现
-    func getNowTime() -> Int64 {
+    private func getNowTime() -> Int64 {
         return Int64(Date().timeIntervalSince1970 * 1000)
     }
     

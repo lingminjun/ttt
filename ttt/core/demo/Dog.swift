@@ -8,9 +8,11 @@
 
 import Foundation
 import RealmSwift
+import HandyJSON
+
 
 ///http://www.ganji.com/dog/
-public final class Dog : RealmSwift.Object,MMJsonable,Codable,FlyModel {
+public final class Dog : RealmSwift.Object,MMJsonable,Codable,FlyModel,HandyJSON {
     public var data_unique_id: String {
         get { return breed }
     }

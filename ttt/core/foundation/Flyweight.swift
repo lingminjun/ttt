@@ -12,7 +12,9 @@ import Foundation
  * Data model protocol
  */
 public protocol FlyModel:Codable {
+    //业务主键 对应 primary column
     var data_unique_id:String {get}
+    //操作数
     var data_sync_flag:Int64 {get set}
 }
 
@@ -42,6 +44,7 @@ public protocol FlyRemoteAccessor {
 }
 
 
+/// 以数据为中心的同步机制，类似于DataLive，将同步多个模块以及页面之间的数据状态
 public class Flyweight<Value: FlyModel> : FlyNotice {
 
     init(capacity: Int, psstn: FlyPersistence? = nil, remote: FlyRemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
@@ -52,14 +55,6 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
             self.psstn = psstn
             monitorPersistent()
         }
-    }
-    
-    init(capacity: Int, storeScope: String, storeDomain: String = "", remote: FlyRemoteAccessor? = nil, flag:Int64 = Int64(Date().timeIntervalSince1970 * 1000)) {
-        self._cache = LRUCache<String, Value>(maxCapacity: capacity)
-        self.remote = remote
-        self.flag = flag
-        self.storeDomain = storeDomain
-        self.storeScope = storeScope
     }
     
     public var count: Int {
@@ -138,18 +133,7 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
      */
     public func restore() {
         _cache.removeAll()
-        _store = nil
     }
-    
-    /**
-     清除所有内存对象
-    */
-    public func switchStoreDomain(_ domain: String) {
-        self.storeDomain = domain
-        self._store = nil
-        self._cache.removeAll()
-    }
-    
     
     // MARK: - private
     private func dataClone(model:Value) -> Value {
@@ -186,8 +170,6 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
             if let model = obj {
                 obj = dataClone(model: model)
             }
-        } else if (obj == nil && store != nil) {
-            obj = store?.model(forKey: dataId, type: Value.self)
         }
         
         //本地获取数据后，仍然可能需要从远程获取数据
@@ -238,8 +220,6 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
         
         if persistent && psstn != nil {
             psstn?.persistent_saveData(dataId: dataId,model: model)
-        } else if persistent && store != nil {
-            store?.store(model: model, forKey: dataId)
         }
         
         notice(dataId,model:model,notices:notices)
@@ -250,8 +230,6 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
         
         if psstn != nil {
             psstn?.persistent_removeData(dataId: dataId)
-        } else if store != nil {
-            store?.removeModel(forKey: dataId)
         }
         
         notice(dataId,model:obj,isDeleted:true,notices:notices);
@@ -420,26 +398,7 @@ public class Flyweight<Value: FlyModel> : FlyNotice {
     }
     
     
-    private var storeDomain = ""
-    private var storeScope = ""
-    private var store:DataStore? {
-        get {
-            
-            if _store != nil {
-                return _store
-            }
-            if !storeDomain.isEmpty && !storeScope.isEmpty {
-                _store = DataStore.documentsStore(withScope: storeDomain+"/"+storeScope)
-            } else if !storeScope.isEmpty {
-                _store = DataStore.documentsStore(withScope: "flyweight/"+storeScope)
-            }
-            
-            return _store
-        }
-    }
     
-    
-    private var _store:DataStore?
     private var _cache:LRUCache<String,Value>!
     
     private var psstn: FlyPersistence?
