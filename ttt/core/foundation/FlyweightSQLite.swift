@@ -61,7 +61,7 @@ public class FlyweightSQLite<T:SQLFlyModel>: FlyPersistence {
     }
     
     public func persistent_saveData(dataId: String, model: FlyModel) {
-        if let data = model as? HandyJSON {
+        if let data = model as? SQLFlyModel {
             _table.upinsert(object: data)
             //记录下rowid与data关系
             if let obj = _table.object(T.self, conditions: [self._column:dataId]) {

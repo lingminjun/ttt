@@ -60,27 +60,30 @@ public struct SQLTable {
 public struct SQLQuery<T: HandyJSON> {
     
     //构建单页查询
-    public init(table:String, template:String = "", predicate:NSPredicate? = nil, sort:String = "", desc:Bool = false, offset:UInt = 0, limit:UInt = 10000) {
-        self.init(table:table,template:template,predicate:predicate,sorts:(sort.isEmpty ? [] : [NSSortDescriptor(key: sort, ascending: !desc)]),offset:offset,limit:limit)
+    public init(table:String, template:String = "", predicate:NSPredicate? = nil, specified set:(String,[Binding])? = nil, sort:String = "", desc:Bool = false, offset:UInt = 0, limit:UInt = 10000) {
+        self.init(table:table,template:template,specified:set,predicate:predicate,sorts:(sort.isEmpty ? [] : [NSSortDescriptor(key: sort, ascending: !desc)]),offset:offset,limit:limit)
     }
     
     //构建单页查询
-    public init(table:String, template:String = "", predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
-        self.init(table: table, columns: [], template:template, predicate: predicate, sorts: sorts, offset: offset, limit: limit)
-    }
-    
-    //构建单页查询
-    public init(table:String, columns:[String] ,template:String = "", predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
-        self.init(tables: [SQLTable(name: table,columns: columns, template:template)], predicate: predicate, sorts: sorts, offset: offset, limit: limit)
+    public init(table:String, columns:[String] = [],template:String = "", specified set:(String,[Binding])? = nil, predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
+        self.init(tables: [SQLTable(name: table,columns: columns, template:template)], specified:set, predicate: predicate, sorts: sorts, offset: offset, limit: limit)
     }
     
     //构建多表查询，表与表之间采用join on字段关联，若
     public init(tables:[SQLTable], predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
+        self.init(tables: tables, predicate: predicate, sorts: sorts, offset: offset, limit: limit)
+    }
+    
+    private init(tables:[SQLTable], specified set:(String,[Binding])? = nil, predicate:NSPredicate? = nil, sorts:[NSSortDescriptor] = [], offset:UInt = 0, limit:UInt = 10000) {
         self._tables = tables
         self.predicate = predicate
         self.sorts = sorts
         self.offset = offset
         self.limit = limit
+        if let set = set {
+            self.limitColumn = set.0
+            self.limitSet = set.1
+        }
     }
     
     //构建sql模式
@@ -145,6 +148,11 @@ public struct SQLQuery<T: HandyJSON> {
         return str
     }
     
+    public var limitColumn:String = ""
+    public var limitSet:[Binding]? = nil
+    public var isSpecifiedSet:Bool {
+        return !limitColumn.isEmpty && limitSet != nil
+    }
     private var _sql:String = ""      //单独写sql的情况
     private var _tables:[SQLTable] = []
     public var tables:[SQLTable] { //关联的表
@@ -301,7 +309,7 @@ public struct SQLQuery<T: HandyJSON> {
             }
         }
         
-        if joins.isEmpty && predicate == nil {
+        if joins.isEmpty && predicate == nil && !self.isSpecifiedSet {
             return ""
         }
         
@@ -323,9 +331,31 @@ public struct SQLQuery<T: HandyJSON> {
             }
         }
         
+        // 指定集合
+        var hasSet = false
+        if let limitSet = self.limitSet, !limitColumn.isEmpty {
+            var values = ""
+            for bind in limitSet {
+                if !values.isEmpty {
+                    values = values + ","
+                }
+                if let str = bind as? String {
+                    values = values + "'\(str)'"
+                } else {
+                    values = values + "\(bind)"
+                }
+            }
+            hasSet = true
+            if joins.count > 0 {
+                sql = sql + " AND ( tbl0.\(limitColumn) in ( \(values) ) )"
+            } else {
+                sql = sql + " ( tbl0.\(limitColumn) in ( \(values) ) )"
+            }
+        }
+        
         // 其他条件
         if let predicate = predicate {
-            if joins.count > 0 {
+            if joins.count > 0 || hasSet {
                 sql = sql + " AND ( \(predicate.predicateFormat) )"
             } else {
                 sql = sql + " ( \(predicate.predicateFormat) )"
@@ -592,25 +622,97 @@ public class MMFetchSQLite<T: SQLiteModel> : MMFetch<T> {
             }, animated:animated)
         }
     }
-    /// Insert `newObjects` at index `i`. Derived class implements.
+    /// 指定结果集可插入新的数据，注意：SQLite Fetch并不委托操作数据表
     public override func insert<C: Sequence>(_ newObjects: C, atIndex i: Int, animated:Bool? = nil) where C.Iterator.Element == T {
-        print("请直接操作DBTable, FetchSQLite暂不支持委托操作")
+        if _query.isSpecifiedSet {
+            let values = filterSpecifiedSet(newObjects)
+            
+            if !values.isEmpty {
+                var idx = i
+                //compatibility out boundary
+                if let set = self._query.limitSet, i < 0 || i > set.count {
+                    idx = set.count
+                }
+                self._query.limitSet?.insert(contentsOf: values, at: idx)
+                
+                let objs = self._db.prepare(type: T.self, sql: self._query.sql, args: [])
+                handleResetNotice(objs: objs, uprowids: [])
+            }
+        } else {
+            print("请直接操作DBTable, FetchSQLite暂不支持委托操作")
+        }
     }
     
-    /// reset `newObjects`. Derived class implements.
+    /// 指定结果集可重置数据， 注意：SQLite Fetch并不委托操作数据表
     public override func reset<C>(_ newObjects: C, animated:Bool? = nil) where T == C.Element, C : Sequence {
-        print("请直接操作DBTable, FetchSQLite暂不支持委托操作")
+        if _query.isSpecifiedSet {
+            let values = filterSpecifiedSet(newObjects)
+            self._query.limitSet? = values
+            
+            let objs = self._db.prepare(type: T.self, sql: self._query.sql, args: [])
+            //重置数据，需要通知列表所有数据将更新
+            var uprowids:[SQLiteItem] = []
+            for obj in objs {
+                let item = SQLiteItem()
+                item.ssn_rowid = obj.ssn_rowid
+                uprowids.append(item)
+            }
+            handleResetNotice(objs: objs, uprowids: uprowids)
+        } else {
+            print("请直接操作DBTable, FetchSQLite暂不支持委托操作")
+        }
     }
     
-    /// Remove and return the element at index `i`. Derived class implements.
+    /// 指定结果集可删除数据，注意：SQLite Fetch并不委托操作数据表
     public override func delete(_ index: Int, length: Int, animated:Bool? = nil) {
-        print("请直接操作DBTable, FetchSQLite暂不支持委托操作")
+        if _query.isSpecifiedSet {
+            var range = Range<Int>(uncheckedBounds: (0, 0))
+            //compatibility out boundary
+            if let set = self._query.limitSet {
+                if index >= set.count {//不合法的数据
+                    return
+                }
+                
+                let end = (index + length >= set.count) ? set.count : (index + length)
+                range = Range<Int>(uncheckedBounds: (index, end))
+            }
+            
+            if range.count > 0 {
+                self._query.limitSet?.removeSubrange(range)
+                let objs = self._db.prepare(type: T.self, sql: self._query.sql, args: [])
+                handleResetNotice(objs: objs, uprowids: [])
+            }
+        } else {
+            print("请直接操作DBTable, FetchSQLite暂不支持委托操作")
+        }
     }
     
     
-    /// Remove all elements. Derived class implements.
+    /// 指定结果集可清除数据，注意：SQLite Fetch并不委托操作数据表
     public override func clear(animated:Bool? = nil) {
-        print("请直接操作DBTable, FetchSQLite暂不支持委托操作")
+        if _query.isSpecifiedSet {
+            guard let set = self._query.limitSet else {
+                return
+            }
+            if set.isEmpty {
+                return
+            }
+            self._query.limitSet?.removeAll()
+            let objs = self._db.prepare(type: T.self, sql: self._query.sql, args: [])
+            handleResetNotice(objs: objs, uprowids: [])
+        } else {
+            print("请直接操作DBTable, FetchSQLite暂不支持委托操作")
+        }
+    }
+    
+    private func filterSpecifiedSet<C>(_ newObjects: C) -> [Binding] where T == C.Element, C : Sequence {
+        var values:[Binding] = []
+        for obj in newObjects {
+            if let value = Injects.get(property: self._query.limitColumn, of: obj) as? Binding {
+                values.append(value)
+            }
+        }
+        return values
     }
     
     /// Get element at index. Derived class implements.

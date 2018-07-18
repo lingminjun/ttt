@@ -67,7 +67,7 @@ class PersonCell: UITableViewCell {
     override func ssn_onDisplay(_ tableView: UIScrollView, model: AnyObject, atIndexPath indexPath: IndexPath, reused: Bool) {
         if let person = model as? Person {
             self.textLabel?.text = "\(person.name) age:\(person.age) birth:\(person.birth)"
-            print("age:\(person.age) birth:\(person.birth)")
+            print("uid:\(person.uid) age:\(person.age) birth:\(person.birth)")
         }
     }
 }
@@ -77,7 +77,9 @@ class ContactViewController: MMUITableController<Person> {
     var sbtable:DBTable!
     
     override func loadFetchs() -> [MMFetch<Person>] {
-        let query = SQLQuery<Person>(table: "person", sort:"name")
+        let query = SQLQuery<Person>(table: "person", specified:("uid",[
+            60,61,62,63,64,65,66,67,68,69,
+            70,71,72,73,74,75,76,77,78,79]), sort:"name")
         let db = DB.db(with: "default")
         let f = MMFetchSQLite(query: query, db: db)
         return [f]

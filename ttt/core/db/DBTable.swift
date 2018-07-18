@@ -258,14 +258,30 @@ public final class DBTable : Equatable {
     
 
     //接管db操作
-    public func insert(object:HandyJSON) {
-        insert(objects: [object])
+    public func insert<T>(object:T) where T : HandyJSON {
+        handleInsert(objects: [object])
     }
     
-    public func insert(objects:[HandyJSON]) {
+    public func insert<S: Sequence>(objects:S) where S.Iterator.Element : HandyJSON {
+        handleInsert(objects: objects)
+    }
+    
+    /// 兼容协议调用接口
+    public func insert(object:HandyJSON) {
+        handleInsert(objects: [object])
+    }
+    
+    /// 兼容协议调用接口
+    public func insert<S: Sequence>(objects:S) where S.Iterator.Element == HandyJSON {
+        handleInsert(objects: objects)
+    }
+    
+    private func handleInsert<S: Sequence>(objects:S) where S.Iterator.Element : Any {
         self.db.transaction { (db) in
             //遍历对象
-            for obj in objects {
+            for entity in objects {
+                guard let obj = entity as? HandyJSON else { continue }
+                
                 let kv = DBTable.validFieldValue(obj: obj, column: self._columnDict)
                 if kv.count == 0 {
                     continue
@@ -289,14 +305,30 @@ public final class DBTable : Equatable {
         }
     }
 
-    public func update(object:HandyJSON) {
-        update(objects: [object])
+    public func update<T>(object:T) where T : HandyJSON {
+        handleUpdate(objects: [object])
     }
     
-    public func update(objects:[HandyJSON]) {
+    public func update<S: Sequence>(objects:S) where S.Iterator.Element : HandyJSON {
+        handleUpdate(objects: objects)
+    }
+    
+    /// 兼容协议调用接口
+    public func update(object:HandyJSON) {
+        handleUpdate(objects: [object])
+    }
+    
+    /// 兼容协议调用接口
+    public func update<S: Sequence>(objects:S) where S.Iterator.Element == HandyJSON {
+        handleUpdate(objects: objects)
+    }
+    
+    private func handleUpdate<S: Sequence>(objects:S) where S.Iterator.Element : Any {
         self.db.transaction { (db) in
             //遍历对象
-            for obj in objects {
+            for entity in objects {
+                guard let obj = entity as? HandyJSON else { continue }
+                
                 let kv = DBTable.validFieldValue(obj: obj, column: self._columnDict)
                 if kv.count == 0 {
                     continue
@@ -332,14 +364,30 @@ public final class DBTable : Equatable {
         }
     }
     
-    public func delete(object:HandyJSON) {
-        delete(objects: [object])
+    public func delete<T>(object:T) where T : HandyJSON {
+        handleDelete(objects: [object])
     }
     
-    public func delete(objects:[HandyJSON]) {
+    public func delete<S: Sequence>(objects:S) where S.Iterator.Element : HandyJSON {
+        handleDelete(objects: objects)
+    }
+    
+    /// 兼容协议调用接口
+    public func delete(object:HandyJSON) {
+        handleDelete(objects: [object])
+    }
+    
+    /// 兼容协议调用接口
+    public func delete<S: Sequence>(objects:S) where S.Iterator.Element == HandyJSON {
+        handleDelete(objects: objects)
+    }
+    
+    private func handleDelete<S: Sequence>(objects:S) where S.Iterator.Element : Any {
         self.db.transaction { (db) in
             //遍历对象
-            for obj in objects {
+            for entity in objects {
+                guard let obj = entity as? HandyJSON else { continue }
+                
                 let kv = DBTable.validFieldValue(obj: obj, column: self._columnDict)
                 if kv.count == 0 {
                     continue
@@ -364,14 +412,31 @@ public final class DBTable : Equatable {
         db.prepare(sql: "DELETE FROM \(self.name) WHERE \(column) = ?", args: [value])
     }
     
-    public func upinsert(object:HandyJSON) {
-        upinsert(objects: [object])
+    public func upinsert<T>(object:T) where T : HandyJSON {
+        handleUpinsert(objects: [object])
     }
     
-    public func upinsert(objects:[HandyJSON]) {
+    public func upinsert<S: Sequence>(objects:S) where S.Iterator.Element : HandyJSON {
+        handleUpinsert(objects: objects)
+    }
+    
+    /// 兼容协议调用接口
+    public func upinsert(object:HandyJSON) {
+        handleUpinsert(objects: [object])
+    }
+    
+    /// 兼容协议调用接口
+    public func upinsert<S: Sequence>(objects:S) where S.Iterator.Element == HandyJSON {
+        handleUpinsert(objects: objects)
+    }
+    
+    // 由于swift泛型无法解释类型和类型派生
+    private func handleUpinsert<S: Sequence>(objects:S) where S.Iterator.Element : Any {
         self.db.transaction { (db) in
             //遍历对象
-            for obj in objects {
+            for entity in objects {
+                guard let obj = entity as? HandyJSON else { continue }
+                
                 let kv = DBTable.validFieldValue(obj: obj, column: self._columnDict)
                 if kv.count == 0 {
                     continue
