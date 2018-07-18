@@ -622,6 +622,7 @@ public final class DBColumn {
         || display == "SMALLINT"
         || display == "MEDIUMINT"
         || display == "BIGINT"
+        || display == "INT64"
         || display == "UNSIGNED BIG INT"
         || display == "INT2"
         || display == "INT8"
