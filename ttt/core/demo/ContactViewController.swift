@@ -77,9 +77,7 @@ class ContactViewController: MMUITableController<Person> {
     var sbtable:DBTable!
     
     override func loadFetchs() -> [MMFetch<Person>] {
-        let query = SQLQuery<Person>(table: "person", specified:("uid",[
-            60,61,62,63,64,65,66,67,68,69,
-            70,71,72,73,74,75,76,77,78,79]), sort:"name")
+        let query = SQLQuery<Person>(table: "person", sort:"name")
         let db = DB.db(with: "default")
         let f = MMFetchSQLite(query: query, db: db)
         return [f]
@@ -112,7 +110,7 @@ class ContactViewController: MMUITableController<Person> {
         ps.name = "测试\(arc4random())"
         ps.age = Int(arc4random()%30)
         ps.sex = Int(arc4random()%2)
-        sbtable.insert(object: ps)
+        sbtable.upinsert(object: ps)
     }
     
 }

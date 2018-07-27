@@ -299,6 +299,11 @@ public final class Urls {
     }
     
     /// get url query dictionary
+    public static func query(url: URL, decord: Bool = true) -> QBundle {
+        guard let q = url.query else {return QBundle()}
+        return query(query:q, decord:decord)
+    }
+    
     public static func query(url: String, decord: Bool = true) -> QBundle {
         let surl = encoding(url: url)
         guard let u = URL(string:surl) else {return QBundle()}

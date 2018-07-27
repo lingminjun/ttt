@@ -19,6 +19,7 @@
 		5342EA8D20143B7D00A806B3 /* RPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5342EA8C20143B7D00A806B3 /* RPC.swift */; };
 		5355BF81209ABA9C00C7CAC0 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */; };
 		5355BF83209ABFC300C7CAC0 /* DogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5355BF82209ABFC300C7CAC0 /* DogManager.swift */; };
+		5360052D21006997000826A1 /* HTTPAccesser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5360052C21006997000826A1 /* HTTPAccesser.swift */; };
 		5374F940209C42E60036225E /* DataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5374F93F209C42E60036225E /* DataStore.swift */; };
 		5374F942209C54530036225E /* StringExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5374F941209C54530036225E /* StringExt.swift */; };
 		53822F2820440CD5009CDE66 /* WFHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53822F2220440CD5009CDE66 /* WFHeaderView.m */; };
@@ -99,6 +100,7 @@
 		5342EA8C20143B7D00A806B3 /* RPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPC.swift; sourceTree = "<group>"; };
 		5355BF80209ABA9C00C7CAC0 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		5355BF82209ABFC300C7CAC0 /* DogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DogManager.swift; sourceTree = "<group>"; };
+		5360052C21006997000826A1 /* HTTPAccesser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPAccesser.swift; sourceTree = "<group>"; };
 		5374F93F209C42E60036225E /* DataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStore.swift; sourceTree = "<group>"; };
 		5374F941209C54530036225E /* StringExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExt.swift; sourceTree = "<group>"; };
 		53822F2220440CD5009CDE66 /* WFHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFHeaderView.m; sourceTree = "<group>"; };
@@ -321,6 +323,7 @@
 				532F4C9620B29DAA00B1DBCB /* DemoCollectionController.swift */,
 				53C6841F20D4B4020099B2F1 /* GifViewController.swift */,
 				5325EAF520F3508A006C2209 /* ContactViewController.swift */,
+				5360052C21006997000826A1 /* HTTPAccesser.swift */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -592,6 +595,7 @@
 				5355BF83209ABFC300C7CAC0 /* DogManager.swift in Sources */,
 				53C6841E20D48B5C0099B2F1 /* GifImageInfo.m in Sources */,
 				D9CCAD1A200CBB7900C03276 /* Injects.swift in Sources */,
+				5360052D21006997000826A1 /* HTTPAccesser.swift in Sources */,
 				D94140672016D6420050132B /* RigidCache.swift in Sources */,
 				53822F3D2047EAC2009CDE66 /* SettingV1Cell.swift in Sources */,
 				53C6842020D4B4020099B2F1 /* GifViewController.swift in Sources */,

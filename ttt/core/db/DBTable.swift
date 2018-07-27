@@ -466,7 +466,7 @@ public final class DBTable : Equatable {
                         inkeystr = inkeystr + ","
                         invalstr = invalstr + ","
                     }
-                    inkeystr = inkeystr + "\(key) = ?"
+                    inkeystr = inkeystr + "\(key)"
                     invalstr = invalstr + "?"
                     invalary.append(value)
                 }
