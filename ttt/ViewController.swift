@@ -21,9 +21,15 @@ extension Dog {
 }
 
 class BasicTypes: HandyJSON {
-    var testa: Int = 0
-    var testb: String = ""
-    var testc: Bool = false
+    private var testa: Int? = 0
+    private var testb: String? = ""
+    private var testc: Bool? = false
+    
+    //计算属性
+    public var Testa: Int { return testa ?? 0 }
+    public var Testb: String { return testb ?? "" }
+    public var Testc: Bool { return testc ?? false }
+    
     required init() {}
 }
 
@@ -55,12 +61,12 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
         
         let jsonString = "{\"testa\":\"1\",\"testb\":\"hello\",\"testc\":\"true\"}"
         if let object = BasicTypes.deserialize(from: jsonString) {
-            print("json \(object.testa) \(object.testb) \(object.testc)")
+            print("json \(object.Testa) \(object.Testb) \(object.Testc)")
         }
 
         let jsonString1 = "{\"testa\":\"34\",\"testb\":123444,\"testc\":1}"
         if let object2 = BasicTypes.deserialize(from: jsonString1) {
-            print("json \(object2.testa) \(object2.testb) \(object2.testc)")
+            print("json \(object2.Testa) \(object2.Testb) \(object2.Testc)")
         }
         
         
