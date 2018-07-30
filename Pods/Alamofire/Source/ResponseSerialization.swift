@@ -113,7 +113,7 @@ extension DataRequest {
     @discardableResult
     public func response(queue: DispatchQueue? = nil, completionHandler: @escaping (DefaultDataResponse) -> Void) -> Self {
         delegate.queue.addOperation {
-            (queue ?? DispatchQueue.main).async {
+            let block:() -> Swift.Void = {
                 var dataResponse = DefaultDataResponse(
                     request: self.request,
                     response: self.response,
@@ -125,6 +125,13 @@ extension DataRequest {
                 dataResponse.add(self.delegate.metrics)
 
                 completionHandler(dataResponse)
+            }
+            
+            //改变queue的使用控制流程
+            if let queue = queue {
+                queue.async(execute: block)
+            } else {
+                block()
             }
         }
 
@@ -163,8 +170,14 @@ extension DataRequest {
             )
 
             dataResponse.add(self.delegate.metrics)
-
-            (queue ?? DispatchQueue.main).async { completionHandler(dataResponse) }
+            
+            //改变queue的使用控制流程
+            let block:() -> Swift.Void = { completionHandler(dataResponse) }
+            if let queue = queue {
+                queue.async(execute: block)
+            } else {
+                block()
+            }
         }
 
         return self
@@ -185,7 +198,7 @@ extension DownloadRequest {
         -> Self
     {
         delegate.queue.addOperation {
-            (queue ?? DispatchQueue.main).async {
+            let block:() -> Swift.Void = {
                 var downloadResponse = DefaultDownloadResponse(
                     request: self.request,
                     response: self.response,
@@ -199,6 +212,13 @@ extension DownloadRequest {
                 downloadResponse.add(self.delegate.metrics)
 
                 completionHandler(downloadResponse)
+            }
+            
+            //改变queue的使用控制流程
+            if let queue = queue {
+                queue.async(execute: block)
+            } else {
+                block()
             }
         }
 
@@ -240,7 +260,13 @@ extension DownloadRequest {
 
             downloadResponse.add(self.delegate.metrics)
 
-            (queue ?? DispatchQueue.main).async { completionHandler(downloadResponse) }
+            //改变queue的使用控制流程
+            let block:() -> Swift.Void = { completionHandler(downloadResponse) }
+            if let queue = queue {
+                queue.async(execute: block)
+            } else {
+                block()
+            }
         }
 
         return self
@@ -287,7 +313,7 @@ extension DataRequest {
     /// - returns: The request.
     @discardableResult
     public func responseData(
-        queue: DispatchQueue? = nil,
+        queue: DispatchQueue? = DispatchQueue.main /*采用默认值方式*/,
         completionHandler: @escaping (DataResponse<Data>) -> Void)
         -> Self
     {
@@ -327,7 +353,7 @@ extension DownloadRequest {
     /// - returns: The request.
     @discardableResult
     public func responseData(
-        queue: DispatchQueue? = nil,
+        queue: DispatchQueue? = DispatchQueue.main /*采用默认值方式*/,
         completionHandler: @escaping (DownloadResponse<Data>) -> Void)
         -> Self
     {
@@ -408,7 +434,7 @@ extension DataRequest {
     /// - returns: The request.
     @discardableResult
     public func responseString(
-        queue: DispatchQueue? = nil,
+        queue: DispatchQueue? = DispatchQueue.main /*采用默认值方式*/,
         encoding: String.Encoding? = nil,
         completionHandler: @escaping (DataResponse<String>) -> Void)
         -> Self
@@ -456,7 +482,7 @@ extension DownloadRequest {
     /// - returns: The request.
     @discardableResult
     public func responseString(
-        queue: DispatchQueue? = nil,
+        queue: DispatchQueue? = DispatchQueue.main /*采用默认值方式*/,
         encoding: String.Encoding? = nil,
         completionHandler: @escaping (DownloadResponse<String>) -> Void)
         -> Self
@@ -529,7 +555,7 @@ extension DataRequest {
     /// - returns: The request.
     @discardableResult
     public func responseJSON(
-        queue: DispatchQueue? = nil,
+        queue: DispatchQueue? = DispatchQueue.main /*采用默认值方式*/,
         options: JSONSerialization.ReadingOptions = .allowFragments,
         completionHandler: @escaping (DataResponse<Any>) -> Void)
         -> Self
@@ -577,7 +603,7 @@ extension DownloadRequest {
     /// - returns: The request.
     @discardableResult
     public func responseJSON(
-        queue: DispatchQueue? = nil,
+        queue: DispatchQueue? = DispatchQueue.main /*采用默认值方式*/,
         options: JSONSerialization.ReadingOptions = .allowFragments,
         completionHandler: @escaping (DownloadResponse<Any>) -> Void)
         -> Self
@@ -650,7 +676,7 @@ extension DataRequest {
     /// - returns: The request.
     @discardableResult
     public func responsePropertyList(
-        queue: DispatchQueue? = nil,
+        queue: DispatchQueue? = DispatchQueue.main /*采用默认值方式*/,
         options: PropertyListSerialization.ReadOptions = [],
         completionHandler: @escaping (DataResponse<Any>) -> Void)
         -> Self
@@ -698,7 +724,7 @@ extension DownloadRequest {
     /// - returns: The request.
     @discardableResult
     public func responsePropertyList(
-        queue: DispatchQueue? = nil,
+        queue: DispatchQueue? = DispatchQueue.main /*采用默认值方式*/,
         options: PropertyListSerialization.ReadOptions = [],
         completionHandler: @escaping (DownloadResponse<Any>) -> Void)
         -> Self

@@ -11,7 +11,7 @@ target 'ttt' do
 
   # 网络
   pod 'HandyJSON',                '~> 4.1.1'
-  pod 'Alamofire',                '~> 4.7.2'
+  pod 'Alamofire',                :git => 'https://github.com/lingminjun/Alamofire.git' #'~> 4.7.2'
   
 # 图片下载
   pod 'Kingfisher',               :git => 'https://github.com/lingminjun/Kingfisher.git' # '4.8.0'
