@@ -24,7 +24,7 @@ public final class HTTPAccesser {
         )
     }()
     
-    //同步请求
+    //同步请求，当前线程
     public static func doRequest<T>(_ method: Alamofire.HTTPMethod, url: URLConvertible, parameters: Parameters? = nil) -> GeneralResponse<T> where T: HandyJSON {
         let semaphore = DispatchSemaphore(value: 0)
         let timeout = DispatchTime.init(uptimeNanoseconds: 60 * 1000 * 1000 * 1000 )
@@ -176,8 +176,8 @@ public class GeneralResponse<T:HandyJSON>: HandyJSON {
     fileprivate var Details: String? = nil
     
     //结果集处理
-    fileprivate var Result:T? = nil
-    fileprivate var Results:[T]? = nil
+    fileprivate var Result:T? = nil    //返回单个数据情况
+    fileprivate var Results:[T]? = nil //返回数组的情况
     
     public var appCode:String {
         if let AppCode = AppCode {
