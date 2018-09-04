@@ -765,7 +765,7 @@ public final class Navigator: NSObject {
         }
     }
     
-    fileprivate func dealAuthPending(vc:UIViewController) {
+    fileprivate func dealAuthPending(vc:UIViewController, animated:Bool = false) {
         if (!_pendingUrl.isEmpty) {
             guard let auth = _auth else {
                 _pendingUrl = ""
@@ -774,9 +774,14 @@ public final class Navigator: NSObject {
             if auth.authorized() {
                 let url = _pendingUrl
                 _pendingUrl = ""
-                dopen(url)
+                //延迟打开，防止当前栈是VC切换动画中
+                self.perform(#selector(Navigator.delayOpen(_:)), with: url, afterDelay: animated ? 0.175 : 0.1)
             }
         }
+    }
+    
+    @objc private func delayOpen(_ url:String) {
+        dopen(url)
     }
     
     // member var
@@ -948,7 +953,7 @@ extension UIViewController {
         Navigator.shared.checkAuthPending(vc: self)
     }
     @objc func router_viewDidDisappear(_ animated: Bool) {
-        Navigator.shared.dealAuthPending(vc: self)
+        Navigator.shared.dealAuthPending(vc: self, animated: animated)
         self.router_viewDidDisappear(animated)
     }
 }
