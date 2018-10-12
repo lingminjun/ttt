@@ -498,12 +498,19 @@ public final class DBTable : Equatable {
         return objs.first
     }
     
-    public func objects<T: HandyJSON>(_ type:T.Type, predicate:NSPredicate) -> [T] {
+    public func objects<T: HandyJSON>(_ type:T.Type, predicate:NSPredicate, sort:NSSortDescriptor? = nil, limit:Int = 1) -> [T] {
         //无法使用format
-        return self.db.prepare(type: type, sql: "SELECT rowid AS ssn_rowid, * FROM \(self.name) WHERE \(predicate.predicateFormat)", args: [])
+        var sql = "SELECT rowid AS ssn_rowid, * FROM \(self.name) WHERE \(predicate.predicateFormat)"
+        if let sort = sort, let key = sort.key {
+            sql = sql + " ORDER BY \(key) \( (sort.ascending ? "ASC" : "DESC") )"
+        }
+        if limit > 0 {
+            sql = sql + " LIMIT \(limit)"
+        }
+        return self.db.prepare(type: type, sql: sql, args: [])
     }
     
-    public func objects<T: HandyJSON>(_ type:T.Type, conditions:[String:Binding?]) -> [T] {
+    public func objects<T: HandyJSON>(_ type:T.Type, conditions:[String:Binding?], sort:NSSortDescriptor? = nil, limit:Int = 1) -> [T] {
         var wherestr = ""
         var upvalary:[Binding?] = []
         for (key,value) in conditions {
@@ -514,10 +521,18 @@ public final class DBTable : Equatable {
             upvalary.append(value)
         }
         
+        var orderstr = ""
+        if let sort = sort, let key = sort.key {
+            orderstr = orderstr + " ORDER BY \(key) \( (sort.ascending ? "ASC" : "DESC") )"
+        }
+        if limit > 0 {
+            orderstr = orderstr + " LIMIT \(limit)"
+        }
+        
         if wherestr.isEmpty {
-            return self.db.prepare(type: type, sql: "SELECT rowid AS ssn_rowid, * FROM \(self.name)", args:[])
+            return self.db.prepare(type: type, sql: "SELECT rowid AS ssn_rowid, * FROM \(self.name) \(orderstr)", args:[])
         } else {
-            return self.db.prepare(type: type, sql: "SELECT rowid AS ssn_rowid, * FROM \(self.name) WHERE \(wherestr)", args: upvalary)
+            return self.db.prepare(type: type, sql: "SELECT rowid AS ssn_rowid, * FROM \(self.name) WHERE \(wherestr) \(orderstr)", args: upvalary)
         }
     }
 
