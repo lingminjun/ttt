@@ -163,7 +163,7 @@ class MMCollectionViewLayout: UICollectionViewLayout {
         
         
         let sectionCount = view.numberOfSections
-        
+        var magic_offset_x:CGFloat = 0
         for section in 0..<sectionCount {
             
             let cellCount = view.numberOfItems(inSection: section);
@@ -234,35 +234,38 @@ class MMCollectionViewLayout: UICollectionViewLayout {
                     }
                 }
                 
+                //支持 magic edge (魔法边距)
+                var ncellWidth = cellWidth
+                var ndiffWidth = diffWidth
+                if let ds = ds, !isFloating && _config.supportMagicHorizontalEdge && _config.scrollDirection == .vertical && respondMagicEdgeForCell {
+                    let magic = ds.collectionView!(view, magicHorizontalEdgeForCellAt: indexPath)
+                    if suitableSetion == 0 {//重置
+                        magic_offset_x = magic > 0 ? magic : 0
+                    }
+                    
+                    if magic_offset_x > 0 {
+                        ncellWidth = CGFloat(roundf(Float((viewWidth - viewWidthInsets - (2 * magic_offset_x) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
+                        ndiffWidth = view.bounds.size.width - viewWidthInsets - (2 * magic_offset_x) - _config.columnSpace * CGFloat(columnCount - 1) - ncellWidth * CGFloat(columnCount)
+                    }
+                }
+                
                 //y起始行特别处理
                 if section == 0 && row == 0 && y == 0.0 && !isFloating {
                     y = y + (_config.scrollDirection == .vertical ? _config.insets.top : _config.insets.left)
                 }
                 
                 //x起始位和宽度
-                var x = (_config.scrollDirection == .vertical ? _config.insets.left : _config.insets.top) + (cellWidth + _config.columnSpace) * CGFloat(suitableSetion)
-                var width = cellWidth * CGFloat(spanSize) + _config.columnSpace * CGFloat(spanSize - 1)
+                var x = magic_offset_x + (_config.scrollDirection == .vertical ? _config.insets.left : _config.insets.top) + (ncellWidth + _config.columnSpace) * CGFloat(suitableSetion)
+                var width = ncellWidth * CGFloat(spanSize) + _config.columnSpace * CGFloat(spanSize - 1)
                 //最后的宽度修正
-                if diffWidth != 0 && abs(viewWidth - (x + width)) < abs(diffWidth) + 0.1 {
-                    width = width + diffWidth
+                if ndiffWidth != 0 && abs(viewWidth - (x + width)) < abs(ndiffWidth) + 0.1 {
+                    width = width + ndiffWidth
                 }
                 
                 //对于floating,满行处理
                 if isFloating {
                     x = 0
                     width = floatingWidth
-                } else if let ds = ds, _config.supportMagicHorizontalEdge && _config.scrollDirection == .vertical && respondMagicEdgeForCell {// 魔法边距
-                    let magic = ds.collectionView!(view, magicHorizontalEdgeForCellAt: indexPath)
-                    if magic > 0 {
-                        //左边 TODO : FIXME
-                        if suitableSetion == 0 {
-                            x = x + magic
-                        }
-                        
-                        //重新计算行宽
-                        let ncellWidth = CGFloat(roundf(Float((viewWidth - viewWidthInsets - (2 * magic) - _config.columnSpace * CGFloat(columnCount - 1)) / CGFloat(columnCount))))
-                        width = ncellWidth * CGFloat(spanSize) + _config.columnSpace * CGFloat(spanSize - 1)
-                    }
                 }
                 
                 //最终位置

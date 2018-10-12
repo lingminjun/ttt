@@ -95,7 +95,7 @@ class SCollectionViewController : MMUIController,UICollectionViewDelegate,UIColl
             _config.floating = true
         } else if title == "瀑布流" {
             _config.rowHeight = 0
-            _config.columnCount = 2
+            _config.columnCount = 4
             _config.columnSpace = 10
             _config.supportMagicHorizontalEdge = true
             _config.floating = false
