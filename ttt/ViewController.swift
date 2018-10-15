@@ -33,6 +33,22 @@ class BasicTypes: HandyJSON {
     required init() {}
 }
 
+class LoginAPI: GWClient.APICall {
+    init() {
+        super.init(selector: "demo.webLogin", level: .none)
+    }
+    override func getResultType() -> GWClient.Entity.Type {
+        return GWClient.ESBToken.self
+    }
+    
+    override func getQuery() -> [String : HTTP.Value] {
+        var dic = super.getQuery()
+        dic["name"] = HTTP.Value("中文字试试")
+        dic["pswd"] = HTTP.Value("123456")
+        return dic
+    }
+}
+
 
 class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     
@@ -49,6 +65,9 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     
     public override func onViewDidLoad() {
         super.onViewDidLoad()
+        
+        print("当期是登录环境\(GWClient.Context.shared.isLogin())")
+        
         table.delegate = self
         let sel = #selector(ViewController.rightAction)
         //title: String?, style: UIBarButtonItemStyle, target: Any?, action: Selector?
@@ -108,16 +127,26 @@ class ViewController: MMUITableController<Dog>,UIActionSheetDelegate {
     }
     
     @objc func rightAction() -> Void {
-        let sheet = UIActionSheet(title: "跳转", delegate: self, cancelButtonTitle: "取消", destructiveButtonTitle: "百度")
-        sheet.addButton(withTitle: "通讯录")
-        sheet.addButton(withTitle: "GIF")
-        sheet.addButton(withTitle: "测试")
-        sheet.addButton(withTitle: "测试1")
-        sheet.addButton(withTitle: "瀑布")
-        sheet.addButton(withTitle: "瀑布2")
-        sheet.addButton(withTitle: "一级")
-        sheet.addButton(withTitle: "二级")
-        sheet.show(in: self.view)
+        DispatchQueue.global().async {
+            let call = LoginAPI()
+            GWClient.en(call)
+            print(">>>>>>>>>:\(call.getStatusCode())")
+            if let token:GWClient.ESBToken = call.getResult() {
+                print(">>>>>>>>>:" + token.token)
+                GWClient.Context.shared.setToken(uid: token.uid, token: token.token, stoken: token.stoken, refresh: token.refresh, key: token.key)
+            }
+        }
+        
+//        let sheet = UIActionSheet(title: "跳转", delegate: self, cancelButtonTitle: "取消", destructiveButtonTitle: "百度")
+//        sheet.addButton(withTitle: "通讯录")
+//        sheet.addButton(withTitle: "GIF")
+//        sheet.addButton(withTitle: "测试")
+//        sheet.addButton(withTitle: "测试1")
+//        sheet.addButton(withTitle: "瀑布")
+//        sheet.addButton(withTitle: "瀑布2")
+//        sheet.addButton(withTitle: "一级")
+//        sheet.addButton(withTitle: "二级")
+//        sheet.show(in: self.view)
     }
     
     override func onReceiveMemoryWarning() {

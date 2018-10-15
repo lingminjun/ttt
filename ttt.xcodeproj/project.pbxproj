@@ -49,6 +49,8 @@
 		538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8D200A2D9C006B3A28 /* SettingCell.swift */; };
 		538F9E90200A2DDE006B3A28 /* SettingNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 538F9E8F200A2DDE006B3A28 /* SettingNode.swift */; };
 		53B133A3209F2ED900B2A3FD /* LRUCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B133A2209F2ED900B2A3FD /* LRUCache.swift */; };
+		53B136FA2171CCF80007FC40 /* HTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B136F92171CCF80007FC40 /* HTTP.swift */; };
+		53B136FC217243830007FC40 /* GWClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53B136FB217243830007FC40 /* GWClient.swift */; };
 		53C6841E20D48B5C0099B2F1 /* GifImageInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C6841C20D48B5C0099B2F1 /* GifImageInfo.m */; };
 		53C6842020D4B4020099B2F1 /* GifViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53C6841F20D4B4020099B2F1 /* GifViewController.swift */; };
 		53C6842220D4B83F0099B2F1 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 53C6842120D4B83F0099B2F1 /* ImageIO.framework */; };
@@ -133,6 +135,8 @@
 		538F9E8D200A2D9C006B3A28 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		538F9E8F200A2DDE006B3A28 /* SettingNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNode.swift; sourceTree = "<group>"; };
 		53B133A2209F2ED900B2A3FD /* LRUCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LRUCache.swift; sourceTree = "<group>"; };
+		53B136F92171CCF80007FC40 /* HTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTP.swift; sourceTree = "<group>"; };
+		53B136FB217243830007FC40 /* GWClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GWClient.swift; sourceTree = "<group>"; };
 		53C6841C20D48B5C0099B2F1 /* GifImageInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GifImageInfo.m; sourceTree = "<group>"; };
 		53C6841D20D48B5C0099B2F1 /* GifImageInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GifImageInfo.h; sourceTree = "<group>"; };
 		53C6841F20D4B4020099B2F1 /* GifViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifViewController.swift; sourceTree = "<group>"; };
@@ -247,6 +251,15 @@
 			path = fetch;
 			sourceTree = "<group>";
 		};
+		53B136F82171CCB90007FC40 /* net */ = {
+			isa = PBXGroup;
+			children = (
+				53B136F92171CCF80007FC40 /* HTTP.swift */,
+				53B136FB217243830007FC40 /* GWClient.swift */,
+			);
+			path = net;
+			sourceTree = "<group>";
+		};
 		53C6841B20D48B5C0099B2F1 /* gif */ = {
 			isa = PBXGroup;
 			children = (
@@ -277,6 +290,7 @@
 		D958F781200868FC00E3F0C5 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				53B136F82171CCB90007FC40 /* net */,
 				530802CC20EEFDED0007AE31 /* db */,
 				D9F5CA14206C7CDC00251D3F /* ext */,
 				538350EC2063A7C3005DDA8A /* track */,
@@ -570,6 +584,7 @@
 				53B133A3209F2ED900B2A3FD /* LRUCache.swift in Sources */,
 				5386382B2033DB2C00AE4DE6 /* LoginViewController.swift in Sources */,
 				D958F78F2008694900E3F0C5 /* DemoListController.swift in Sources */,
+				53B136FC217243830007FC40 /* GWClient.swift in Sources */,
 				538F9E8E200A2D9C006B3A28 /* SettingCell.swift in Sources */,
 				D958F78C2008694200E3F0C5 /* MMUIController.swift in Sources */,
 				D941405C20107C610050132B /* MMTry.m in Sources */,
@@ -612,6 +627,7 @@
 				5325EAF220F2F7C0006C2209 /* MMFetchSQLite.swift in Sources */,
 				5325EAF620F3508A006C2209 /* ContactViewController.swift in Sources */,
 				538350F02063AC20005DDA8A /* HomePageViewController.swift in Sources */,
+				53B136FA2171CCF80007FC40 /* HTTP.swift in Sources */,
 				53822F3B2047E766009CDE66 /* CltProfileViewController.swift in Sources */,
 				D958F78D2008694200E3F0C5 /* MMFetchsController.swift in Sources */,
 				53822F2A20440CD5009CDE66 /* CollectViewController.m in Sources */,
